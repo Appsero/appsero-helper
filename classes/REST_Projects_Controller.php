@@ -43,7 +43,7 @@ class REST_Projects_Controller extends WP_REST_Controller {
      * @return WP_Error|bool True if the request has read access, WP_Error object otherwise.
      */
     public function get_items_permissions_check( $request ) {
-        return true;
+        return true; // Set true for now
     }
 
 
