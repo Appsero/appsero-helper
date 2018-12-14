@@ -8,7 +8,7 @@ Tested up to: 5.0
 Stable Tag: 1.0.0
 License: GNU Version 2 or Any Later Version
 
-Helper plugin to connect WP marketplace to AppSero
+Helper plugin to connect WP marketplace with AppSero
 
 == Description ==
 
