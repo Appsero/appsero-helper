@@ -122,9 +122,10 @@ class REST_Projects_Controller extends WP_REST_Controller {
         ];
 
         foreach ( $query_result as $post ) {
-            $has_variation = isset( $meta['variation'][ $post->ID ] ) ? $meta['variation'][ $post->ID ] : false;
-            $variations    = isset( $meta['variable_prices'][ $post->ID ] ) ? $meta['variable_prices'][ $post->ID ] : [];
-            $price         = isset( $meta['price'][ $post->ID ] ) ? $meta['price'][ $post->ID ] : 0;
+            $has_variation    = isset( $meta['variation'][ $post->ID ] ) ? $meta['variation'][ $post->ID ] : false;
+            $variations       = isset( $meta['variable_prices'][ $post->ID ] ) ? $meta['variable_prices'][ $post->ID ] : [];
+            $price            = isset( $meta['price'][ $post->ID ] ) ? $meta['price'][ $post->ID ] : 0;
+            $license_limit = isset( $meta['license_limit'][ $post->ID ] ) ? $meta['license_limit'][ $post->ID ] : 0;
 
             $data['items'][] = [
                 'id'            => $post->ID,
@@ -134,6 +135,7 @@ class REST_Projects_Controller extends WP_REST_Controller {
                 'has_variation' => $has_variation,
                 'variations'    => $variations,
                 'price'         => $price,
+                'license_limit' => (int) $license_limit,
             ];
         }
 
@@ -178,9 +180,10 @@ class REST_Projects_Controller extends WP_REST_Controller {
         $results = $wpdb->get_results( $query, ARRAY_A );
 
         $meta_data = [
-            'variation' => [],
+            'variation'       => [],
             'variable_prices' => [],
-            'price' => [],
+            'price'           => [],
+            'license_limit'   => [],
         ];
 
         foreach ( $results as $item ) {
@@ -196,10 +199,11 @@ class REST_Projects_Controller extends WP_REST_Controller {
 
         $query = "SELECT post_id, meta_value FROM {$wpdb->postmeta} WHERE post_id IN (" . implode( ',', $ids ) . ") AND meta_key = 'edd_price' ";
         $results = $wpdb->get_results( $query, ARRAY_A );
+        $meta_data['price'] = array_column( $results, 'meta_value', 'post_id' );
 
-        foreach ( $results as $item ) {
-            $meta_data['price'][ $item['post_id'] ] = $item['meta_value'];
-        }
+        $query = "SELECT post_id, meta_value FROM {$wpdb->postmeta} WHERE post_id IN (" . implode( ',', $ids ) . ") AND meta_key = '_edd_sl_limit' ";
+        $results = $wpdb->get_results( $query, ARRAY_A );
+        $meta_data['license_limit'] = array_column( $results, 'meta_value', 'post_id' );
 
         return $meta_data;
     }
@@ -259,16 +263,12 @@ class REST_Projects_Controller extends WP_REST_Controller {
 
         $last_page = ceil( $total_items / $per_page );
 
-        if ( $current_page > $last_page ) {
-            return new WP_Error( 'invalid-page-number', 'Use correct page number.', array( 'status' => 400 ) );
-        }
-
         // Get meta data
         $meta_data = $this->get_edd_item_meta( $download_id );
 
         $data = [
             'items'        => [],
-            'total_items'  => $total_items,
+            'total_items'  => (int) $total_items,
             'current_page' => $current_page,
             'per_page'     => $per_page,
             'last_page'    => $last_page,
@@ -277,16 +277,21 @@ class REST_Projects_Controller extends WP_REST_Controller {
         $activations = $this->get_edd_activations( $results );
 
         foreach ( $results as $license ) {
-            $expiration = $license['expiration'] ? date( 'Y-m-d H:i:s', $license['expiration'] ) : null;
+            $expiration       = $license['expiration'] ? date( 'Y-m-d H:i:s', $license['expiration'] ) : null;
+            $status           = ( 'active' == $license['status'] ? 1 : ( 'inactive' == $license['status'] ? 0 : 2 ) );
+            $item_activations = isset( $activations['all'][ $license['id'] ] ) ? $activations['all'][ $license['id'] ] : [];
+            $active_sites     = isset( $activations['active_sites'][ $license['id'] ] ) ? $activations['active_sites'][ $license['id'] ] : 0;
 
             $data['items'][] = [
-                'id'               => $license['id'],
-                'license_key'      => $license['license_key'],
-                'status'           => $license['status'],
-                'date_created'     => $license['date_created'],
-                'expiration'       => $expiration,
-                'activation_limit' => $this->get_edd_activation_limit( $license, $meta_data ),
-                'activations'      => isset( $activations[ $license['id'] ] ) ? $activations[ $license['id'] ] : [],
+                'source_identifier' => (int) $license['id'],
+                'key'               => $license['license_key'],
+                'status'            => $status,
+                'created_at'        => $license['date_created'],
+                'expire_date'       => $expiration,
+                'activation_limit'  => $this->get_edd_activation_limit( $license, $meta_data ),
+                'activations'       => $item_activations,
+                'variation_source'  => (int) $license['price_id'] ?: null,
+                'active_sites'      => (int) $active_sites,
             ];
         }
 
@@ -357,7 +362,15 @@ class REST_Projects_Controller extends WP_REST_Controller {
             ];
         }
 
-        return $activations;
+        $query  = "SELECT COUNT(site_id) as `active_sites`, license_id FROM {$wpdb->prefix}edd_license_activations ";
+        $query .= " WHERE license_id IN (" . implode( ',', $ids ) . ") AND activated = 1 AND is_local = 0 GROUP BY license_id";
+        $active_sites = $wpdb->get_results( $query, ARRAY_A );
+        $active_sites = wp_list_pluck( $active_sites, 'active_sites', 'license_id' );
+
+        return [
+            'all'          => $activations,
+            'active_sites' => $active_sites,
+        ];
     }
 
 }

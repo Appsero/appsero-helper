@@ -5,6 +5,7 @@
 
 require_once __DIR__ . '/Option_Page.php';
 require_once __DIR__ . '/REST_Projects_Controller.php';
+require_once __DIR__ . '/REST_Projects_Activations_Controller.php';
 
 /**
  * Instantiate all admin classes
@@ -18,6 +19,9 @@ function register_ashp_rest_routes() {
 
     $projects = new ASHP\REST_Projects_Controller();
     $projects->register_routes();
+
+    $activations = new ASHP\REST_Projects_Activations_Controller();
+    $activations->register_routes();
 
 }
 
