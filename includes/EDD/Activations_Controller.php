@@ -63,12 +63,15 @@ class Activations_Controller extends REST_Projects_Activations_Controller {
             return new WP_Error( 'activation-limit-exceeded', 'Activation limit exceeded.', array( 'status' => 400 ) );
         }
 
-        $site_added = $this->add_edd_activation_site( $site_url, $license['id'] );
+        $status = $request->get_param( 'status' );
+        $status = ( $status === null ) ? 1 : $status;
+
+        $site_added = $this->add_edd_activation_site( $site_url, $license['id'], $status );
 
         if ( $site_added ) {
             return new WP_REST_Response( [
                 'success' => true,
-            ], 201 );
+            ] );
         }
 
         return new WP_Error( 'unknown-error', 'EDD could not add site.', array( 'status' => 400 ) );
@@ -77,7 +80,7 @@ class Activations_Controller extends REST_Projects_Activations_Controller {
     /**
      * Add URL to EDD database table
      */
-    private function add_edd_activation_site( $site, $license_id ) {
+    private function add_edd_activation_site( $site, $license_id, $status ) {
 
         $args = array(
             'site_name'  => $site,
@@ -94,14 +97,54 @@ class Activations_Controller extends REST_Projects_Activations_Controller {
             $added = edd_software_licensing()->activations_db->insert( array(
                 'site_name'  => $site,
                 'license_id' => $license_id,
-                'activated'  => 1,
+                'activated'  => $status,
                 'is_local'   => $is_local ? 1 : 0,
             ), 'site_activation' );
         } else {
-            $added = edd_software_licensing()->activations_db->update( $exists[0], array( 'activated' => 1 ) );
+            $added = edd_software_licensing()->activations_db->update( $exists[0], array( 'activated' => $status ) );
         }
 
         return ! empty( $added );
+    }
+
+    /**
+     * Delete an activation
+     */
+    public function delete_activation( $request ) {
+        $download_id = $request->get_param( 'project_id' );
+        $license_id  = $request->get_param( 'license_id' );
+
+        global $wpdb;
+
+        // retrieve license
+        $query = "SELECT * FROM {$wpdb->prefix}edd_licenses WHERE id = {$license_id} AND download_id = {$download_id} ";
+        $license = $wpdb->get_row( $query, ARRAY_A );
+
+        if ( ! $license ) {
+            return new WP_Error( 'invalid-license', 'License not found.', array( 'status' => 404 ) );
+        }
+
+        $site = trailingslashit( edd_software_licensing()->clean_site_url( $request->get_param( 'site_url' ) ) );
+
+        $exists = edd_software_licensing()->activations_db->get_activations( array(
+            'site_name'  => $site,
+            'license_id' => $license_id,
+            'activated'  => array( 0, 1 ),
+            'fields'     => 'site_id',
+        ) );
+
+        if ( empty( $exists ) ) {
+            return new WP_Error( 'invalid-url', 'Invalid URL provided.', array( 'status' => 400 ) );
+        }
+
+        $deleted = edd_software_licensing()->activations_db->delete( $exists[0] );
+        if ( $deleted ) {
+            return new WP_REST_Response( [
+                'success' => true,
+            ] );
+        }
+
+        return new WP_Error( 'unknown-error', 'EDD could not add site.', array( 'status' => 400 ) );
     }
 
 }

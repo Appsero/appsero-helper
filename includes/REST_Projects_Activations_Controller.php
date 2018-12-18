@@ -30,6 +30,16 @@ class REST_Projects_Activations_Controller extends \WP_REST_Controller {
             'args' => $this->add_activation_route_args(),
         ) );
 
+        register_rest_route( $this->namespace, $this->rest_base, array(
+            array(
+                'methods'             => 'DELETE',
+                'callback'            => array( $this, 'delete_activation' ),
+                'permission_callback' => array( $this, 'activation_permission_check' ),
+                'args' => $this->delete_activation_params()
+            ),
+            'args' => $this->add_activation_route_args(),
+        ) );
+
         // @route /projects/{id}/licenses
         /*register_rest_route( $this->namespace, $this->rest_base . '/(?P<id>[\d]+)/licenses', array(
             array(
@@ -59,7 +69,7 @@ class REST_Projects_Activations_Controller extends \WP_REST_Controller {
     }
 
     /**
-     * Get the query params for collections
+     * Get the query params for add and edit activation
      *
      * @return array
      */
@@ -68,7 +78,31 @@ class REST_Projects_Activations_Controller extends \WP_REST_Controller {
             'site_url' => array(
                 'description'       => 'Site URL of active license.',
                 'type'              => 'string',
-                'required'           => true,
+                'required'          => true,
+                'validate_callback' => 'rest_validate_request_arg',
+            ),
+            'status' => array(
+                'description'       => 'Status of a site.',
+                'type'              => 'integer',
+                'default'           => null,
+                'sanitize_callback' => 'absint',
+                'validate_callback' => 'rest_validate_request_arg',
+                'enum'              => array( 0, 1 )
+            )
+        );
+    }
+
+    /**
+     * Get the query params for delete activation
+     *
+     * @return array
+     */
+    public function delete_activation_params() {
+        return array(
+            'site_url' => array(
+                'description'       => 'Site URL of active license.',
+                'type'              => 'string',
+                'required'          => true,
                 'validate_callback' => 'rest_validate_request_arg',
             )
         );
