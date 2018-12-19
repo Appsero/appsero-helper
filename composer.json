@@ -1,0 +1,15 @@
+{
+    "name": "appsero/appsero-helper",
+    "description": "Helper plugin to connect WordPress to Appsero",
+    "type": "wordpress-plugin",
+    "license": "GPL-3.0-or-later",
+    "minimum-stability": "dev",
+    "require": {
+        "composer/installers": "~1.2"
+    },
+    "autoload": {
+        "psr-4": {
+          "Appsero\\Helper\\": "includes"
+        }
+    }
+}

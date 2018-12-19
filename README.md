@@ -1,3 +1,3 @@
-# AppSero Helper
+# Appsero Helper
 
-Helper plugin to connect WP marketplace with AppSero
+Helper plugin to connect WordPress with Appsero
