@@ -62,6 +62,37 @@ class Downloads {
             'type'          => $download->get_type(),
             'has_variation' => $download->has_variable_prices(),
             'total_sales'   => $download->get_sales(),
+            'variations'    => $this->get_variations( $download ),
         ];
     }
+
+    /**
+     * Get valiations of a project
+     *
+     * @param EDD_Download $download
+     *
+     * @return array
+     */
+    private function get_variations( $download ) {
+        $the_prices = [];
+        $result = $download->get_prices();
+
+        foreach( $result as $key => $price ) {
+            $prices[ strval( $key ) ] = [
+                'id'               => (int) $key,
+                'name'             => $price['name'],
+                'amount'           => $price['amount'],
+                'activation_limit' => $price['license_limit'],
+                'recurring'        => $price['recurring'],
+                'trial_quantity'   => $price['trial-quantity'],
+                'trial_unit'       => $price['trial-unit'],
+                'period'           => $price['period'],
+                'times'            => $price['times'],
+                'signup_fee'       => $price['signup_fee'],
+            ];
+        }
+
+        return $prices;
+    }
+
 }

@@ -51,7 +51,7 @@ class Api {
 
         $this->get( '/products', [ $products, 'get_items' ], appsero_api_collection_params() );
         $this->get( '/orders', [ $orders, 'get_items' ], appsero_api_collection_params() );
-        $this->get( '/licenses', [ $licenses, 'get_items' ], appsero_api_collection_params() );
+        $this->get( '/licenses/(?P<product_id>[\d]+)', [ $licenses, 'get_items' ], $this->licenses_params() );
     }
 
     /**
@@ -65,6 +65,24 @@ class Api {
             'version' => ASHP_VERSION,
             'php'     => phpversion(),
         ] );
+    }
+
+    /**
+     * URL and query parameter of licenses endpoint
+     * @return array
+     */
+    private function licenses_params() {
+        $collection_params = appsero_api_collection_params();
+
+        $license_param = [
+            'product_id' => [
+                'description'       => __( 'Unique identifier for the project.', 'appsero-helper' ),
+                'type'              => 'integer',
+                'sanitize_callback' => 'absint',
+            ]
+        ];
+
+        return array_merge( $collection_params, $license_param );
     }
 
 }
