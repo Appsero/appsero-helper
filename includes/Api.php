@@ -43,15 +43,30 @@ class Api {
      * @return void
      */
     public function init_api() {
-        $products = $this->app->products();
-        $orders   = $this->app->orders();
-        $licenses = $this->app->licenses();
+        $products    = $this->app->products();
+        $orders      = $this->app->orders();
+        $licenses    = $this->app->licenses();
+        $activations = $this->app->activations();
 
         $this->get( '/status', [ $this, 'app_status' ] );
 
         $this->get( '/products', [ $products, 'get_items' ], appsero_api_collection_params() );
-        $this->get( '/orders', [ $orders, 'get_items' ], appsero_api_collection_params() );
-        $this->get( '/licenses/(?P<product_id>[\d]+)', [ $licenses, 'get_items' ], $this->licenses_params() );
+        $this->get( '/products/(?P<product_id>[\d]+)/licenses', [ $licenses, 'get_items' ], appsero_api_get_licenses_params() );
+
+        // $this->get( '/orders', [ $orders, 'get_items' ], appsero_api_collection_params() );
+
+        $this->post(
+            '/projects/(?P<project_id>[\d]+)/licenses/(?P<license_id>[\d]+)/activations',
+            [ $activations, 'update_or_create_item' ],
+            appsero_api_update_or_create_activations_params()
+        );
+
+        $this->delete(
+            '/projects/(?P<project_id>[\d]+)/licenses/(?P<license_id>[\d]+)/activations',
+            [ $activations, 'delete_item' ],
+            appsero_api_delete_activations_params()
+        );
+
     }
 
     /**
@@ -65,24 +80,6 @@ class Api {
             'version' => ASHP_VERSION,
             'php'     => phpversion(),
         ] );
-    }
-
-    /**
-     * URL and query parameter of licenses endpoint
-     * @return array
-     */
-    private function licenses_params() {
-        $collection_params = appsero_api_collection_params();
-
-        $license_param = [
-            'product_id' => [
-                'description'       => __( 'Unique identifier for the project.', 'appsero-helper' ),
-                'type'              => 'integer',
-                'sanitize_callback' => 'absint',
-            ]
-        ];
-
-        return array_merge( $collection_params, $license_param );
     }
 
 }

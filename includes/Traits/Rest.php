@@ -41,6 +41,21 @@ trait Rest {
     }
 
     /**
+     * Register DELETE route
+     *
+     * @since 1.0.0
+     *
+     * @param  string $endpoint
+     * @param  string $callback
+     * @param  string $permission
+     *
+     * @return void
+     */
+    protected function delete( $endpoint, $callback, $args = [] ) {
+        $this->register_route( 'delete', $endpoint, $callback, $args );
+    }
+
+    /**
      * Register route endpoints
      *
      * @since 1.0.0

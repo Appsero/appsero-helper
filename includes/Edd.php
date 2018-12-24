@@ -38,4 +38,15 @@ class Edd {
 
         return new Edd\Licenses();
     }
+
+    /**
+     * Activations REST API Class
+     *
+     * @return Edd\Activations
+     */
+    public function activations() {
+        require_once __DIR__ . '/Edd/Activations.php';
+
+        return new Edd\Activations();
+    }
 }
