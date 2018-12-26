@@ -57,22 +57,22 @@ function appsero_api_get_licenses_params() {
 function appsero_api_update_or_create_activations_params() {
     $params = [
         'project_id' => [
-            'description' => 'Unique identifier for the project.',
+            'description' => __( 'Unique identifier for the project.', 'appsero-helper' ),
             'type'        => 'integer',
         ],
         'license_id' => [
-            'description' => 'Unique identifier for the license.',
+            'description' => __( 'Unique identifier for the license.', 'appsero-helper' ),
             'type'        => 'integer',
         ],
         'site_url' => [
-            'description'       => 'Site URL of active license.',
+            'description'       => __( 'Site URL of active license.', 'appsero-helper' ),
             'type'              => 'string',
             'required'          => true,
             'validate_callback' => 'rest_validate_request_arg',
             'sanitize_callback' => 'sanitize_text_field',
         ],
         'status' => [
-            'description'       => 'Status of a site.',
+            'description'       => __( 'Status of a site.', 'appsero-helper' ),
             'type'              => 'integer',
             'default'           => null,
             'sanitize_callback' => 'absint',
@@ -92,15 +92,15 @@ function appsero_api_update_or_create_activations_params() {
 function appsero_api_delete_activations_params() {
     $params = [
         'project_id' => [
-            'description' => 'Unique identifier for the project.',
+            'description' => __( 'Unique identifier for the project.', 'appsero-helper' ),
             'type'        => 'integer',
         ],
         'license_id' => [
-            'description' => 'Unique identifier for the license.',
+            'description' => __( 'Unique identifier for the license.', 'appsero-helper' ),
             'type'        => 'integer',
         ],
         'site_url' => [
-            'description'       => 'Site URL of active license.',
+            'description'       => __( 'Site URL of active license.', 'appsero-helper' ),
             'type'              => 'string',
             'required'          => true,
             'validate_callback' => 'rest_validate_request_arg',
