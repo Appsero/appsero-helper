@@ -34,21 +34,7 @@ class Licenses {
         $total_items = $wpdb->get_var( 'SELECT FOUND_ROWS()' );
 
         foreach( $results as $id ) {
-            $license = new EDD_SL_License( $id );
-            $status     = ( 'active' == $license->status ? 1 : ( 'inactive' == $license->status ? 0 : 2 ) );
-            $expiration = $license->expiration ? date( 'Y-m-d H:i:s', (int) $license->expiration ) : null;
-
-            $licenses[] = [
-                'source_identifier' => $license->id,
-                'key'               => $license->license_key,
-                'status'            => $status,
-                'created_at'        => $license->date_created,
-                'expire_date'       => $expiration,
-                'activation_limit'  => $license->activation_limit ?: null,
-                'activations'       => $this->filter_active_sites( $license->sites ),
-                'variation_source'  => (int) $license->price_id ?: null,
-                'active_sites'      => (int) $license->activation_count,
-            ];
+            $licenses[] = $this->get_license_data( $id );
         }
 
         $response = rest_ensure_response( $licenses );
@@ -61,23 +47,58 @@ class Licenses {
     }
 
     /**
-     * Filter domain, remove end "/"
+     * get active sites
      *
-     * @param array $sites
-     * @uses  untrailingslashit()
+     * @param int $id
      *
      * @return array
      */
-    private function filter_active_sites( $sites ) {
-        if ( empty( $sites ) || ! is_array( $sites ) )
-            return [];
+    private function get_activations( $id ) {
+        $args  = [
+            'number'     => -1,
+            'license_id' => $id
+        ];
 
-        foreach( $sites as $site ) {
-            $domains[] = untrailingslashit( $site );
+        $sites = edd_software_licensing()->activations_db->get_activations( $args );
+
+        if( empty( $sites ) || ! is_array( $sites ) ) {
+            return [];
+        }
+
+        foreach ( $sites as $site ) {
+            $domains[] = [
+                'site_url'  => untrailingslashit( $site->site_name ),
+                'is_active' => !! $site->activated,
+                'is_local'  => !! $site->is_local,
+            ];
         }
 
         return $domains;
     }
 
+    /**
+     * Get single license data
+     *
+     * @return array
+     */
+    protected function get_license_data( $id ) {
+        $license = new EDD_SL_License( $id );
+        $status     = ( 'active' == $license->status ? 1 : ( 'inactive' == $license->status ? 0 : 2 ) );
+        $expiration = $license->expiration ? date( 'Y-m-d H:i:s', (int) $license->expiration ) : null;
+        // `$license->sites` not fulfill my need
+        $activations = $this->get_activations( $license->id );
+
+        return [
+            'source_identifier' => $license->id,
+            'key'               => $license->license_key,
+            'status'            => $status,
+            'created_at'        => $license->date_created,
+            'expire_date'       => $expiration,
+            'activation_limit'  => $license->activation_limit ?: null,
+            'activations'       => $activations,
+            'variation_source'  => (int) $license->price_id ?: null,
+            'active_sites'      => (int) $license->activation_count,
+        ];
+    }
 
 }
