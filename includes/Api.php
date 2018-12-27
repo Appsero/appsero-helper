@@ -50,19 +50,31 @@ class Api {
 
         $this->get( '/status', [ $this, 'app_status' ] );
 
+        // Get all projects with pagination
         $this->get( '/products', [ $products, 'get_items' ], appsero_api_collection_params() );
+
+        // Get licenses with activations in pagination
         $this->get( '/products/(?P<product_id>[\d]+)/licenses', [ $licenses, 'get_items' ], appsero_api_get_licenses_params() );
+
+        // Change license status
+        $this->post(
+            '/products/(?P<product_id>[\d]+)/licenses/(?P<license_id>[\d]+)/change-status',
+            [ $licenses, 'change_status' ],
+            appsero_api_change_license_status_params()
+        );
 
         // $this->get( '/orders', [ $orders, 'get_items' ], appsero_api_collection_params() );
 
+        // Add or Update activation
         $this->post(
-            '/projects/(?P<project_id>[\d]+)/licenses/(?P<license_id>[\d]+)/activations',
+            '/projects/(?P<product_id>[\d]+)/licenses/(?P<license_id>[\d]+)/activations',
             [ $activations, 'update_or_create_item' ],
             appsero_api_update_or_create_activations_params()
         );
 
+        // Delete activation
         $this->delete(
-            '/projects/(?P<project_id>[\d]+)/licenses/(?P<license_id>[\d]+)/activations',
+            '/projects/(?P<product_id>[\d]+)/licenses/(?P<license_id>[\d]+)/activations',
             [ $activations, 'delete_item' ],
             appsero_api_delete_activations_params()
         );

@@ -1,7 +1,9 @@
 <?php
 namespace Appsero\Helper\Edd;
 
+use WP_Error;
 use EDD_SL_License;
+use WP_REST_Response;
 
 /**
  * Licenses
@@ -99,6 +101,38 @@ class Licenses {
             'variation_source'  => (int) $license->price_id ?: null,
             'active_sites'      => (int) $license->activation_count,
         ];
+    }
+
+    /**
+     * Change status of a license
+     *
+     * @param WP_REST_Request $request Full details about the request.
+     *
+     * @return WP_Error|WP_REST_Response
+     */
+    public function change_status( $request ) {
+        $download_id = $request->get_param( 'product_id' );
+        $license_id  = $request->get_param( 'license_id' );
+
+        $license = edd_software_licensing()->get_license( $license_id );
+
+        if ( $download_id !== $license->download_id ) {
+            return new WP_Error( 'invalid-license', 'License not found.', array( 'status' => 404 ) );
+        }
+
+        $status = $request->get_param( 'status' );
+        $status = ( 1 === $status ? 'active' : ( 0 === $status ? 'inactive' : 'disabled' ) );
+
+        $updated = $license->update( [ 'status' => $status ] );
+
+        if ( $updated ) {
+            return new WP_REST_Response( [
+                'success' => true,
+                'message' => 'License updated successfully.',
+            ] );
+        }
+
+        return new WP_Error( 'unknown-error', 'EDD could not update license.', array( 'status' => 400 ) );
     }
 
 }

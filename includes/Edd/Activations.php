@@ -14,7 +14,7 @@ class Activations {
      * Add/Edit ativation
      */
     public function update_or_create_item( $request ) {
-        $download_id = $request->get_param( 'project_id' );
+        $download_id = $request->get_param( 'product_id' );
         $license_id  = $request->get_param( 'license_id' );
 
         $license = edd_software_licensing()->get_license( $license_id );
@@ -98,7 +98,7 @@ class Activations {
      * Delete activation
      */
     public function delete_item( $request ) {
-        $download_id = $request->get_param( 'project_id' );
+        $download_id = $request->get_param( 'product_id' );
         $license_id  = $request->get_param( 'license_id' );
 
         $license = edd_software_licensing()->get_license( $license_id );

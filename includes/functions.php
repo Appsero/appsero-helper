@@ -56,7 +56,7 @@ function appsero_api_get_licenses_params() {
  */
 function appsero_api_update_or_create_activations_params() {
     $params = [
-        'project_id' => [
+        'product_id' => [
             'description' => __( 'Unique identifier for the project.', 'appsero-helper' ),
             'type'        => 'integer',
         ],
@@ -91,7 +91,7 @@ function appsero_api_update_or_create_activations_params() {
  */
 function appsero_api_delete_activations_params() {
     $params = [
-        'project_id' => [
+        'product_id' => [
             'description' => __( 'Unique identifier for the project.', 'appsero-helper' ),
             'type'        => 'integer',
         ],
@@ -105,6 +105,34 @@ function appsero_api_delete_activations_params() {
             'required'          => true,
             'validate_callback' => 'rest_validate_request_arg',
             'sanitize_callback' => 'sanitize_text_field',
+        ],
+    ];
+
+    return $params;
+}
+
+
+/**
+ * Parameters of change license status
+ *
+ * @return array
+ */
+function appsero_api_change_license_status_params() {
+    $params = [
+        'product_id' => [
+            'description' => __( 'Unique identifier for the project.', 'appsero-helper' ),
+            'type'        => 'integer',
+        ],
+        'license_id' => [
+            'description' => __( 'Unique identifier for the license.', 'appsero-helper' ),
+            'type'        => 'integer',
+        ],
+        'status' => [
+            'description'       => __( 'Status of license.', 'appsero-helper' ),
+            'type'              => 'integer',
+            'required'          => true,
+            'validate_callback' => 'rest_validate_request_arg',
+            'sanitize_callback' => 'absint',
         ],
     ];
 

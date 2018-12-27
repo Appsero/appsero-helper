@@ -103,15 +103,13 @@ trait Rest {
      * @return bool
      */
     public function permission_check( $request ) {
-        return true; // allow everything for now.
-
         $secret  = $request->get_header( 'X-Api-Key' );
 
         if ( empty( $secret ) ) {
             return false;
         }
 
-        $api_key = defined( 'APPSERO_API_KEY' ) ? APPSERO_API_KEY : get_option( 'appsero_api_key' );
+        $api_key = defined( 'APPSERO_API_KEY' ) ? APPSERO_API_KEY : get_option( 'appsero_connection_token' );
 
         if ( $secret == $api_key ) {
             return true;
