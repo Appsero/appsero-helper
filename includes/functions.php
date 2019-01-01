@@ -138,3 +138,30 @@ function appsero_api_change_license_status_params() {
 
     return $params;
 }
+
+/**
+ * HTTP request function
+ */
+function appsero_helper_remote_post( $route, $body ) {
+    $endpoint = apply_filters( 'appsero_endpoint', 'https://api.appsero.com' );
+    $endpoint = trailingslashit( $endpoint );
+
+    $url = $endpoint . $route;
+
+    $api_key = defined( 'APPSERO_API_KEY' ) ? APPSERO_API_KEY : get_option( 'appsero_connection_token' );
+
+    $args = [
+        'method'      => 'POST',
+        'timeout'     => 15,
+        'redirection' => 5,
+        'body'        => $body,
+        'headers'     => [
+            'user-agent' => 'AppSero/' . md5( esc_url( home_url() ) ) . ';',
+            'Accept'     => 'application/json',
+            'X-Api-Key'  => $api_key,
+        ],
+        'httpversion' => '1.0',
+    ];
+
+    return wp_remote_post( $url, $args );
+}

@@ -74,7 +74,7 @@ class Downloads {
      * @return array
      */
     private function get_variations( $download ) {
-        $the_prices = [];
+        $prices = [];
         $result = $download->get_prices();
 
         foreach( $result as $key => $price ) {
@@ -88,7 +88,7 @@ class Downloads {
                 'trial_unit'       => $price['trial-unit'],
                 'period'           => $price['period'],
                 'times'            => $price['times'],
-                'signup_fee'       => $price['signup_fee'],
+                'signup_fee'       => isset( $price['signup_fee'] ) ? $price['signup_fee'] : 0,
             ];
         }
 

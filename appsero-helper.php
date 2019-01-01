@@ -113,6 +113,7 @@ class Appsero_Helper {
         require_once __DIR__ . '/includes/Traits/Hooker.php';
         require_once __DIR__ . '/includes/Traits/Rest.php';
         require_once __DIR__ . '/includes/Api.php';
+        require_once __DIR__ . '/includes/SendRequests.php';
 
         if ( class_exists( 'WooCommerce' ) ) {
 
@@ -125,7 +126,11 @@ class Appsero_Helper {
             $client = new Appsero\Helper\Edd();
         }
 
+        // Initialize API hooks
         new Appsero\Helper\Api( $client );
+
+        // Initialize request hooks
+        new Appsero\Helper\SendRequests();
     }
 
     /**
@@ -242,25 +247,11 @@ class Appsero_Helper {
             ] );
         }
 
-        $url = $this->endpoint() . 'public/connect-helper';
-
-        $args = [
-            'method'      => 'POST',
-            'timeout'     => 15,
-            'redirection' => 5,
-            'body'        => [
-                'token'      => $_POST['token'],
-                'url'        => esc_url( home_url() ),
-                'api_prefix' => rest_get_url_prefix(),
-            ],
-            'headers'     => [
-                'user-agent' => 'AppSero/' . md5( esc_url( home_url() ) ) . ';',
-                'Accept'     => 'application/json',
-            ],
-            'httpversion' => '1.0',
-        ];
-
-        $response = wp_remote_post( $url, $args );
+        $response = appsero_helper_remote_post( 'public/connect-helper', [
+            'token'      => $_POST['token'],
+            'url'        => esc_url( home_url() ),
+            'api_prefix' => rest_get_url_prefix(),
+        ] );
 
         if ( is_wp_error( $response ) ) {
             wp_send_json( [
@@ -283,16 +274,6 @@ class Appsero_Helper {
             'success' => false,
             'message' => 'Unknown error occurred.',
         ] );
-    }
-
-    /**
-     * API Endpoint
-     *
-     * @return string
-     */
-    public function endpoint() {
-        $endpoint = apply_filters( 'appsero_endpoint', 'https://api.appsero.com' );
-        return trailingslashit( $endpoint );
     }
 
 } // AppSero_Helper
