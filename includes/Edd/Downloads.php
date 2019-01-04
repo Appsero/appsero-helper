@@ -77,8 +77,8 @@ class Downloads {
         $prices = [];
         $result = $download->get_prices();
 
-        foreach( $result as $key => $price ) {
-            $prices[ strval( $key ) ] = [
+        foreach ( $result as $key => $price ) {
+            $prices[] = [
                 'id'               => (int) $key,
                 'name'             => $price['name'],
                 'amount'           => $price['amount'],
@@ -86,8 +86,8 @@ class Downloads {
                 'recurring'        => $price['recurring'],
                 'trial_quantity'   => $price['trial-quantity'],
                 'trial_unit'       => $price['trial-unit'],
-                'period'           => $price['period'],
-                'times'            => $price['times'],
+                'period'           => isset( $price['period'] ) ? $price['period'] : null,
+                'times'            => isset( $price['times'] ) ? $price['times'] : null,
                 'signup_fee'       => isset( $price['signup_fee'] ) ? $price['signup_fee'] : 0,
             ];
         }

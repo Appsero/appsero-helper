@@ -77,7 +77,6 @@ function appsero_api_update_or_create_activations_params() {
             'default'           => null,
             'sanitize_callback' => 'absint',
             'validate_callback' => 'rest_validate_request_arg',
-            'enum'              => [ 0, 1 ]
         ]
     ];
 

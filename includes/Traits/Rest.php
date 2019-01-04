@@ -111,7 +111,7 @@ trait Rest {
 
         $api_key = defined( 'APPSERO_API_KEY' ) ? APPSERO_API_KEY : get_option( 'appsero_connection_token' );
 
-        if ( $secret == $api_key ) {
+        if ( trim( $secret ) == trim( $api_key ) ) {
             return true;
         }
 

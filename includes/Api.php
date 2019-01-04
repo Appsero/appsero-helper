@@ -67,14 +67,14 @@ class Api {
 
         // Add or Update activation
         $this->post(
-            '/projects/(?P<product_id>[\d]+)/licenses/(?P<license_id>[\d]+)/activations',
+            '/products/(?P<product_id>[\d]+)/licenses/(?P<license_id>[\d]+)/activations',
             [ $activations, 'update_or_create_item' ],
             appsero_api_update_or_create_activations_params()
         );
 
         // Delete activation
         $this->delete(
-            '/projects/(?P<product_id>[\d]+)/licenses/(?P<license_id>[\d]+)/activations',
+            '/products/(?P<product_id>[\d]+)/licenses/(?P<license_id>[\d]+)/activations',
             [ $activations, 'delete_item' ],
             appsero_api_delete_activations_params()
         );

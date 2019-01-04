@@ -38,4 +38,15 @@ class WooCommerce {
 
         return new WooCommerce\Licenses();
     }
+
+    /**
+     * Activations REST API Class
+     *
+     * @return WooCommerce\Activations
+     */
+    public function activations() {
+        require_once __DIR__ . '/WooCommerce/Activations.php';
+
+        return new Edd\Activations();
+    }
 }

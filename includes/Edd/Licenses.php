@@ -55,7 +55,7 @@ class Licenses {
      *
      * @return array
      */
-    private function get_activations( $id ) {
+    protected function get_activations( $id ) {
         $args  = [
             'number'     => -1,
             'license_id' => $id
@@ -85,7 +85,7 @@ class Licenses {
      */
     protected function get_license_data( $id ) {
         $license = new EDD_SL_License( $id );
-        $status     = ( 'active' == $license->status ? 1 : ( 'inactive' == $license->status ? 0 : 2 ) );
+        $status     = ( 'active' == $license->status || 'inactive' == $license->status ) ? 1 : 2;
         $expiration = $license->expiration ? date( 'Y-m-d H:i:s', (int) $license->expiration ) : null;
         // `$license->sites` not fulfill my need
         $activations = $this->get_activations( $license->id );
@@ -121,7 +121,7 @@ class Licenses {
         }
 
         $status = $request->get_param( 'status' );
-        $status = ( 1 === $status ? 'active' : ( 0 === $status ? 'inactive' : 'disabled' ) );
+        $status = ( 1 === $status || 0 === $status ) ? 'active' : 'disabled';
 
         $updated = $license->update( [ 'status' => $status ] );
 

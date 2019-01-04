@@ -63,6 +63,49 @@ class Products {
             'type'          => $product->get_type(),
             'has_variation' => 'variable' == $product->get_type(),
             'total_sales'   => $product->get_total_sales(),
+            'variations'    => $this->get_variations( $product ),
         ];
     }
+
+    /**
+     * Get valiations of a project
+     *
+     * @param EDD_Download $download
+     *
+     * @return array
+     */
+    private function get_variations( $product ) {
+
+        if ( ! is_a( $product, 'WC_Product_Variable' ) || class_exists( 'WC_Software' ) ) {
+            return [];
+        }
+
+        $prices = [];
+        $result = $product->get_available_variations();
+
+        foreach( $result as $variation ) {
+
+            if ( empty( $variation['variation_is_active'] ) ) {
+                continue;
+            }
+
+            $activation_limit = get_post_meta( $variation['variation_id'], '_api_activations', true );
+
+            $prices[] = [
+                'id'               => $variation['variation_id'],
+                'name'             => implode( ', ', $variation['attributes'] ),
+                'amount'           => $variation['display_regular_price'],
+                'activation_limit' => (int) $activation_limit ?: null,
+                'recurring'        => null,
+                'trial_quantity'   => null,
+                'trial_unit'       => null,
+                'period'           => null,
+                'times'            => null,
+                'signup_fee'       => 0,
+            ];
+        }
+
+        return $prices;
+    }
+
 }
