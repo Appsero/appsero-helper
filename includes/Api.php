@@ -56,9 +56,9 @@ class Api {
         // Get licenses with activations in pagination
         $this->get( '/products/(?P<product_id>[\d]+)/licenses', [ $licenses, 'get_items' ], appsero_api_get_licenses_params() );
 
-        // Change license status
+        // Change license status; active, deactive, disable
         $this->post(
-            '/products/(?P<product_id>[\d]+)/licenses/(?P<license_id>[\d]+)/change-status',
+            '/products/(?P<product_id>[\d]+)/licenses/(?P<license_key>[\w]+)/change-status',
             [ $licenses, 'change_status' ],
             appsero_api_change_license_status_params()
         );
@@ -67,14 +67,14 @@ class Api {
 
         // Add or Update activation
         $this->post(
-            '/products/(?P<product_id>[\d]+)/licenses/(?P<license_id>[\d]+)/activations',
+            '/products/(?P<product_id>[\d]+)/licenses/(?P<license_key>[\w]+)/activations',
             [ $activations, 'update_or_create_item' ],
             appsero_api_update_or_create_activations_params()
         );
 
         // Delete activation
         $this->delete(
-            '/products/(?P<product_id>[\d]+)/licenses/(?P<license_id>[\d]+)/activations',
+            '/products/(?P<product_id>[\d]+)/licenses/(?P<license_key>[\w]+)/activations',
             [ $activations, 'delete_item' ],
             appsero_api_delete_activations_params()
         );

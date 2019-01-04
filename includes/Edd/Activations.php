@@ -15,9 +15,9 @@ class Activations {
      */
     public function update_or_create_item( $request ) {
         $download_id = $request->get_param( 'product_id' );
-        $license_id  = $request->get_param( 'license_id' );
+        $license_key = $request->get_param( 'license_key' );
 
-        $license = edd_software_licensing()->get_license( $license_id );
+        $license = edd_software_licensing()->get_license( $license_key, true );
         if ( $download_id !== $license->download_id ) {
             return new WP_Error( 'invalid-license', 'License not found.', array( 'status' => 404 ) );
         }
@@ -99,9 +99,9 @@ class Activations {
      */
     public function delete_item( $request ) {
         $download_id = $request->get_param( 'product_id' );
-        $license_id  = $request->get_param( 'license_id' );
+        $license_key = $request->get_param( 'license_key' );
 
-        $license = edd_software_licensing()->get_license( $license_id );
+        $license = edd_software_licensing()->get_license( $license_key, true );
         if ( $download_id !== $license->download_id ) {
             return new WP_Error( 'invalid-license', 'License not found.', array( 'status' => 404 ) );
         }
@@ -111,7 +111,7 @@ class Activations {
 
         $exists = edd_software_licensing()->activations_db->get_activations( [
             'site_name'  => $site_url,
-            'license_id' => $license_id,
+            'license_id' => $license->id,
             'fields'     => 'site_id',
         ] );
 

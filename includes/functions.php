@@ -60,9 +60,10 @@ function appsero_api_update_or_create_activations_params() {
             'description' => __( 'Unique identifier for the project.', 'appsero-helper' ),
             'type'        => 'integer',
         ],
-        'license_id' => [
-            'description' => __( 'Unique identifier for the license.', 'appsero-helper' ),
-            'type'        => 'integer',
+        'license_key' => [
+            'description'       => __( 'Unique identifier for the license.', 'appsero-helper' ),
+            'type'              => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
         ],
         'site_url' => [
             'description'       => __( 'Site URL of active license.', 'appsero-helper' ),
@@ -94,9 +95,10 @@ function appsero_api_delete_activations_params() {
             'description' => __( 'Unique identifier for the project.', 'appsero-helper' ),
             'type'        => 'integer',
         ],
-        'license_id' => [
-            'description' => __( 'Unique identifier for the license.', 'appsero-helper' ),
-            'type'        => 'integer',
+        'license_key' => [
+            'description'       => __( 'Unique identifier for the license.', 'appsero-helper' ),
+            'type'              => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
         ],
         'site_url' => [
             'description'       => __( 'Site URL of active license.', 'appsero-helper' ),
@@ -122,9 +124,10 @@ function appsero_api_change_license_status_params() {
             'description' => __( 'Unique identifier for the project.', 'appsero-helper' ),
             'type'        => 'integer',
         ],
-        'license_id' => [
-            'description' => __( 'Unique identifier for the license.', 'appsero-helper' ),
-            'type'        => 'integer',
+        'license_key' => [
+            'description'       => __( 'Unique identifier for the license.', 'appsero-helper' ),
+            'type'              => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
         ],
         'status' => [
             'description'       => __( 'Status of license.', 'appsero-helper' ),

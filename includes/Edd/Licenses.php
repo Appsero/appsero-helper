@@ -112,9 +112,9 @@ class Licenses {
      */
     public function change_status( $request ) {
         $download_id = $request->get_param( 'product_id' );
-        $license_id  = $request->get_param( 'license_id' );
+        $license_key = $request->get_param( 'license_key' );
 
-        $license = edd_software_licensing()->get_license( $license_id );
+        $license = edd_software_licensing()->get_license( $license_key, true );
 
         if ( $download_id !== $license->download_id ) {
             return new WP_Error( 'invalid-license', 'License not found.', array( 'status' => 404 ) );
