@@ -13,11 +13,17 @@ class SendRequests {
     use Traits\Hooker;
 
     public function __construct() {
+
+        // EDD Hooks
         $this->action( 'edd_complete_download_purchase', 'edd_add_license', 20, 5 );
 
         $this->action( 'edd_sl_post_revoke_license', 'edd_cancel_order', 10, 2 );
 
         $this->action( 'edd_sl_post_delete_license', 'edd_cancel_order', 10, 2 );
+
+        // Woo Hooks
+        $this->action( 'woocommerce_order_status_completed', 'woo_add_license', 20, 1 );
+
     }
 
     /**
@@ -50,6 +56,7 @@ class SendRequests {
 
     /**
      * Send request to appsero server to add license
+     * For EDD
      */
     public function send_add_license_request( $license ) {
         $status = ('active' == $license->status || 'inactive' == $license->status) ? 1 : 0;
@@ -63,7 +70,6 @@ class SendRequests {
             'activation_limit'  => $license->activation_limit ?: '',
             'active_sites'      => (int) $license->activation_count,
             'expire_date'       => $expiration,
-            'source_identifier' => $license->id,
             'variation_source'  => (int) $license->price_id ?: '',
             'license_source'    => 'EDD',
         ];
@@ -84,6 +90,66 @@ class SendRequests {
             'key'            => $license->key,
             'license_source' => 'EDD',
             'order_id'       => $payment_id,
+        ];
+
+        appsero_helper_remote_post( $route, $body );
+    }
+
+    /**
+     * Woocommerce send request to AppSero
+     */
+    public function woo_add_license( $order_id ) {
+        if ( ! WC_AM_SUBSCRIPTION()->is_subscription_renewal_order( $order_id ) ) {
+            $order = wc_get_order( $order_id );
+            $api_keys_exist = WC_AM_HELPERS()->order_api_keys_exist( $order_id );
+
+            $order_items = $order->get_items();
+
+            if ( $api_keys_exist && count( $order_items ) > 0 && $order->has_downloadable_item() ) {
+                foreach ( $order_items as $item ) {
+                    $product_id = $item->get_product_id();
+
+                    if ( WC_AM_HELPERS()->is_api( $product_id ) ) {
+                        $quantity = $item->get_quantity();
+
+                        for ( $loop = 0; $loop < $quantity; $loop++ ) {
+                            $metakey = '_api_license_key_' . $loop;
+                            $license_key = get_post_meta( $order->get_id(), $metakey, true);
+                            if ( ! empty( $license_key ) ) {
+                                $this->send_woo_api_add_license_request( $order->get_user_id(), $license_key, $product_id );
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    /**
+     * Send request to appsero server to add license
+     * For Woo API
+     */
+    private function send_woo_api_add_license_request( $user_id, $license_key, $product_id ) {
+        global $wpdb;
+        $license_data = get_user_meta( $user_id, $wpdb->get_blog_prefix() . WC_AM_HELPERS()->user_meta_key_orders, true );
+
+        if ( ! isset( $license_data[ $license_key ] ) ) {
+            return false;
+        }
+
+        $license = $license_data[ $license_key ];
+
+        $route = 'public/' . $product_id . '/add-license';
+
+        $body = [
+            'key'              => $license['api_key'],
+            'status'           => 1,
+            'activation_limit' => $license['_api_activations'] ?: '',
+            'active_sites'     => 0,
+            'expire_date'      => '',
+            'variation_source' => (int) $license['variable_product_id'] ?: '',
+            'license_source'   => 'Woo API',
         ];
 
         appsero_helper_remote_post( $route, $body );

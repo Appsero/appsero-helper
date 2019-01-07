@@ -35,6 +35,8 @@ class Licenses {
         $results     = $wpdb->get_col( $query, 0 );
         $total_items = $wpdb->get_var( 'SELECT FOUND_ROWS()' );
 
+        $licenses = [];
+
         foreach( $results as $id ) {
             $licenses[] = $this->get_license_data( $id );
         }
@@ -91,7 +93,6 @@ class Licenses {
         $activations = $this->get_activations( $license->id );
 
         return [
-            'source_identifier' => $license->id,
             'key'               => $license->license_key,
             'status'            => $status,
             'created_at'        => $license->date_created,

@@ -1,6 +1,8 @@
 <?php
 namespace Appsero\Helper\WooCommerce;
 
+use WP_REST_Response;
+
 /**
  * Licenses
  */
@@ -84,7 +86,9 @@ class Licenses {
 
         global $wpdb;
 
-        $query = "SELECT meta_value FROM {$wpdb->usermeta} WHERE meta_key = 'wp_wc_am_orders' ";
+        $meta_key = $wpdb->get_blog_prefix() . WC_AM_HELPERS()->user_meta_key_orders;
+
+        $query = "SELECT meta_value FROM {$wpdb->usermeta} WHERE meta_key = '{$meta_key}' ";
         $query .= " AND meta_value LIKE '%{$license_key}%' ";
 
         $license_data = $wpdb->get_var( $query );
@@ -95,12 +99,6 @@ class Licenses {
         }
 
         $license = $license_data[ $license_key ];
-// $this->licenses[] = $license;
-// print_r($license);
-// return;
-        // $license = new EDD_SL_License( $id );
-        // $expiration = $license->expiration ? date( 'Y-m-d H:i:s', (int) $license->expiration ) : null;
-        // $results = $wpdb->get_results( $query, ARRAY_A );
 
         $activations = $this->get_activations( $license['user_id'], $license['order_key'] );
 
@@ -108,11 +106,11 @@ class Licenses {
             'key'              => $license['api_key'],
             'status'           => 1,
             'created_at'       => $license['_purchase_time'],
-            'expire_date'      => null,
-            'activation_limit' => $license['_api_activations'] ?: null,
+            'expire_date'      => '',
+            'activation_limit' => $license['_api_activations'] ?: '',
             'activations'      => $activations,
-            'variation_source' => (int) $license['variable_product_id'] ?: null,
-            'active_sites'     => count( $activations ),
+            'variation_source' => (int) $license['variable_product_id'] ?: '',
+            'active_sites'     => $this->get_active_sites_count( $activations ),
         ];
     }
 
@@ -146,4 +144,36 @@ class Licenses {
         return $domains;
     }
 
+    /**
+     * Change status of a license
+     *
+     * @param WP_REST_Request $request Full details about the request.
+     *
+     * @return WP_Error|WP_REST_Response
+     */
+    public function change_status( $request ) {
+        $product_id  = $request->get_param( 'product_id' );
+        $license_key = $request->get_param( 'license_key' );
+
+        return new WP_REST_Response( [
+            'success' => true,
+            'message' => 'License updated successfully.',
+        ] );
+    }
+
+    /**
+     * Get the count of active siyes
+     * @return int
+     */
+    protected function get_active_sites_count( $activations ) {
+        $site_count = 0;
+
+        foreach ( $activations as $activation ) {
+            if ( $activation['is_active'] ) {
+                $site_count++;
+            }
+        }
+
+        return $site_count;
+    }
 }
