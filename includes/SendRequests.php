@@ -99,31 +99,13 @@ class SendRequests {
      * Woocommerce send request to AppSero
      */
     public function woo_add_license( $order_id ) {
-        if ( ! WC_AM_SUBSCRIPTION()->is_subscription_renewal_order( $order_id ) ) {
-            $order = wc_get_order( $order_id );
-            $api_keys_exist = WC_AM_HELPERS()->order_api_keys_exist( $order_id );
 
-            $order_items = $order->get_items();
-
-            if ( $api_keys_exist && count( $order_items ) > 0 && $order->has_downloadable_item() ) {
-                foreach ( $order_items as $item ) {
-                    $product_id = $item->get_product_id();
-
-                    if ( WC_AM_HELPERS()->is_api( $product_id ) ) {
-                        $quantity = $item->get_quantity();
-
-                        for ( $loop = 0; $loop < $quantity; $loop++ ) {
-                            $metakey = '_api_license_key_' . $loop;
-                            $license_key = get_post_meta( $order->get_id(), $metakey, true);
-                            if ( ! empty( $license_key ) ) {
-                                $this->send_woo_api_add_license_request( $order->get_user_id(), $license_key, $product_id );
-                            }
-                        }
-                    }
-
-                }
-            }
+        // if WooCommerce API Manager Exists
+        if ( class_exists( 'WooCommerce_API_Manager' ) ) {
+            $this->woo_api_add_license( $order_id );
         }
+
+
     }
 
     /**
@@ -153,6 +135,37 @@ class SendRequests {
         ];
 
         appsero_helper_remote_post( $route, $body );
+    }
+
+    /**
+     * Send add license request to AppSero server
+     */
+    private function woo_api_add_license( $order_id ) {
+        if ( ! WC_AM_SUBSCRIPTION()->is_subscription_renewal_order( $order_id ) ) {
+            $order = wc_get_order( $order_id );
+            $api_keys_exist = WC_AM_HELPERS()->order_api_keys_exist( $order_id );
+
+            $order_items = $order->get_items();
+
+            if ( $api_keys_exist && count( $order_items ) > 0 && $order->has_downloadable_item() ) {
+                foreach ( $order_items as $item ) {
+                    $product_id = $item->get_product_id();
+
+                    if ( WC_AM_HELPERS()->is_api( $product_id ) ) {
+                        $quantity = $item->get_quantity();
+
+                        for ( $loop = 0; $loop < $quantity; $loop++ ) {
+                            $metakey = '_api_license_key_' . $loop;
+                            $license_key = get_post_meta( $order->get_id(), $metakey, true);
+                            if ( ! empty( $license_key ) ) {
+                                $this->send_woo_api_add_license_request( $order->get_user_id(), $license_key, $product_id );
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
     }
 
 }
