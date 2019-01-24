@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Appsero Helper
  * Plugin URI: https://github.com/Appsero/appsero-helper
- * Description: Helper plugin to connect WordPress to Appsero
+ * Description: Helper plugin to connect WordPress store to AppSero
  * Author: Appsero
  * Author URI: https://appsero.com
  * Version: 1.0.0
@@ -54,13 +54,17 @@ class Appsero_Helper {
      * @uses add_action()
      */
     public function __construct() {
+        add_action( 'activated_plugin', [ $this, 'helper_activation' ], 12, 1 );
+
         $this->define_constants();
 
         add_action( 'plugins_loaded', [ $this, 'init_plugin' ] );
 
-        add_action( 'admin_init', [ $this, 'register_setting' ] );
-
         add_action( 'wp_ajax_connect_with_appsero', [ $this, 'connect_with_appsero' ] );
+
+        // Add settings page for set API key
+        require_once __DIR__ . '/includes/SettingsPage.php';
+        new Appsero\Helper\SettingsPage();
     }
 
     /**
@@ -161,119 +165,17 @@ class Appsero_Helper {
     }
 
     /**
-     * Settings field for API token
+     * Run this function after activate the plugin
      *
-     * @return void
+     * @uses plugin_basename()
+     * @uses wp_redirect()
+     * @uses admin_url()
      */
-    public function register_setting() {
-        if ( 'options-general.php' != $GLOBALS['pagenow'] )
-            return;
-
-        add_settings_section(
-            'appsero_helper_setting_section',
-            'AppSero Helper',
-            [ $this, 'setting_section_callback' ],
-            'general'
-        );
-
-        add_settings_field(
-            'appsero_connection_token',
-            'Token',
-            [ $this, 'setting_field_callback' ],
-            'general',
-            'appsero_helper_setting_section',
-            [ 'label_for' => 'appsero_connection_token' ]
-        );
-    }
-
-    /**
-     * Settings field html output
-     */
-    public function setting_field_callback( $args ) {
-        $value = get_option( 'appsero_connection_token', '' );
-        ?>
-        <div class="appsero_token_field">
-            <input id="appsero_connection_token" type="text" value="<?php echo $value; ?>" class="regular-text code" />
-            <button class="button" type="button" id="appsero_connect_button" style="margin: 1px 10px 0 10px;">Connect</button>
-            <span class="spinner is-active" style="display: none"></span>
-            <span class="feedback-message"></span>
-        </div>
-        <?php
-    }
-
-    /**
-     * Settigs section
-     */
-    public function setting_section_callback() {
-        ?>
-        <script type="text/javascript">
-            jQuery( function() {
-                jQuery( '#appsero_connect_button' ).click( function() {
-                    var spinner = jQuery( '.appsero_token_field span.spinner' );
-                    var feedback = jQuery( '.appsero_token_field span.feedback-message' );
-                    spinner.show();
-                    feedback.text('');
-
-                    var token = jQuery( '#appsero_connection_token' ).val();
-                    var data = {
-                        'action': 'connect_with_appsero',
-                        'token': token
-                    };
-
-                    jQuery.post(ajaxurl, data, function( response ) {
-                        spinner.hide();
-                        if ( response.success ) {
-                            feedback.css( 'color', '#4CAF50' );
-                        } else  {
-                            feedback.css( 'color', '#ff4d4d' );
-                        }
-                        feedback.text( response.message );
-                    } );
-                } );
-            } );
-        </script>
-        <?php
-    }
-
-    /**
-     * Connect with appsero server
-     * Handle HTTP request for connect site using token
-     */
-    public function connect_with_appsero() {
-        if ( empty( $_POST['token'] ) ) {
-            wp_send_json( [
-                'success' => false,
-                'message' => 'Token is required.'
-            ] );
+    public function helper_activation( $plugin ) {
+        if( $plugin == plugin_basename( __FILE__ ) ) {
+            wp_redirect( admin_url( 'options-general.php?page=appsero_helper' ) );
+            exit;
         }
-
-        $response = appsero_helper_remote_post( 'public/connect-helper', [
-            'token'      => $_POST['token'],
-            'url'        => esc_url( home_url() ),
-            'api_prefix' => rest_get_url_prefix(),
-        ] );
-
-        if ( is_wp_error( $response ) ) {
-            wp_send_json( [
-                'success' => false,
-                'message' => $response->get_error_message(),
-            ] );
-        }
-
-        if ( 200 == $response['response']['code'] ) {
-            update_option( 'appsero_connection_token', $_POST['token'], false );
-        }
-
-        $response_array = json_decode( $response['body'], true );
-
-        if ( isset( $response_array['success'] ) ) {
-            wp_send_json( $response_array );
-        }
-
-        wp_send_json( [
-            'success' => false,
-            'message' => 'Unknown error occurred.',
-        ] );
     }
 
 } // AppSero_Helper

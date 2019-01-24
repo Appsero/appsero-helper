@@ -1,6 +1,7 @@
 <?php
 namespace Appsero\Helper\Traits;
 
+use Appsero\Helper\SettingsPage;
 use WP_REST_Controller;
 use WP_REST_Server;
 use WP_Error;
@@ -109,9 +110,16 @@ trait Rest {
             return false;
         }
 
-        $api_key = defined( 'APPSERO_API_KEY' ) ? APPSERO_API_KEY : get_option( 'appsero_connection_token' );
+        $api_key = false;
 
-        if ( trim( $secret ) == trim( $api_key ) ) {
+        if ( defined( 'APPSERO_API_KEY' ) ) {
+            $api_key = APPSERO_API_KEY;
+        } else {
+            $connection = get_option( SettingsPage::$connection_key, null );
+            $api_key    = isset( $connection['token'] ) ? $connection['token'] : false;
+        }
+
+        if ( $api_key && trim( $secret ) == trim( $api_key ) ) {
             return true;
         }
 
