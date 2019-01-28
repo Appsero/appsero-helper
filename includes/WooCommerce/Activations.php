@@ -1,5 +1,5 @@
 <?php
-namespace Appsero\Helper\Edd;
+namespace Appsero\Helper\WooCommerce;
 
 use WP_Error;
 use WP_REST_Response;

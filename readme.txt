@@ -1,20 +1,23 @@
 === Appsero Helper ===
-Author URI: https://appsero.com
-Plugin URI: https://github.com/Appsero/appsero-helper
-Contributors: tareq1988
-Tags: woocommerce, woocommerce analytics, woocommerce reports, easy-digital-downloads, licensing, release
-Requires at least: 4.7
+Contributors: tareq1988, wedevs, nizamuddinbabu, sourovroy, almamunsarkar
+Donate link: https://tareq.co/donate/
+Tags: licensing, release, analytics, deactivation
+Requires at least: 4.0
 Tested up to: 5.0.3
-Stable Tag: 1.0.0
-License: GNU Version 2 or Any Later Version
+Stable tag: trunk
+Requires PHP: 5.4
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Helper plugin to connect WordPress store to AppSero
+Helper plugin to connect WordPress site to Appsero
 
 == Description ==
 
-Appsero Helper provide a connection between your Plugin or Theme users and their sites to your WordPress store.
+> **Note:** This plugin is only really of use to you if you have a Appsero account. You can set one up for free (currently invitation only). [**Join**](https://appsero.com/?ref=wporg) our waiting list if you are interested.
 
-AppSero offers Analytics, Licensing and Release system for Premium Plugins and Themes.
+Appsero Helper provides a connection between Appsero service and your site.
+
+Appsero offers analytics, licensing and release system for free/premium plugins and themes.
 
 == Installation ==
 
@@ -26,7 +29,24 @@ This section describes how to install the plugin and get it working.
 
 On Appsero Helper settings page you have to connect your store with AppSero using API key.
 
+== Frequently Asked Questions ==
+
+= What is Appsero? =
+
+Appsero is a SaaS solution that provides Analytics, Software Licensing, Automatic Updates
+for WordPress Plugins and Themes.
+
+= Is it free? =
+
+It has both free and premium services which you can avail by [registering](https://appsero.com) an account.
+
+
+== Screenshots ==
+
+
 == Changelog ==
 
-= 1.0.0 =
-* Initial release.
+
+== Upgrade Notice ==
+
+Nothing here right now.
