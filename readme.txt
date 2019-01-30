@@ -46,6 +46,9 @@ It has both free and premium services which you can avail by [registering](https
 
 == Changelog ==
 
+= v1.0 - (30 Jan, 2019)
+
+ * Initial release
 
 == Upgrade Notice ==
 
