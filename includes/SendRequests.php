@@ -139,7 +139,7 @@ class SendRequests {
             'license_source'   => 'Woo API',
         ];
 
-        appsero_helper_remote_post( $route, $body );
+        return appsero_helper_remote_post( $route, $body );
     }
 
     /**

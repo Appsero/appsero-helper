@@ -110,14 +110,7 @@ trait Rest {
             return false;
         }
 
-        $api_key = false;
-
-        if ( defined( 'APPSERO_API_KEY' ) ) {
-            $api_key = APPSERO_API_KEY;
-        } else {
-            $connection = get_option( SettingsPage::$connection_key, null );
-            $api_key    = isset( $connection['token'] ) ? $connection['token'] : false;
-        }
+        $api_key = appsero_helper_connection_token();
 
         if ( $api_key && trim( $secret ) == trim( $api_key ) ) {
             return true;

@@ -47,6 +47,6 @@ class WooCommerce {
     public function activations() {
         require_once __DIR__ . '/WooCommerce/Activations.php';
 
-        return new Edd\Activations();
+        return new WooCommerce\Activations();
     }
 }
