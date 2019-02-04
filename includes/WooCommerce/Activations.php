@@ -172,7 +172,7 @@ class Activations {
 
         $current_activations = $this->get_current_activations( $license['user_id'], $license['order_key'], $site_url );
 
-        if ( count( $current_activations ) >= $license['_api_activations'] ) {
+        if ( ! empty( $license['_api_activations'] ) && count( $current_activations ) >= $license['_api_activations'] ) {
             return new WP_Error( 'activation-limit-exceeded', 'Activation limit exceeded.', [ 'status' => 400 ] );
         }
 

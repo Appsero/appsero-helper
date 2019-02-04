@@ -150,7 +150,7 @@ function appsero_helper_remote_post( $route, $body ) {
 
     $url = $endpoint . $route;
 
-    $api_key = defined( 'APPSERO_API_KEY' ) ? APPSERO_API_KEY : get_option( 'appsero_connection_token' );
+    $api_key = appsero_helper_connection_token();
 
     $args = [
         'method'      => 'POST',
@@ -166,4 +166,20 @@ function appsero_helper_remote_post( $route, $body ) {
     ];
 
     return wp_remote_post( $url, $args );
+}
+
+/**
+ * Get API key
+ */
+function appsero_helper_connection_token() {
+    $api_key = false;
+
+    if ( defined( 'APPSERO_API_KEY' ) ) {
+        $api_key = APPSERO_API_KEY;
+    } else {
+        $connection = get_option( \Appsero\Helper\SettingsPage::$connection_key, null );
+        $api_key    = isset( $connection['token'] ) ? $connection['token'] : false;
+    }
+
+    return $api_key;
 }
