@@ -29,10 +29,10 @@ echo ".........................................."
 echo
 
 
-# if [ "$READMEVERSION" != "$PLUGINVERSION" ]; then
-#     echo "Versions don't match. Exiting....";
-#     exit 1
-# fi
+if [ "$READMEVERSION" != "$PLUGINVERSION" ]; then
+    echo "Versions don't match. Exiting....";
+    exit 1
+fi
 
 # make sure the destination dir exists
 svn mkdir $TRUNK 2> /dev/null
@@ -74,7 +74,7 @@ done
 svn stat | grep '^\?' | awk '{print $2}' | xargs svn add > /dev/null 2>&1
 svn stat | grep '^\!' | awk '{print $2}' | xargs svn rm  > /dev/null 2>&1
 
-# svn copy trunk/ tags/$READMEVERSION/
+svn copy trunk/ tags/$READMEVERSION/
 
 svn stat
 
