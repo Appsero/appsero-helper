@@ -4,7 +4,7 @@ Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
 Tested up to: 5.0.3
-Stable tag: trunk
+Stable tag: 1.0.1
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -45,6 +45,11 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= v1.0.1 - (4th Feb, 2019) =
+
+ * **Fix:** API key connection issue fixed.
+ * **Fix:** WooCommerce namespace, it was EDD before mistakenly.
 
 = v1.0 - (30 Jan, 2019)
 
