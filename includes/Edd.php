@@ -49,4 +49,16 @@ class Edd {
 
         return new Edd\Activations();
     }
+
+    /**
+     * Customers REST API Class
+     *
+     * @return Edd\Customers
+     */
+    public function customers() {
+        require_once __DIR__ . '/Edd/Customers.php';
+
+        return new Edd\Customers();
+    }
+
 }

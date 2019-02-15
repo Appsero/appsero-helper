@@ -32,12 +32,15 @@ class SendRequests {
      * Send request to add license
      */
     public function edd_add_license( $download_id = 0, $payment_id = 0, $type = 'default', $cart_item = [], $cart_index = 0 ) {
-        // Bail if this cart item is for a renewal
+
+        if ( ! class_exists( 'EDD_SL_Download' ) ) return;
+
+        // Fail if this cart item is for a renewal
         if( ! empty( $cart_item['item_number']['options']['is_renewal'] ) ) {
             return;
         }
 
-        // Bail if this cart item is for an upgrade
+        // Fail if this cart item is for an upgrade
         if( ! empty( $cart_item['item_number']['options']['is_upgrade'] ) ) {
             return;
         }
@@ -84,6 +87,8 @@ class SendRequests {
      * It will deactive a license on appsero server
      */
     public function edd_cancel_order( $license_id, $payment_id ) {
+        if ( ! class_exists( 'EDD_SL_License' ) ) return;
+
         $license = new EDD_SL_License( $license_id );
 
         $route = 'public/' . $license->download_id . '/cancel-order';
