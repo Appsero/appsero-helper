@@ -23,8 +23,8 @@ class Orders {
      * @return WP_Error|WP_REST_Response
      */
     public function get_items( $request ) {
-        $per_page    = $request->get_param( 'per_page' );
-        $paged       = $request->get_param( 'page' );
+        $per_page          = $request->get_param( 'per_page' );
+        $paged             = $request->get_param( 'page' );
         $this->download_id = $request->get_param( 'product_id' );
 
         $args = [
@@ -36,7 +36,7 @@ class Orders {
             'order'    => 'ASC',
         ];
 
-        list( $order_ids, $total_posts ) = $this->edd_get_payments( $args );
+        list( $order_ids, $total_orders ) = $this->edd_get_payments( $args );
 
         $items = [];
 
@@ -46,9 +46,9 @@ class Orders {
 
         $response = rest_ensure_response( $items );
 
-        $max_pages   = ceil( $total_posts / (int) $per_page );
+        $max_pages = ceil( $total_orders / (int) $per_page );
 
-        $response->header( 'X-WP-Total', (int) $total_posts );
+        $response->header( 'X-WP-Total', (int) $total_orders );
         $response->header( 'X-WP-TotalPages', (int) $max_pages );
 
         return $response;
@@ -63,21 +63,32 @@ class Orders {
 
         $cart = $this->get_cart_details( $payment->cart_details );
 
+        // Calculate fee for this item
+        $fee = 0;
+        if ( ! empty( $payment->subtotal ) && ! empty( $payment->fees_total ) ) {
+            $fee = $payment->fees_total / $payment->subtotal;
+            $fee = $this->number_format( $fee * $cart['subtotal'] );
+        }
+
         return [
-            'id'         => $payment->ID,
-            'price'      => $cart['price'],
-            'quantity'   => $cart['quantity'],
-            'status'     => $this->get_order_status( $payment->status ),
-            'customer' => [
-                'id'      => (int) $payment->user_info['id'],
-                'email'   => $payment->user_info['email'],
-                'name'    => $payment->user_info['first_name'] .' '. $payment->user_info['last_name'],
-                'address' => $payment->address['line1'] .' '. $payment->address['line2'],
-                'zip'     => $payment->address['zip'],
-                'state'   => $payment->address['state'],
-                'country' => $payment->address['country'],
+            'id'             => $payment->ID,
+            'price'          => $cart['item_price'],
+            'quantity'       => $cart['quantity'],
+            'discount'       => $cart['discount'],
+            'tax'            => $cart['tax'],
+            'fee'            => $fee,
+            'status'         => $this->get_order_status( $payment->status ),
+            'ordered_at'     => $payment->date,
+            'payment_method' => $this->format_payment_method( $payment->gateway ),
+            'customer'       => [
+                'id'       => (int) $payment->user_info['id'],
+                'email'    => $payment->user_info['email'],
+                'name'     => $payment->user_info['first_name'] .' '. $payment->user_info['last_name'],
+                'address'  => $payment->address['line1'] .' '. $payment->address['line2'],
+                'zip_code' => $payment->address['zip'],
+                'state'    => edd_get_state_name( $payment->address['country'], $payment->address['state'] ),
+                'country'  => edd_get_country_name( $payment->address['country'] ),
             ],
-            'ordered_at' => $payment->date,
         ];
     }
 
@@ -113,15 +124,64 @@ class Orders {
     }
 
     /**
-     * Tranform status
+     * Transform status similar to WooCommerce
+     *
+     * @param $status
+     *
+     * @return string
      */
     private function get_order_status( $status ) {
-        if ( 'publish' == $status ) {
-            return 2;
-        } else if ( 'pending' == $status || 'processing' == $status ) {
-            return 1;
-        } else {
-            return 3;
+        switch ( $status ) {
+            case 'publish':
+                return 'completed';
+
+            case 'pending':
+                return 'pending';
+
+            case 'processing':
+                return 'processing';
+
+            case 'refunded':
+                return 'refunded';
+
+            case 'failed':
+                return 'failed';
+
+            case 'abandoned':
+                return 'cancelled';
+
+            case 'revoked':
+                return 'cancelled';
+
+            default:
+                return 'on-hold';
         }
     }
+
+    /**
+     * Format float value
+     */
+    private function number_format( $number ) {
+        return floatval( number_format( $number, 2, ".", "" ) );
+    }
+
+    /**
+     * Format getway string
+     */
+    private function format_payment_method( $gateway ) {
+        switch ( $gateway ) {
+            case 'paypal':
+                return 'PayPal Standard';
+
+            case 'manual':
+                return 'Test Payment';
+
+            case 'amazon':
+                return 'Amazon';
+
+            default:
+                return $gateway;
+        }
+    }
+
 }
