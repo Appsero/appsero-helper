@@ -80,6 +80,7 @@ class Orders {
             'status'         => $this->get_order_status( $payment->status ),
             'ordered_at'     => $payment->date,
             'payment_method' => $this->format_payment_method( $payment->gateway ),
+            'notes'          => $this->get_notes( $payment->ID ),
             'customer'       => [
                 'id'       => (int) $payment->user_info['id'],
                 'email'    => $payment->user_info['email'],
@@ -182,6 +183,35 @@ class Orders {
             default:
                 return $gateway;
         }
+    }
+
+    /**
+     * Get order notes
+     *
+     * @return array
+     */
+    private function get_notes( $id ) {
+        $notes = edd_get_payment_notes( $id );
+
+        $items = [];
+
+        foreach ( $notes as $note ) {
+            if ( ! empty( $note->user_id ) ) {
+                $user     = get_userdata( $note->user_id );
+                $added_by = $user ? $user->display_name : 'Unknown';
+            } else {
+                $added_by = __( 'EDD Bot', 'easy-digital-downloads' );
+            }
+
+            $items[] = [
+                'id'         => (int) $note->comment_ID,
+                'message'    => $note->comment_content,
+                'added_by'   => $added_by,
+                'created_at' => $note->comment_date,
+            ];
+        }
+
+        return $items;
     }
 
 }

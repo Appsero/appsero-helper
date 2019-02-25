@@ -105,6 +105,7 @@ class Orders {
             'status'         => $order_data['status'],
             'ordered_at'     => $order_data['date_created']->date( 'Y-m-d H:i:s' ),
             'payment_method' => $order_data['payment_method_title'],
+            'notes'          => $this->get_notes( $order_data['id'] ),
             'customer'       => [
                 'id'       => $order_data['customer_id'],
                 'email'    => $order_data['billing']['email'],
@@ -174,5 +175,29 @@ class Orders {
         }
 
         return $code;
+    }
+
+    /**
+     * Get order notes
+     *
+     * @return array
+     */
+    private function get_notes( $id ) {
+        $notes = wc_get_order_notes( [
+            'order_id' => $id,
+        ] );
+
+        $items = [];
+
+        foreach ( $notes as $note ) {
+            $items[] = [
+                'id'         => $note->id,
+                'message'    => $note->content,
+                'added_by'   => ( $note->added_by == 'system' ) ? 'Woo Bot' : ucfirst( $note->added_by ),
+                'created_at' => $note->date_created->date( 'Y-m-d H:i:s' ),
+            ];
+        }
+
+        return $items;
     }
 }
