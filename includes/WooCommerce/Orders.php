@@ -8,7 +8,11 @@ use WC_Order;
  */
 class Orders {
 
-    protected $product_id;
+    /**
+     * Product id to manage cart item
+     * @var integer
+     */
+    public $product_id;
 
     /**
      * Get a collection of orders.
@@ -70,8 +74,8 @@ class Orders {
      * Generate order data
      * @return array
      */
-    private function get_order_data( $order_id ) {
-        $order = new WC_Order( $order_id );
+    public function get_order_data( $order_id ) {
+        $order = is_numeric( $order_id ) ? new WC_Order( $order_id ) : $order_id;
 
         $order_data  = $order->get_data();
         $order_total = (float) $order->get_total();
@@ -111,7 +115,7 @@ class Orders {
                 'email'    => $order_data['billing']['email'],
                 'name'     => $order_data['billing']['first_name'] .' '. $order_data['billing']['last_name'],
                 'address'  => $order_data['billing']['address_1'] .' '. $order_data['billing']['address_2'],
-                'zip_code' => $order_data['billing']['postcode'],
+                'zip'      => $order_data['billing']['postcode'],
                 'state'    => $this->get_state( $order_data['billing']['country'], $order_data['billing']['state'] ),
                 'country'  => $this->get_country( $order_data['billing']['country'] ),
             ],

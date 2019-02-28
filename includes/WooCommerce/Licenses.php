@@ -8,7 +8,11 @@ use WP_REST_Response;
  */
 class Licenses {
 
-    protected $licenses = [];
+    /**
+     * Store each license information
+     * @var array
+     */
+    public $licenses = [];
 
     /**
      * Get a collection of licenses.
@@ -82,17 +86,19 @@ class Licenses {
      *
      * @return array|false
      */
-    protected function get_woo_api_license_data( $license_key ) {
+    public function get_woo_api_license_data( $license_key, $needActivations = true, $status = null, $license_data = null ) {
 
         global $wpdb;
 
-        $meta_key = $wpdb->get_blog_prefix() . WC_AM_HELPERS()->user_meta_key_orders;
+        if ( empty( $license_data ) ) {
+            $meta_key = $wpdb->get_blog_prefix() . WC_AM_HELPERS()->user_meta_key_orders;
 
-        $query = "SELECT meta_value FROM {$wpdb->usermeta} WHERE meta_key = '{$meta_key}' ";
-        $query .= " AND meta_value LIKE '%{$license_key}%' ";
+            $query = "SELECT meta_value FROM {$wpdb->usermeta} WHERE meta_key = '{$meta_key}' ";
+            $query .= " AND meta_value LIKE '%{$license_key}%' ";
 
-        $license_data = $wpdb->get_var( $query );
-        $license_data = maybe_unserialize( $license_data );
+            $license_data = $wpdb->get_var( $query );
+            $license_data = maybe_unserialize( $license_data );
+        }
 
         if ( ! isset( $license_data[ $license_key ] ) ) {
             return false;
@@ -100,17 +106,18 @@ class Licenses {
 
         $license = $license_data[ $license_key ];
 
-        $activations = $this->get_woo_api_activations( $license['user_id'], $license['order_key'] );
+        $activations = $needActivations ? $this->get_woo_api_activations( $license['user_id'], $license['order_key'] ) : [];
 
         $this->licenses[] = [
             'key'              => $license['api_key'],
-            'status'           => 1,
+            'status'           => ( null === $status ) ? 1 : $status,
             'created_at'       => $license['_purchase_time'],
             'expire_date'      => '',
             'activation_limit' => $license['_api_activations'] ?: '',
             'activations'      => $activations,
             'variation_source' => (int) $license['variable_product_id'] ?: '',
             'active_sites'     => $this->get_active_sites_count( $activations ),
+            'license_source'   => 'Woo API',
         ];
     }
 
@@ -216,18 +223,19 @@ class Licenses {
      *
      * @return array|false
      */
-    protected function get_woo_sa_license_data( $item ) {
-        $activations = $this->get_woo_sa_activations( $item['key_id'] );
+    public function get_woo_sa_license_data( $item, $needActivations = true, $status = null ) {
+        $activations = $needActivations ? $this->get_woo_sa_activations( $item['key_id'] ) : [];
 
         $this->licenses[] = [
             'key'              => $item['license_key'],
-            'status'           => 1,
+            'status'           => ( null === $status ) ? 1 : $status,
             'created_at'       => $item['created'],
             'expire_date'      => '',
             'activation_limit' => $item['activations_limit'] ?: '',
             'activations'      => $activations,
             'variation_source' => '',
             'active_sites'     => $this->get_active_sites_count( $activations ),
+            'license_source'   => 'Woo SA',
         ];
     }
 

@@ -105,24 +105,31 @@ class Appsero_Helper {
         require_once __DIR__ . '/includes/Traits/Hooker.php';
         require_once __DIR__ . '/includes/Traits/Rest.php';
         require_once __DIR__ . '/includes/Api.php';
-        require_once __DIR__ . '/includes/SendRequests.php';
 
         if ( class_exists( 'WooCommerce' ) ) {
 
+            // Initialize WooCommerce API hooks
             require_once __DIR__ . '/includes/WooCommerce.php';
             $client = new Appsero\Helper\WooCommerce();
 
+            // Initialize WooCommerce requests hooks
+            require_once __DIR__ . '/includes/WooCommerce/SendRequests.php';
+            new Appsero\Helper\WooCommerce\SendRequests();
+
         } else if ( class_exists( 'Easy_Digital_Downloads' ) ) {
 
+            // Initialize Edd API hooks
             require_once __DIR__ . '/includes/Edd.php';
             $client = new Appsero\Helper\Edd();
+
+            // Initialize Edd requests hooks
+            require_once __DIR__ . '/includes/Edd/SendRequests.php';
+            new Appsero\Helper\Edd\SendRequests();
         }
 
         // Initialize API hooks
         new Appsero\Helper\Api( $client );
 
-        // Initialize request hooks
-        new Appsero\Helper\SendRequests();
     }
 
     /**

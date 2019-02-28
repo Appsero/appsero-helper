@@ -13,7 +13,7 @@ class Orders {
      * Product id to get orders
      * @var [type]
      */
-    protected $download_id;
+    public $download_id;
 
     /**
      * Get a collection of orders.
@@ -56,10 +56,13 @@ class Orders {
 
     /**
      * Generate order data
+     *
+     * @param $order_id
+     *
      * @return array
      */
-    private function get_order_data( $order_id ) {
-        $payment = edd_get_payment( $order_id );
+    public function get_order_data( $order_id ) {
+        $payment = is_numeric( $order_id ) ? edd_get_payment( $order_id ) : $order_id;
 
         $cart = $this->get_cart_details( $payment->cart_details );
 
@@ -86,7 +89,7 @@ class Orders {
                 'email'    => $payment->user_info['email'],
                 'name'     => $payment->user_info['first_name'] .' '. $payment->user_info['last_name'],
                 'address'  => $payment->address['line1'] .' '. $payment->address['line2'],
-                'zip_code' => $payment->address['zip'],
+                'zip'      => $payment->address['zip'],
                 'state'    => edd_get_state_name( $payment->address['country'], $payment->address['state'] ),
                 'country'  => edd_get_country_name( $payment->address['country'] ),
             ],
