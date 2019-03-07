@@ -1,7 +1,6 @@
 <?php
 namespace Appsero\Helper\WooCommerce;
 
-use Appsero\Helper\RestController;
 use WP_Query;
 
 /**

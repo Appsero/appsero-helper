@@ -43,10 +43,11 @@ class Api {
      * @return void
      */
     public function init_api() {
-        $products    = $this->app->products();
-        $orders      = $this->app->orders();
-        $licenses    = $this->app->licenses();
-        $activations = $this->app->activations();
+        $products      = $this->app->products();
+        $orders        = $this->app->orders();
+        $licenses      = $this->app->licenses();
+        $activations   = $this->app->activations();
+        $subscriptions = $this->app->subscriptions();
 
         $this->get( '/status', [ $this, 'app_status' ] );
 
@@ -85,6 +86,13 @@ class Api {
         $this->get(
             '/products/(?P<product_id>[\d]+)/orders',
             [ $orders, 'get_items' ],
+            appsero_api_params_with_product_id()
+        );
+
+        // Get subscriptions of specific product
+        $this->get(
+            '/products/(?P<product_id>[\d]+)/subscriptions',
+            [ $subscriptions, 'get_items' ],
             appsero_api_params_with_product_id()
         );
 

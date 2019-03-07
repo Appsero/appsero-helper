@@ -104,6 +104,7 @@ class Appsero_Helper {
         require_once __DIR__ . '/includes/functions.php';
         require_once __DIR__ . '/includes/Traits/Hooker.php';
         require_once __DIR__ . '/includes/Traits/Rest.php';
+        require_once __DIR__ . '/includes/Traits/OrderHelper.php';
         require_once __DIR__ . '/includes/Api.php';
 
         if ( class_exists( 'WooCommerce' ) ) {

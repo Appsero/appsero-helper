@@ -2,11 +2,14 @@
 namespace Appsero\Helper\WooCommerce;
 
 use WC_Order;
+use Appsero\Helper\Traits\OrderHelper;
 
 /**
  * Licenses
  */
 class Orders {
+
+    use OrderHelper;
 
     /**
      * Product id to manage cart item
@@ -32,7 +35,10 @@ class Orders {
         $items = [];
 
         foreach ( $order_ids as $order_id ) {
-            $items[] = $this->get_order_data( $order_id );
+            $order_array = $this->get_order_data( $order_id );
+            if ( ! empty( $order_array ) ) {
+                $items[] = $order_array;
+            }
         }
 
         $response = rest_ensure_response( $items );
@@ -60,6 +66,7 @@ class Orders {
             WHERE woi.order_item_id = woim.order_item_id
             AND woi.order_id = p.ID
             AND p.post_status IN ( '{$orders_statuses}' )
+            AND p.post_type = 'shop_order'
             AND woim.meta_key = '_product_id'
             AND woim.meta_value = '{$this->product_id}'
             ORDER BY woi.order_item_id ASC LIMIT {$limit} OFFSET {$offset}";
@@ -75,7 +82,11 @@ class Orders {
      * @return array
      */
     public function get_order_data( $order_id ) {
-        $order = is_numeric( $order_id ) ? new WC_Order( $order_id ) : $order_id;
+        $order = is_numeric( $order_id ) ? wc_get_order( $order_id ) : $order_id;
+
+        if ( ! is_a( $order, 'WC_Abstract_Order' ) ) {
+            return false;
+        }
 
         $order_data  = $order->get_data();
         $order_total = (float) $order->get_total();
@@ -99,7 +110,7 @@ class Orders {
             $fee         = $this->number_format( $fee * $cart_total );
         }
 
-        return [
+        $order_response = [
             'id'             => $order_data['id'],
             'price'          => $price,
             'quantity'       => $quantity,
@@ -109,17 +120,28 @@ class Orders {
             'status'         => $order_data['status'],
             'ordered_at'     => $order_data['date_created']->date( 'Y-m-d H:i:s' ),
             'payment_method' => $order_data['payment_method_title'],
-            'notes'          => $this->get_notes( $order_data['id'] ),
-            'customer'       => [
-                'id'       => $order_data['customer_id'],
-                'email'    => $order_data['billing']['email'],
-                'name'     => $order_data['billing']['first_name'] .' '. $order_data['billing']['last_name'],
-                'address'  => $order_data['billing']['address_1'] .' '. $order_data['billing']['address_2'],
-                'zip'      => $order_data['billing']['postcode'],
-                'state'    => $this->get_state( $order_data['billing']['country'], $order_data['billing']['state'] ),
-                'country'  => $this->get_country( $order_data['billing']['country'] ),
-            ],
+            'notes'          => $this->get_woocommerce_notes( $order_data['id'] ),
+            'customer'       => $this->woocommerce_customer( $order_data ),
         ];
+
+        if ( function_exists( 'wcs_order_contains_subscription' ) && wcs_order_contains_subscription( $order, [ 'any' ] ) ) {
+            $subscriptions = wcs_get_subscriptions_for_order( $order, [
+                'product_id' => $this->product_id,
+                'order_type' => 'any',
+            ] );
+
+            if ( ! empty( $subscriptions ) && count( $subscriptions ) == 1 ) {
+                $subscription = array_shift( $subscriptions );
+                if ( wcs_is_subscription( $subscription ) ) {
+                    require_once __DIR__ . '/Subscriptions.php';
+                    $subscription_data = ( new Subscriptions() )->get_subscription_data( $subscription, false );
+                    $order_response['subscription'] = $subscription_data;
+                    $order_response['order_type'] = $this->get_order_type( $order_data['id'], $subscription_data['id'] );
+                }
+            }
+        }
+
+        return $order_response;
     }
 
     /**
@@ -156,52 +178,25 @@ class Orders {
     }
 
     /**
-     * Get country name
+     * Get order type
      */
-    private function get_country( $code ) {
-        $countries = wc()->countries->get_countries();
+    private function get_order_type( $order_id, $subscription_id ) {
+        global $wpdb;
+        $query = "SELECT * FROM $wpdb->postmeta WHERE post_id = {$order_id}
+                  AND (
+                    meta_key = '_subscription_renewal'
+                    OR meta_key = '_subscription_resubscribe'
+                    OR meta_key = '_subscription_switch'
+                  )
+                  AND meta_value = {$subscription_id}
+                  LIMIT 1";
+        $result = $wpdb->get_row( $query, ARRAY_A );
 
-        if ( isset( $countries[ $code ] ) ) {
-            return $countries[ $code ];
+        if ( empty( $result ) ) {
+            return 'parent';
         }
 
-        return $code;
+        return str_replace( '_subscription_', '', $result['meta_key'] );
     }
 
-    /**
-     * Get state name
-     */
-    private function get_state( $country, $code ) {
-        $states = wc()->countries->get_states( $country );
-
-        if ( isset( $states[ $code ] ) ) {
-            return $states[ $code ];
-        }
-
-        return $code;
-    }
-
-    /**
-     * Get order notes
-     *
-     * @return array
-     */
-    private function get_notes( $id ) {
-        $notes = wc_get_order_notes( [
-            'order_id' => $id,
-        ] );
-
-        $items = [];
-
-        foreach ( $notes as $note ) {
-            $items[] = [
-                'id'         => $note->id,
-                'message'    => $note->content,
-                'added_by'   => ( $note->added_by == 'system' ) ? 'Woo Bot' : ucfirst( $note->added_by ),
-                'created_at' => $note->date_created->date( 'Y-m-d H:i:s' ),
-            ];
-        }
-
-        return $items;
-    }
 }
