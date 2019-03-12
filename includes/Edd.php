@@ -50,4 +50,14 @@ class Edd {
         return new Edd\Activations();
     }
 
+    /**
+     * Subscriptions REST API Class
+     *
+     * @return Edd\Subscriptions
+     */
+    public function subscriptions() {
+        require_once __DIR__ . '/Edd/Subscriptions.php';
+
+        return new Edd\Subscriptions();
+    }
 }

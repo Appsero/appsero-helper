@@ -76,4 +76,29 @@ trait OrderHelper {
 
         return $items;
     }
+
+    /**
+     * Generate EDD customer data
+     *
+     * @return array
+     */
+    private function edd_customer_data( $payment ) {
+        return [
+            'id'       => (int) $payment->customer_id,
+            'email'    => $payment->user_info['email'],
+            'name'     => $payment->user_info['first_name'] .' '. $payment->user_info['last_name'],
+            'address'  => $payment->address['line1'] .' '. $payment->address['line2'],
+            'zip'      => $payment->address['zip'],
+            'state'    => edd_get_state_name( $payment->address['country'], $payment->address['state'] ),
+            'country'  => edd_get_country_name( $payment->address['country'] ),
+        ];
+    }
+
+    /**
+     * Format float value
+     */
+    private function number_format( $number ) {
+        return floatval( number_format( $number, 2, ".", "" ) );
+    }
+
 }

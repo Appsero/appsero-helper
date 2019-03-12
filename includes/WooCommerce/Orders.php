@@ -122,23 +122,13 @@ class Orders {
             'payment_method' => $order_data['payment_method_title'],
             'notes'          => $this->get_woocommerce_notes( $order_data['id'] ),
             'customer'       => $this->woocommerce_customer( $order_data ),
+            'order_type'     => '',
+            'subscription'   => [],
         ];
 
+        // Check if WooCommerce subscription active and this order has subscription
         if ( function_exists( 'wcs_order_contains_subscription' ) && wcs_order_contains_subscription( $order, [ 'any' ] ) ) {
-            $subscriptions = wcs_get_subscriptions_for_order( $order, [
-                'product_id' => $this->product_id,
-                'order_type' => 'any',
-            ] );
-
-            if ( ! empty( $subscriptions ) && count( $subscriptions ) == 1 ) {
-                $subscription = array_shift( $subscriptions );
-                if ( wcs_is_subscription( $subscription ) ) {
-                    require_once __DIR__ . '/Subscriptions.php';
-                    $subscription_data = ( new Subscriptions() )->get_subscription_data( $subscription, false );
-                    $order_response['subscription'] = $subscription_data;
-                    $order_response['order_type'] = $this->get_order_type( $order_data['id'], $subscription_data['id'] );
-                }
-            }
+            $order_response = $this->add_subscription_response( $order_response, $order, $order_data );
         }
 
         return $order_response;
@@ -171,13 +161,6 @@ class Orders {
     }
 
     /**
-     * Format float value
-     */
-    private function number_format( $number ) {
-        return floatval( number_format( $number, 2, ".", "" ) );
-    }
-
-    /**
      * Get order type
      */
     private function get_order_type( $order_id, $subscription_id ) {
@@ -197,6 +180,28 @@ class Orders {
         }
 
         return str_replace( '_subscription_', '', $result['meta_key'] );
+    }
+
+    /**
+     * Add subscription data to order array
+     */
+    private function add_subscription_response( $order_response, $order, $order_data ) {
+        $subscriptions = wcs_get_subscriptions_for_order( $order, [
+            'product_id' => $this->product_id,
+            'order_type' => 'any',
+        ] );
+
+        if ( ! empty( $subscriptions ) && count( $subscriptions ) == 1 ) {
+            $subscription = array_shift( $subscriptions );
+            if ( wcs_is_subscription( $subscription ) ) {
+                require_once __DIR__ . '/Subscriptions.php';
+                $subscription_data = ( new Subscriptions() )->get_subscription_data( $subscription, false );
+                $order_response['subscription'] = $subscription_data;
+                $order_response['order_type'] = $this->get_order_type( $order_data['id'], $subscription_data['id'] );
+            }
+        }
+
+        return $order_response;
     }
 
 }
