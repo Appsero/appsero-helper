@@ -52,7 +52,15 @@ class SendRequests {
 
         // if WooCommerce API Manager Exists
         if ( class_exists( 'WooCommerce_API_Manager' ) ) {
-            return $this->woo_api_licenses( $order, $product_id, $licensesObject, $status, $wooItem );
+            // If version 1.*
+            if ( function_exists( 'WC_AM_HELPERS' ) ) {
+                return $this->woo_legacy_api_licenses( $order, $product_id, $licensesObject, $status, $wooItem );
+            }
+
+            // If version above 2.*
+            if ( version_compare( WCAM()->version, '2.0.0', '>=' ) ) {
+                return $this->woo_api_licenses( $order, $product_id, $licensesObject );
+            }
         }
 
         return [];
@@ -78,9 +86,9 @@ class SendRequests {
     }
 
     /**
-     * WooCommerce API licenses
+     * WooCommerce API licenses for V1
      */
-    private function woo_api_licenses( $order, $product_id, $licensesObject, $status, $wooItem ) {
+    private function woo_legacy_api_licenses( $order, $product_id, $licensesObject, $status, $wooItem ) {
         global $wpdb;
 
         $order_id = $order->get_id();
@@ -96,9 +104,33 @@ class SendRequests {
                 $license_data = get_user_meta( $user_id, $wpdb->get_blog_prefix() . WC_AM_HELPERS()->user_meta_key_orders, true );
 
                 if ( ! empty( $license_key ) && ! empty( $license_data ) ) {
-                    $licensesObject->get_woo_api_license_data( $license_key, false, $status, $license_data );
+                    $licensesObject->get_woo_legacy_api_license_data( $license_key, false, $status, $license_data );
                 }
             } // End for
+        }
+
+        return $licensesObject->licenses;
+    }
+
+    /**
+     * Get WooCommerce API manager licenses for a specific product
+     */
+    private function woo_api_licenses( $order, $product_id, $licensesObject ) {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . WC_AM_USER()->get_api_resource_table_name();
+        $order_id   = $order->get_id();
+
+        $sql = "
+            SELECT * FROM {$table_name}
+            WHERE order_id = %d
+            AND product_id = %d
+        ";
+
+        $resources = $wpdb->get_results( $wpdb->prepare( $sql, $order_id, $product_id ), ARRAY_A );
+
+        foreach( $resources as $resource ) {
+             $licensesObject->generate_woo_api_license_data( $resource, false );
         }
 
         return $licensesObject->licenses;

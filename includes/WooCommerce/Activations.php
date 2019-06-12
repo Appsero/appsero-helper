@@ -30,7 +30,15 @@ class Activations {
 
         // if WooCommerce API Manager Exists
         if ( class_exists( 'WooCommerce_API_Manager' ) ) {
-            $site_added = $this->update_or_create_woo_api_ativation( $request, $product_id, $license_key );
+            // If version 1.*
+            if ( function_exists( 'WC_AM_HELPERS' ) ) {
+                $site_added = $this->update_or_create_legacy_woo_api_activation( $request, $product_id, $license_key );
+            }
+
+            // If version above 2.*
+            if ( version_compare( WCAM()->version, '2.0.0', '>=' ) ) {
+                $site_added = $this->update_or_create_woo_api_activation( $request, $product_id, $license_key );
+            }
         }
 
         if ( is_wp_error( $site_added ) ) {
@@ -41,7 +49,7 @@ class Activations {
             ] );
         }
 
-        return new WP_Error( 'unknown-error', 'Helper could not add site.', [ 'status' => 400 ] );
+        return new WP_Error( 'unknown-error', 'Could not add site.', [ 'status' => 400 ] );
     }
 
     /**
@@ -49,7 +57,7 @@ class Activations {
      *
      * @return boolean
      */
-    private function process_woo_api_update_or_create( $site_url, $license, $status, $current_activations ) {
+    private function process_legacy_woo_api_update_or_create( $site_url, $license, $status, $current_activations ) {
         $software_title = ( empty( $license['_api_software_title_var'] ) ) ? $license['_api_software_title_parent'] : $license['_api_software_title_var'];
         if ( empty( $software_title ) ) {
             $software_title = $license['software_title'];
@@ -86,7 +94,15 @@ class Activations {
 
         // if WooCommerce API Manager Exists
         if ( class_exists( 'WooCommerce_API_Manager' ) ) {
-            $this->delete_woo_api_ativation( $request, $product_id, $license_key );
+            // If version 1.*
+            if ( function_exists( 'WC_AM_HELPERS' ) ) {
+                $this->delete_legacy_woo_api_ativation( $request, $product_id, $license_key );
+            }
+
+            // If version above 2.*
+            if ( version_compare( WCAM()->version, '2.0.0', '>=' ) ) {
+                $this->delete_woo_api_ativation( $request, $product_id, $license_key );
+            }
         }
 
         return new WP_REST_Response( [
@@ -97,7 +113,7 @@ class Activations {
     /**
      * Get license data
      */
-    protected function get_license( $license_key ) {
+    protected function get_legacy_woo_api_license( $license_key ) {
         global $wpdb;
 
         $meta_key = $wpdb->get_blog_prefix() . WC_AM_HELPERS()->user_meta_key_orders;
@@ -118,7 +134,7 @@ class Activations {
     /**
      * Get activations of this order
      */
-    protected function get_current_activations( $user_id, $order_key, $site_url ) {
+    protected function get_legacy_woo_api_current_activations( $user_id, $order_key, $site_url ) {
         global $wpdb;
         $this->woo_api_activations_key = $wpdb->get_blog_prefix() . WC_AM_HELPERS()->user_meta_key_activations . $order_key;
         $activations = get_user_meta( $user_id, $this->woo_api_activations_key, true );
@@ -152,15 +168,15 @@ class Activations {
     }
 
     /**
-     * Update or create for Woo API
+     * Update or create for Woo API V1
      *
      * @param int $product_id
      * @param int $license_key
      *
      * @return
      */
-    private function update_or_create_woo_api_ativation( $request, $product_id, $license_key ) {
-        $license = $this->get_license( $license_key );
+    private function update_or_create_legacy_woo_api_activation( $request, $product_id, $license_key ) {
+        $license = $this->get_legacy_woo_api_license( $license_key );
 
         if ( ! isset( $license['parent_product_id'] ) || $product_id !== $license['parent_product_id'] ) {
             return new WP_Error( 'invalid-license', 'License not found.', [ 'status' => 404 ] );
@@ -170,7 +186,7 @@ class Activations {
         $site_url = WC_AM_HELPERS()->esc_url_raw_no_scheme( $site_url );
         $site_url = $this->clean_url( $site_url );
 
-        $current_activations = $this->get_current_activations( $license['user_id'], $license['order_key'], $site_url );
+        $current_activations = $this->get_legacy_woo_api_current_activations( $license['user_id'], $license['order_key'], $site_url );
 
         if ( ! empty( $license['_api_activations'] ) && count( $current_activations ) >= $license['_api_activations'] ) {
             return new WP_Error( 'activation-limit-exceeded', 'Activation limit exceeded.', [ 'status' => 400 ] );
@@ -179,7 +195,7 @@ class Activations {
         $status = $request->get_param( 'status' );
         $status = ( $status === null ) ? 1 : $status;
 
-        return $this->process_woo_api_update_or_create( $site_url, $license, $status, $current_activations );
+        return $this->process_legacy_woo_api_update_or_create( $site_url, $license, $status, $current_activations );
     }
 
     /**
@@ -202,7 +218,7 @@ class Activations {
         $site_url = $this->clean_url( $site_url );
 
         if ( $this->is_limit_exceed( $license, $site_url ) ) {
-            return new WP_Error( 'activation-limit-exceeded', 'Activation limit exceeded.', array( 'status' => 400 ) );
+            return new WP_Error( 'activation-limit-exceeded', 'Activation limit exceeded.', [ 'status' => 400 ] );
         }
 
         $status = $request->get_param( 'status' );
@@ -243,13 +259,13 @@ class Activations {
 
         if ( empty( $exists ) ) {
             // Create new
-            $insert = array(
+            $insert = [
                 'key_id'              => $license['key_id'],
                 'instance'            => uniqid(),
                 'activation_time'     => current_time( 'mysql' ),
                 'activation_active'   => $status,
                 'activation_platform' => $site_url
-            );
+            ];
 
             $format = [ '%d', '%s', '%s', '%d', '%s' ];
 
@@ -275,8 +291,8 @@ class Activations {
      *
      * @return void
      */
-    private function delete_woo_api_ativation( $request, $product_id, $license_key ) {
-        $license = $this->get_license( $license_key );
+    private function delete_legacy_woo_api_ativation( $request, $product_id, $license_key ) {
+        $license = $this->get_legacy_woo_api_license( $license_key );
 
         if ( ! isset( $license['parent_product_id'] ) || $product_id !== $license['parent_product_id'] ) {
             return new WP_Error( 'invalid-license', 'License not found.', [ 'status' => 404 ] );
@@ -286,7 +302,7 @@ class Activations {
         $site_url = WC_AM_HELPERS()->esc_url_raw_no_scheme( $site_url );
         $site_url = $this->clean_url( $site_url );
 
-        $current_activations = $this->get_current_activations( $license['user_id'], $license['order_key'], $site_url );
+        $current_activations = $this->get_legacy_woo_api_current_activations( $license['user_id'], $license['order_key'], $site_url );
 
         if ( empty( $current_activations ) ) {
             delete_user_meta( $license['user_id'], $this->woo_api_activations_key );
@@ -316,7 +332,7 @@ class Activations {
         $exists = $this->get_exist_activation( $license['key_id'], $site_url );
 
         if ( empty( $exists ) ) {
-            return new WP_Error( 'invalid-url', 'URL not found.', array( 'status' => 404 ) );
+            return new WP_Error( 'invalid-url', 'URL not found.', [ 'status' => 404 ] );
         }
 
         $wpdb->delete(
@@ -354,4 +370,140 @@ class Activations {
         $query .= " WHERE key_id = %s AND activation_platform = '%s' ";
         return $wpdb->get_row( $wpdb->prepare( $query, $key_id, $site_url ), ARRAY_A );
     }
+
+    /**
+     * Save WooCommerce API manager V2 activation site
+     */
+    private function update_or_create_woo_api_activation( $request, $product_id, $license_key ) {
+        $resource = $this->get_woo_api_resource( $product_id, $license_key );
+
+        if ( empty( $resource ) ) {
+            return new WP_Error( 'invalid-license', 'License not found.', [ 'status' => 404 ] );
+        }
+
+        $site_url = $request->get_param( 'site_url' );
+        $site_url = $this->clean_url( $site_url );
+
+        $exists = $this->is_woo_api_activation_exists( $resource, $site_url );
+
+        if ( $exists === false ) {
+            if ( $resource->activations_purchased_total <= $resource->activations_total ) {
+                return new WP_Error( 'activation-limit-exceeded', 'Activation limit exceeded.', [ 'status' => 400 ] );
+            }
+
+            $ip = gethostbyname( $site_url );
+
+            $request = [
+                'api_key'    => $license_key,
+                'user_ip'    => ( $ip == $site_url ) ? '127.0.0.1' : $ip,
+                'instance'   => md5( $site_url ),
+                'object'     => $site_url,
+                'product_id' => $resource->product_id,
+            ];
+
+            // Add new activation
+            WC_AM_API_ACTIVATION_DATA_STORE()->add_api_key_activation( $resource->user_id, [ $resource ], $request );
+        } else {
+            global $wpdb;
+            $table_name = $wpdb->prefix . WC_AM_USER()->get_api_activation_table_name();
+
+            // Update old activation site
+            $wpdb->update( $table_name,
+                [
+                    'instance' => md5( $site_url ),
+                    'object'   => $site_url,
+                ],
+                [ 'activation_id' => $exists->activation_id ]
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Get API resocurce for WooCommerce API manager V2
+     */
+    private function get_woo_api_resource( $product_id, $api_key ) {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . WC_AM_USER()->get_api_resource_table_name();
+
+        $sql = "
+            SELECT * FROM {$table_name}
+            WHERE ( master_api_key = %s OR product_order_api_key = %s )
+            AND ( product_id = %d OR parent_id = %d )
+            LIMIT 1
+        ";
+
+        // Get the API resource
+        return $wpdb->get_row( $wpdb->prepare( $sql, $api_key, $api_key, $product_id, $product_id ) );
+    }
+
+    /**
+     * Check if activation exists with this license
+     */
+    private function is_woo_api_activation_exists( $resource, $site_url ) {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . WC_AM_USER()->get_api_activation_table_name();
+        $site_url = "%" . $wpdb->esc_like( $site_url ) . "%";
+
+        $sql = "
+            SELECT * FROM {$table_name}
+            WHERE object LIKE %s
+            AND product_order_api_key = %s
+            AND product_id = %d
+            ORDER BY object ASC LIMIT 1
+        ";
+
+        $query = $wpdb->prepare( $sql, $site_url, $resource->product_order_api_key, $resource->product_id );
+
+        $activation = $wpdb->get_row( $wpdb->remove_placeholder_escape( $query ) );
+
+        if ( empty( $activation ) ) {
+            return false;
+        }
+
+        return $activation;
+    }
+
+    /**
+     * Delete activation of WooCommerce API manager V2
+     * @param $request
+     * @param $product_id
+     * @param $license_key
+     */
+    private function delete_woo_api_ativation( $request, $product_id, $license_key ) {
+        $resource = $this->get_woo_api_resource( $product_id, $license_key );
+
+        if ( empty( $resource ) ) {
+            return new WP_Error( 'invalid-license', 'License not found.', [ 'status' => 404 ] );
+        }
+
+        $site_url = $request->get_param( 'site_url' );
+        $site_url = $this->clean_url( $site_url );
+
+        $exists = $this->is_woo_api_activation_exists( $resource, $site_url );
+
+        if ( false !== $exists ) {
+            WC_AM_API_ACTIVATION_DATA_STORE()->delete_api_key_activation_by_instance_id( $exists->instance );
+
+            // Delete cache
+            $trans_hash = md5( $exists->api_key . $exists->instance . $exists->product_id );
+
+            $trans_keys = array(
+                'wc_am_api_status_func_data_' . $trans_hash,
+                'wc_am_api_status_func_top_level_data_' . $trans_hash,
+                'wc_am_api_information_func_response_active_' . $trans_hash,
+                'wc_am_api_information_func_data_active_' . $trans_hash,
+                'wc_am_api_information_func_top_level_data_active_' . $trans_hash,
+                'wc_am_api_update_func_response_active_' . $trans_hash,
+                'wc_am_api_update_func_data_active_' . $trans_hash,
+                'wc_am_api_update_func_top_level_data_active_' . $trans_hash
+            );
+
+            WC_AM_CACHE_HANDLER()->queue_delete_transient( $trans_keys );
+        }
+    }
+
 }

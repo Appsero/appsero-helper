@@ -34,7 +34,15 @@ class Licenses {
 
         // if WooCommerce API Manager Exists
         if ( class_exists( 'WooCommerce_API_Manager' ) ) {
-            return $this->woo_api_manager_licenses( $product_id, $per_page, $current_page, $offset );
+            // If version 1.*
+            if ( function_exists( 'WC_AM_HELPERS' ) ) {
+                return $this->woo_legacy_api_manager_licenses( $product_id, $per_page, $current_page, $offset );
+            }
+
+            // If version above 2.*
+            if ( version_compare( WCAM()->version, '2.0.0', '>=' ) ) {
+                return $this->woo_api_manager_licenses( $product_id, $per_page, $current_page, $offset );
+            }
         }
 
         return rest_ensure_response( [] );
@@ -49,7 +57,7 @@ class Licenses {
      *
      * @return WP_Error|WP_REST_Response
      */
-    private function woo_api_manager_licenses( $product_id, $per_page, $current_page, $offset ) {
+    private function woo_legacy_api_manager_licenses( $product_id, $per_page, $current_page, $offset ) {
         global $wpdb;
         $table_order_itemmeta = $wpdb->prefix . 'woocommerce_order_itemmeta';
         $table_order_items    = $wpdb->prefix . 'woocommerce_order_items';
@@ -69,7 +77,7 @@ class Licenses {
         $total_items = $wpdb->get_var( 'SELECT FOUND_ROWS()' );
 
         foreach( $results as $key ) {
-             $this->get_woo_api_license_data( $key );
+             $this->get_woo_legacy_api_license_data( $key );
         }
 
         $response = rest_ensure_response( $this->licenses );
@@ -86,7 +94,7 @@ class Licenses {
      *
      * @return array|false
      */
-    public function get_woo_api_license_data( $license_key, $needActivations = true, $status = null, $license_data = null ) {
+    public function get_woo_legacy_api_license_data( $license_key, $needActivations = true, $status = null, $license_data = null ) {
 
         global $wpdb;
 
@@ -106,7 +114,7 @@ class Licenses {
 
         $license = $license_data[ $license_key ];
 
-        $activations = $needActivations ? $this->get_woo_api_activations( $license['user_id'], $license['order_key'] ) : [];
+        $activations = $needActivations ? $this->get_woo_legacy_api_activations( $license['user_id'], $license['order_key'] ) : [];
 
         $this->licenses[] = [
             'key'              => $license['api_key'],
@@ -122,13 +130,13 @@ class Licenses {
     }
 
     /**
-     * Get active sites for Woo API
+     * Get active sites for Woo API V1
      *
      * @param int $id
      *
      * @return array
      */
-    protected function get_woo_api_activations( $user_id, $order_key ) {
+    protected function get_woo_legacy_api_activations( $user_id, $order_key ) {
 
         $activations = WC_AM_HELPERS()->get_users_activation_data( $user_id, $order_key );;
 
@@ -137,9 +145,7 @@ class Licenses {
         }
 
         foreach ( $activations as $site ) {
-            $remove_protocols = [ 'http://', 'https://' ];
-            $domain = str_replace( $remove_protocols, '', $site['activation_domain'] );
-            $domain = untrailingslashit( $domain );
+            $domain = $this->prepare_domain_name( $site['activation_domain'] );
 
             $domains[] = [
                 'site_url'  => $domain,
@@ -259,9 +265,7 @@ class Licenses {
         }
 
         foreach ( $activations as $site ) {
-            $remove_protocols = [ 'http://', 'https://' ];
-            $domain = str_replace( $remove_protocols, '', $site['activation_platform'] );
-            $domain = untrailingslashit( $domain );
+            $domain = $this->prepare_domain_name( $site['activation_platform'] );
 
             $domains[] = [
                 'site_url'  => $domain,
@@ -271,6 +275,111 @@ class Licenses {
         }
 
         return $domains;
+    }
+
+    /**
+     * WooCommerce API manager version 2 get licenses of a product
+     *
+     * @return WP_Error|WP_REST_Response
+     */
+    private function woo_api_manager_licenses( $product_id, $per_page, $current_page, $offset ) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . WC_AM_USER()->get_api_resource_table_name();
+
+        $sql = "
+            SELECT SQL_CALC_FOUND_ROWS * FROM {$table_name}
+            WHERE parent_id = %d
+            ORDER BY api_resource_id ASC
+            LIMIT %d OFFSET %d
+        ";
+
+        $resources = $wpdb->get_results( $wpdb->prepare( $sql, $product_id, $per_page, $offset ), ARRAY_A );
+        $total_items = $wpdb->get_var( 'SELECT FOUND_ROWS()' );
+
+        foreach( $resources as $resource ) {
+             $this->generate_woo_api_license_data( $resource );
+        }
+
+        $response = rest_ensure_response( $this->licenses );
+
+        $max_pages = ceil( $total_items / $per_page );
+        $response->header( 'X-WP-Total', (int) $total_items );
+        $response->header( 'X-WP-TotalPages', (int) $max_pages );
+
+        return $response;
+    }
+
+    /**
+     * Prepare WooCommerce API manager V2 license data
+     */
+    public function generate_woo_api_license_data( $resource, $needActivations = true ) {
+        $activation_limit = empty( $resource['activations_purchased_total'] ) ? '' : intval( $resource['activations_purchased_total'] );
+        $created_at       =  empty( $resource['access_granted'] ) ? '' : get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $resource['access_granted'] ) );
+        $expire_date      =  empty( $resource['access_expires'] ) ? '' : get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $resource['access_expires'] ) );
+
+        $activations = $needActivations ? $this->get_woo_api_activations( $resource ) : [];
+
+        $this->licenses[] = [
+            'key'              => $resource['product_order_api_key'],
+            'status'           => empty( $resource['active'] ) ? 0 : 1,
+            'created_at'       => $created_at,
+            'expire_date'      => $expire_date,
+            'activation_limit' => $activation_limit,
+            'activations'      => $activations,
+            'variation_source' => empty( $resource['variation_id'] ) ? '' : intval( $resource['variation_id'] ),
+            'active_sites'     => $resource['activations_total'],
+            'license_source'   => 'Woo API',
+        ];
+    }
+
+    /**
+     * Get WooCommerce API manager V2 license activations
+     */
+    private function get_woo_api_activations( $resource ) {
+
+        $activations = WC_AM_API_ACTIVATION_DATA_STORE()->get_total_activations_resources_for_api_key_by_product_id(
+            $resource['product_order_api_key'], $resource['product_id']
+        );
+
+        if ( false === $activations ) {
+            return [];
+        }
+
+        foreach ( $activations as $site ) {
+            $domain = $this->prepare_domain_name( $site->object );
+
+            $domains[] = [
+                'site_url'  => $domain,
+                'is_active' => true,
+                'is_local'  => $this->is_local_ip_address( $site->ip_address ),
+            ];
+        }
+
+        return $domains;
+    }
+
+    /**
+     * Prepare domain name
+     * Remove unuecessary portions
+     */
+    private function prepare_domain_name( $domain ) {
+        $remove_protocols = [ 'http://', 'https://' ];
+        $domain = str_replace( $remove_protocols, '', $domain );
+
+        return untrailingslashit( $domain );
+    }
+
+    /**
+     * Check IP address is local or not
+     *
+     * @return boolean
+     */
+    private function is_local_ip_address( $ip_address ) {
+        if ( $ip_address == '127.0.0.1' ) {
+            return true;
+        }
+
+        return ( ! filter_var( $ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) );
     }
 
 }

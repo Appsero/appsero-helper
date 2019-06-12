@@ -41,8 +41,6 @@ class Appsero_Helper {
      * @uses add_action()
      */
     public function __construct() {
-        add_action( 'activated_plugin', [ $this, 'helper_activation' ], 12, 1 );
-
         $this->define_constants();
 
         add_action( 'plugins_loaded', [ $this, 'init_plugin' ] );
@@ -158,20 +156,6 @@ class Appsero_Helper {
         }
 
         echo '</div>';
-    }
-
-    /**
-     * Run this function after activate the plugin
-     *
-     * @uses plugin_basename()
-     * @uses wp_redirect()
-     * @uses admin_url()
-     */
-    public function helper_activation( $plugin ) {
-        if( $plugin == plugin_basename( __FILE__ ) ) {
-            wp_redirect( admin_url( 'options-general.php?page=appsero_helper' ) );
-            exit;
-        }
     }
 
 } // AppSero_Helper
