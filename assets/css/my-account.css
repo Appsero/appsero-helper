@@ -1,0 +1,104 @@
+.appsero-license {
+    border: 1px solid #E1DDE0;
+    margin-bottom: 30px;
+}
+.license-product-info{
+    padding: 15px 20px;
+    width: calc(100% - 80px);
+    display: flex;
+    border-right: 1px solid #E1DDE0;
+}
+.license-product-info h2 {
+    color: #A04E8C;
+    font-size: 22px;
+    margin: 0 0 7px 0;
+}
+.license-product-info p {
+    margin: 0;
+    color: #555555;
+}
+.license-product-info p.h3 {
+    font-size: 17px;
+}
+.license-product-info h4 {
+    font-size: 15px;
+    text-transform: capitalize;
+    color: #5B5B5B;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+}
+.license-header {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+.license-toggle-info {
+    width: 80px;
+    display: -ms-flexbox;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    cursor: pointer;
+}
+.license-product-title {
+    width: 50%;
+}
+.license-product-expire,
+.license-product-activation {
+    width: 25%;
+}
+.license-key-activations {
+    border-top: 1px solid #E1DDE0;
+    padding: 20px 20px 15px 20px;
+    display: none;
+}
+.appsero-license-key {
+    padding-bottom: 20px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #E1DDE0;
+}
+.appsero-license-key p {
+    margin: 0;
+}
+.appsero-license-key strong {
+    font-weight: 600;
+    font-size: 17px;
+    color: #5B5B5B;
+}
+.license-key-code {
+    background-color: #E3E1E3;
+    color: #4D4D4D;
+    padding: 0px 8px;
+    display: inline-block;
+    margin-left: 10px;
+    letter-spacing: 1px;
+}
+.appsero-activations h4 {
+    font-size: 19px;
+    color: #5B5B5B;
+    font-weight: 600;
+    margin: 0 0 7px 0;
+}
+.appsero-activation-item {
+    display: -ms-flexbox;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #A04E8C;
+}
+.appsero-activation-item + .appsero-activation-item {
+    border-top: 1px solid #E1DDE0;
+    margin-top: 6px;
+    padding-top: 6px;
+}
+.appsero-activation-item span {
+    font-weight: 600;
+    font-size: 16px;
+}
+.hentry .entry-content .appsero-activation-item a,
+.appsero-activation-item a {
+    text-decoration: none;
+    font-size: 16px;
+}

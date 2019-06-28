@@ -169,6 +169,31 @@ function appsero_helper_remote_post( $route, $body ) {
 }
 
 /**
+ * Appsero API GET request
+ */
+function appsero_helper_remote_get( $route ) {
+    $endpoint = apply_filters( 'appsero_endpoint', 'https://api.appsero.com' );
+    $endpoint = trailingslashit( $endpoint );
+
+    $url = $endpoint . $route;
+
+    $api_key = appsero_helper_connection_token();
+
+    $args = [
+        'timeout'     => 15,
+        'redirection' => 5,
+        'headers'     => [
+            'user-agent' => 'AppSero/' . md5( esc_url( home_url() ) ) . ';',
+            'Accept'     => 'application/json',
+            'X-Api-Key'  => $api_key,
+        ],
+        'httpversion' => '1.0',
+    ];
+
+    return wp_remote_get( $url, $args );
+}
+
+/**
  * Get API key
  */
 function appsero_helper_connection_token() {

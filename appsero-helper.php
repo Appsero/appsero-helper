@@ -41,6 +41,10 @@ class Appsero_Helper {
      * @uses add_action()
      */
     public function __construct() {
+
+        register_activation_hook( __FILE__, [ $this, 'activation_hook' ] );
+        register_deactivation_hook( __FILE__, [ $this, 'activation_and_deactivation_hook' ] );
+
         $this->define_constants();
 
         add_action( 'plugins_loaded', [ $this, 'init_plugin' ] );
@@ -51,6 +55,8 @@ class Appsero_Helper {
         require_once __DIR__ . '/includes/SettingsPage.php';
 
         new Appsero\Helper\SettingsPage();
+
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
     }
 
     /**
@@ -76,6 +82,7 @@ class Appsero_Helper {
     public function define_constants() {
         define( 'ASHP_VERSION', $this->version );
         define( 'ASHP_ROOT_PATH', plugin_dir_path( __FILE__ ) );
+        define( 'ASHP_ROOT_URL', plugins_url( '/', __FILE__ ) );
     }
 
     /**
@@ -84,7 +91,11 @@ class Appsero_Helper {
      * @return void
      */
     public function init_plugin() {
+        // Require API classes and Initialize
         $this->includes();
+
+        // Initialize My Account page functionality
+        $this->init_user_licenses_page();
     }
 
     /**
@@ -158,6 +169,80 @@ class Appsero_Helper {
         echo '</div>';
     }
 
-} // AppSero_Helper
+    /**
+     * Run my account page funcitonality
+     */
+    private function init_user_licenses_page() {
+        if ( class_exists( 'WooCommerce' ) ) {
+            require_once __DIR__ . '/includes/WooCommerce/MyAccountPage.php';
+
+            new Appsero\Helper\WooCommerce\MyAccountPage();
+        }
+
+        if ( class_exists( 'Easy_Digital_Downloads' ) ) {
+            require_once __DIR__ . '/includes/Edd/MyAccountPage.php';
+
+            new Appsero\Helper\Edd\MyAccountPage();
+        }
+    }
+
+    /**
+     * Plugin activation and deactivation hook
+     */
+    public function activation_and_deactivation_hook() {
+        // Flush rewrite rules on plugin activation
+        add_rewrite_endpoint( 'my-licenses', EP_ROOT | EP_PAGES );
+
+        flush_rewrite_rules();
+    }
+
+    /**
+     * Enqueue CSS and JS
+     */
+    public function enqueue_scripts() {
+        wp_register_style( 'ashp-my-account', ASHP_ROOT_URL . 'assets/css/my-account.css' );
+
+        wp_register_script( 'ashp-my-account', ASHP_ROOT_URL . 'assets/js/my-account.js' );
+    }
+
+    /**
+     * Activation Hook
+     */
+    public function activation_hook() {
+        // Create tables
+        $this->create_tables();
+
+        // Run common functionality
+        $this->activation_and_deactivation_hook();
+    }
+
+    /**
+     * Create Database Tables
+     */
+    private function create_tables() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'appsero_licenses';
+
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS `{$table_name}` (
+            `id` INT(11) NOT NULL AUTO_INCREMENT,
+            `product_id` BIGINT(20) NOT NULL,
+            `variation_id` BIGINT(20) NULL DEFAULT NULL,
+            `order_id` BIGINT(20) NOT NULL,
+            `user_id` BIGINT(20) NOT NULL,
+            `key` VARCHAR(255) NOT NULL,
+            `status` TINYINT(1) NULL DEFAULT '1',
+            `activation_limit` SMALLINT(5) NULL DEFAULT '0',
+            `expire_date` DATETIME NULL DEFAULT NULL,
+            `activations` LONGTEXT NULL DEFAULT NULL,
+            PRIMARY KEY (`id`)
+        ) {$charset_collate};";
+
+        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        dbDelta( $sql );
+    }
+
+} // Appsero_Helper
 
 Appsero_Helper::instance();
