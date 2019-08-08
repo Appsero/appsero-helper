@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Appsero Helper
  * Plugin URI: https://wordpress.org/plugins/appsero-helper
- * Description: Helper plugin to connect WordPress store to AppSero
+ * Description: Helper plugin to connect WordPress store to Appsero
  * Author: Appsero
  * Author URI: https://appsero.com
  * Version: 1.0.1
@@ -49,14 +49,9 @@ class Appsero_Helper {
 
         add_action( 'plugins_loaded', [ $this, 'init_plugin' ] );
 
-        add_action( 'wp_ajax_connect_with_appsero', [ $this, 'connect_with_appsero' ] );
-
-        // Add settings page for set API key
-        require_once __DIR__ . '/includes/SettingsPage.php';
-
-        new Appsero\Helper\SettingsPage();
-
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+
+        $this->immediate_classes();
     }
 
     /**
@@ -117,13 +112,15 @@ class Appsero_Helper {
         require_once __DIR__ . '/includes/Api.php';
 
         if ( class_exists( 'WooCommerce' ) ) {
+            // Include class files
+            require_once __DIR__ . '/includes/WooCommerce/UseCases/SendRequestsHelper.php';
+            require_once __DIR__ . '/includes/WooCommerce/SendRequests.php';
+            require_once __DIR__ . '/includes/WooCommerce.php';
 
             // Initialize WooCommerce API hooks
-            require_once __DIR__ . '/includes/WooCommerce.php';
             $client = new Appsero\Helper\WooCommerce();
 
             // Initialize WooCommerce requests hooks
-            require_once __DIR__ . '/includes/WooCommerce/SendRequests.php';
             new Appsero\Helper\WooCommerce\SendRequests();
 
         } else if ( class_exists( 'Easy_Digital_Downloads' ) ) {
@@ -236,11 +233,28 @@ class Appsero_Helper {
             `activation_limit` SMALLINT(5) NULL DEFAULT '0',
             `expire_date` DATETIME NULL DEFAULT NULL,
             `activations` LONGTEXT NULL DEFAULT NULL,
+            `source_id` BIGINT(20) NOT NULL,
             PRIMARY KEY (`id`)
         ) {$charset_collate};";
 
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
         dbDelta( $sql );
+    }
+
+    /**
+     * Run class on Appsero_Helper instantiate
+     */
+    private function immediate_classes() {
+
+        // Add settings page for set API key
+        require_once __DIR__ . '/includes/SettingsPage.php';
+
+        new Appsero\Helper\SettingsPage();
+
+        // Manage ajax requests
+        require_once __DIR__ . '/includes/Ajax_Requsts.php';
+
+        new Appsero\Helper\Ajax_Requsts();
     }
 
 } // Appsero_Helper

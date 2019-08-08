@@ -144,7 +144,7 @@ function appsero_api_change_license_status_params() {
 /**
  * HTTP request function
  */
-function appsero_helper_remote_post( $route, $body ) {
+function appsero_helper_remote_post( $route, $body, $method = 'POST' ) {
     $endpoint = apply_filters( 'appsero_endpoint', 'https://api.appsero.com' );
     $endpoint = trailingslashit( $endpoint );
 
@@ -153,7 +153,7 @@ function appsero_helper_remote_post( $route, $body ) {
     $api_key = appsero_helper_connection_token();
 
     $args = [
-        'method'      => 'POST',
+        'method'      => $method,
         'timeout'     => 15,
         'redirection' => 5,
         'body'        => $body,
@@ -207,4 +207,36 @@ function appsero_helper_connection_token() {
     }
 
     return $api_key;
+}
+
+/**
+ * Get appsero license
+ */
+function get_appsero_license( $id ) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'appsero_licenses';
+
+    $sql = "
+        SELECT * FROM {$table_name}
+        WHERE `id` = {$id}
+        LIMIT 1
+    ";
+
+    $license = $wpdb->get_row( $sql, ARRAY_A );
+
+    $license['activations'] = json_decode( $license['activations'], true );
+
+    return $license;
+}
+
+/**
+ * Update appsero license
+ */
+function update_appsero_license( $id, $data ) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'appsero_licenses';
+
+    $result = $wpdb->update( $table_name, $data, [ 'id' => $id ] );
+
+    return false !== $result;
 }

@@ -25,6 +25,7 @@ class MyAccountPage {
 
     /**
      * Account menu items
+     * `Licenses` menu, set after `Downloads`
      *
      * @param array $items
      * @return array
@@ -73,21 +74,31 @@ class MyAccountPage {
         ?>
         <div class="appsero-licenses">
 
-            <?php foreach( $this->get_licenses() as $license ): ?>
-            <div class="appsero-license" data-showing="0">
+            <?php
+                foreach ( $this->get_licenses() as $license ):
+
+                $product = wc_get_product( $license['product_id'] );
+
+                list( $expires_on, $activations ) = $this->getActivationsAndExpires( $license );
+            ?>
+            <div class="appsero-license" data-showing="0"
+                data-sourceid="<?php echo $license['source_id']; ?>"
+                data-productid="<?php echo $license['product_id']; ?>"
+                data-licenseid="<?php echo $license['id']; ?>"
+            >
                 <div class="license-header">
                     <div class="license-product-info">
                         <div class="license-product-title">
-                            <h2>Product Title</h2>
+                            <h2><?php echo $product->get_name(); ?></h2>
                             <p class="h3">Variation</p>
                         </div>
                         <div class="license-product-expire">
                             <h4>Expires On</h4>
-                            <p class="h3">Jul 17th, 2019</p>
+                            <p class="h3"><?php echo $expires_on; ?></p>
                         </div>
                         <div class="license-product-activation">
                             <h4>Activations Remaining</h4>
-                            <p class="h3">Jul 17th, 2019</p>
+                            <p class="h3"><?php echo $license['activation_limit'] - count( $activations ); ?></p>
                         </div>
                     </div>
                     <div class="license-toggle-info">
@@ -96,22 +107,18 @@ class MyAccountPage {
                 </div>
                 <div class="license-key-activations">
                     <div class="appsero-license-key">
-                        <p><strong>Key</strong> <span class="license-key-code">b5631efe-1587-4365-a4e8-31a5ebab2b6d</span></p>
+                        <p><strong>Key</strong> <span class="license-key-code"><?php echo $license['key']; ?></span></p>
                     </div>
                     <div class="appsero-activations">
                         <h4>Activations</h4>
+
+                        <?php foreach ( $activations as $activation ) : ?>
                         <div class="appsero-activation-item">
-                            <span>wedevs.com</span>
-                            <a href="#">Remove</a>
+                            <span><?php echo $activation['site_url']; ?></span>
+                            <a href="#" data-activationid="<?php echo $activation['id']; ?>" class="remove-activation-button">Remove</a>
                         </div>
-                        <div class="appsero-activation-item">
-                            <span>wedevs.com</span>
-                            <a href="#">Remove</a>
-                        </div>
-                        <div class="appsero-activation-item">
-                            <span>wedevs.com</span>
-                            <a href="#">Remove</a>
-                        </div>
+                        <?php endforeach; ?>
+
                     </div>
                 </div>
             </div>
@@ -160,12 +167,10 @@ class MyAccountPage {
 
         // If no data found then get from appsero API
         if ( empty( $licenses ) ) {
-            $licenses = $this->get_appsero_licenses( $user_id, $order_ids );
+            $response = $this->get_appsero_licenses( $user_id, $order_ids );
         }
 
-        var_export($licenses);
-
-        return [ 1, 2, 3 ];
+        return $licenses;
     }
 
     /**
@@ -190,8 +195,68 @@ class MyAccountPage {
 
         $route = 'public/users/' . $user_id . '/licenses?' . $query;
 
+        // Send request to appsero server
         $response = appsero_helper_remote_get( $route );
 
-        return wp_remote_retrieve_body( $response );
+        if ( wp_remote_retrieve_response_code( $response ) != 200 ) {
+            return [];
+        }
+
+        $response = json_decode( wp_remote_retrieve_body( $response ), true );
+
+        // Store licenses
+        if ( isset( $response['data'] ) && ! empty( $response['data'] ) ) {
+            $this->store_appsero_licenses( $response['data'] );
+
+            // Get newly stored licenses
+            return $this->get_stored_licenses( $user_id, $order_ids );
+        }
+
+        return [];
     }
+
+    /**
+     * Store licenses that are received from appsero
+     */
+    private function store_appsero_licenses( $licenses ) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'appsero_licenses';
+
+        foreach ( $licenses as $license ) {
+            $wpdb->insert( $table_name, [
+                'product_id'       => $license['product_id'],
+                'variation_id'     => $license['variation_id'],
+                'order_id'         => $license['order_id'],
+                'user_id'          => $license['user_id'],
+                'key'              => $license['key'],
+                'status'           => $license['status'],
+                'activation_limit' => $license['activation_limit'],
+                'expire_date'      => $license['expire_date'],
+                'activations'      => json_encode( $license['activations'] ),
+                'source_id'        => $license['source_id'],
+            ] );
+        }
+    }
+
+    /**
+     * Prpare activation and expires
+     */
+    private function getActivationsAndExpires( $license ) {
+        if ( empty( $license['expire_date'] ) ) {
+            $expires_on = 'Unlimited';
+        } else {
+            $date_time = \DateTime::createFromFormat( 'Y-m-d H:i:s', $license['expire_date'] );
+            $expires_on = $date_time->format( 'M jS, Y' );
+        }
+
+        if ( is_array( $license['activations'] ) ) {
+            $activations = $license['activations'];
+        } else {
+            $activations = json_decode( $license['activations'], true );
+            $activations = ( ! is_array( $activations ) ) ? [] : $activations;
+        }
+
+        return [ $expires_on, $activations ];
+    }
+
 }

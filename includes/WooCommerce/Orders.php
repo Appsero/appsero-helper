@@ -3,13 +3,14 @@ namespace Appsero\Helper\WooCommerce;
 
 use WC_Order;
 use Appsero\Helper\Traits\OrderHelper;
+use Appsero\Helper\WooCommerce\UseCases\SendRequestsHelper;
 
 /**
- * Licenses
+ * Orders API
  */
 class Orders {
 
-    use OrderHelper;
+    use OrderHelper, SendRequestsHelper;
 
     /**
      * Product id to manage cart item
@@ -124,6 +125,7 @@ class Orders {
             'customer'       => $this->woocommerce_customer( $order_data ),
             'order_type'     => '',
             'subscription'   => [],
+            'licenses'       => $this->get_order_licenses( $order ),
         ];
 
         // Check if WooCommerce subscription active and this order has subscription
@@ -202,6 +204,21 @@ class Orders {
         }
 
         return $order_response;
+    }
+
+    /**
+     * Get licenses of active add-on
+     */
+    private function get_order_licenses( $order ) {
+        require_once __DIR__ . '/Licenses.php';
+
+        $licensesObject = new Licenses();
+
+        foreach( $order->get_items( 'line_item' ) as $wooItem ) {
+            $this->get_order_item_licenses( $order, $this->product_id, $licensesObject, $wooItem );
+        }
+
+        return $licensesObject->licenses;
     }
 
 }
