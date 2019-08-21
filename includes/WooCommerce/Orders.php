@@ -82,7 +82,7 @@ class Orders {
      * Generate order data
      * @return array
      */
-    public function get_order_data( $order_id ) {
+    public function get_order_data( $order_id, $cart = null ) {
         $order = is_numeric( $order_id ) ? wc_get_order( $order_id ) : $order_id;
 
         if ( ! is_a( $order, 'WC_Abstract_Order' ) ) {
@@ -92,7 +92,10 @@ class Orders {
         $order_data  = $order->get_data();
         $order_total = (float) $order->get_total();
 
-        $cart     = $this->get_cart_details( $order_data['line_items'] );
+        if ( ! is_a( $cart, 'WC_Order_Item_Product' ) ) {
+            $cart = $this->get_cart_details( $order_data['line_items'] );
+        }
+
         $total    = $this->number_format( $cart->get_total() );
         $subtotal = $this->number_format( $cart->get_subtotal() );
         $quantity = $cart->get_quantity();
@@ -111,6 +114,9 @@ class Orders {
             $fee         = $this->number_format( $fee * $cart_total );
         }
 
+        // Varation ID
+        $variation_id = $cart->get_variation_id();
+
         $order_response = [
             'id'             => $order_data['id'],
             'price'          => $price,
@@ -126,6 +132,7 @@ class Orders {
             'order_type'     => '',
             'subscription'   => [],
             'licenses'       => $this->get_order_licenses( $order ),
+            'variation_id'   => $variation_id ? $variation_id : '',
         ];
 
         // Check if WooCommerce subscription active and this order has subscription

@@ -12,6 +12,7 @@
     color: #A04E8C;
     font-size: 22px;
     margin: 0 0 7px 0;
+    font-weight: 600;
 }
 .license-product-info p {
     margin: 0;
@@ -101,4 +102,16 @@
 .appsero-activation-item a {
     text-decoration: none;
     font-size: 16px;
+}
+.appsero-notice {
+    padding: 15px;
+    margin-bottom: 30px;
+    border-left: 8px solid rgba(0, 0, 0, .15);
+    color: #fff;
+}
+.appsero-notice.notice-info {
+    background-color: #3d9cd2;
+}
+.appsero-notice.notice-error {
+    background-color: #e2401c;
 }

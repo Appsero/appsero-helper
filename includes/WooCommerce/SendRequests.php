@@ -13,7 +13,6 @@ class SendRequests {
     use UseCases\SendRequestsHelper;
 
     public function __construct() {
-
         // Add or Update order with license
         $this->action( 'woocommerce_order_status_changed', 'order_status_changed', 20, 4 );
     }
@@ -27,12 +26,19 @@ class SendRequests {
         foreach( $order->get_items( 'line_item' ) as $wooItem ) {
             $ordersObject = new Orders();
             $ordersObject->product_id = $wooItem->get_product_id();
-            $orderData = $ordersObject->get_order_data( $order );
-            $orderData['licenses'] = $this->get_order_licenses( $order, $ordersObject->product_id, $wooItem );
 
-            $route = 'public/' . $ordersObject->product_id . '/update-order';
+            $connected = get_option( 'appsero_connected_products', [] );
 
-            appsero_helper_remote_post( $route, $orderData );
+            // Check the product is connected with appsero
+            if ( in_array( $ordersObject->product_id, $connected ) ) {
+                $orderData = $ordersObject->get_order_data( $order, $wooItem );
+
+                $orderData['licenses'] = $this->get_order_licenses( $order, $ordersObject->product_id, $wooItem );
+
+                $route = 'public/' . $ordersObject->product_id . '/update-order';
+
+                appsero_helper_remote_post( $route, $orderData );
+            }
         }
 
     }

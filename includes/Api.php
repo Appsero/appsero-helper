@@ -48,6 +48,7 @@ class Api {
         $licenses      = $this->app->licenses();
         $activations   = $this->app->activations();
         $subscriptions = $this->app->subscriptions();
+        $common        = $this->common_api();
 
         $this->get( '/status', [ $this, 'app_status' ] );
 
@@ -96,6 +97,11 @@ class Api {
             appsero_api_params_with_product_id()
         );
 
+        // Connect Appsero projects with WP store
+        $this->post( '/products/connect', [ $common, 'connect_products' ] );
+
+        // Disconnect Appsero projects with WP store
+        $this->post( '/products/disconnect', [ $common, 'disconnect_products' ] );
     }
 
     /**
@@ -111,4 +117,13 @@ class Api {
         ] );
     }
 
+    /**
+     * connect_products
+     */
+    private function common_api() {
+        // Initialize common API class
+        require_once __DIR__ . '/Common_Api.php';
+
+        return new Common_Api();
+    }
 }

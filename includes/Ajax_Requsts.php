@@ -31,10 +31,6 @@ class Ajax_Requsts {
         $response_code = wp_remote_retrieve_response_code( $response );
         $response = json_decode( wp_remote_retrieve_body( $response ), true );
 
-        error_log( $response_code );
-        error_log( print_r( $response, 1) );
-        error_log( isset( $response['success'] ) && $response['success'] );
-
         if ( isset( $response['success'] ) && $response['success'] ) {
             // Delete local DB record
             $license = get_appsero_license( $_POST['license_id'] );

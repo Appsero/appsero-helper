@@ -55,7 +55,7 @@ class Appsero_Helper {
     }
 
     /**
-     * Initializes the AppSero_Helper() class
+     * Initializes the Appsero_Helper() class
      *
      * Checks for an existing AppSero_Helper() instance
      * and if it doesn't find one, creates it.
@@ -255,6 +255,11 @@ class Appsero_Helper {
         require_once __DIR__ . '/includes/Ajax_Requsts.php';
 
         new Appsero\Helper\Ajax_Requsts();
+
+        // Manage shortcode
+        require_once __DIR__ . '/includes/Shortcode.php';
+
+        new Appsero\Helper\Shortcode();
     }
 
 } // Appsero_Helper
