@@ -5,6 +5,7 @@ use EDD_Payment;
 use EDD_SL_License;
 use EDD_SL_Download;
 use Appsero\Helper\Traits\Hooker;
+use Appsero\Helper\Edd\UseCases\SendRequestsHelper;
 
 /**
  * SendRequests Class
@@ -12,7 +13,7 @@ use Appsero\Helper\Traits\Hooker;
  */
 class SendRequests {
 
-    use Hooker;
+    use Hooker, SendRequestsHelper;
 
     /**
      * Constructor of EDD SendRequests class
@@ -36,9 +37,14 @@ class SendRequests {
      * Send request to add order with license
      */
     public function add_new_order_and_license( $download_id = 0, $payment_id = 0, $type = 'default', $cart_item = [], $cart_index = 0 ) {
-        $payment = new EDD_Payment( $payment_id );
+        $connected = get_option( 'appsero_connected_products', [] );
 
-        $this->add_or_update_order_and_license( $payment, $download_id );
+        // Check the product is connected with appsero
+        if ( in_array( $download_id, $connected ) ) {
+            $payment = new EDD_Payment( $payment_id );
+
+            $this->add_or_update_order_and_license( $payment, $download_id );
+        }
     }
 
     /**
@@ -51,9 +57,13 @@ class SendRequests {
         }
 
         $payment = new EDD_Payment( $payment_id );
+        $connected = get_option( 'appsero_connected_products', [] );
 
         foreach ( $payment->downloads as $download ) {
-            $this->add_or_update_order_and_license( $payment, $download['id'] );
+            // Check the product is connected with appsero
+            if ( in_array( $download['id'], $connected ) ) {
+                $this->add_or_update_order_and_license( $payment, $download['id'] );
+            }
         }
     }
 
@@ -72,34 +82,6 @@ class SendRequests {
         $route = 'public/' . $download_id . '/update-order';
 
         appsero_helper_remote_post( $route, $order );
-    }
-
-    /**
-     * Get license of an order
-     */
-    private function get_order_licenses( $payment_id, $download_id ) {
-        if ( ! class_exists( 'EDD_SL_Download' ) ) return [];
-
-        $purchased_download = new EDD_SL_Download( $download_id );
-        if ( ! $purchased_download->is_bundled_download() && ! $purchased_download->licensing_enabled() ) {
-            return [];
-        }
-
-        $licenses = edd_software_licensing()->get_licenses_of_purchase( $payment_id );
-
-        $items = [];
-
-        if ( false !== $licenses ) {
-            require_once __DIR__ . '/Licenses.php';
-
-            $licensesObject = new Licenses();
-
-            foreach( $licenses as $license ) {
-                $items[] = $licensesObject->get_license_data( $license, false );
-            }
-        }
-
-        return $items;
     }
 
     /**

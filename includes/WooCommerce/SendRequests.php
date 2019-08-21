@@ -23,11 +23,11 @@ class SendRequests {
     public function order_status_changed( $order_id, $status_from, $status_to, $order ) {
         require_once __DIR__ . '/Orders.php';
 
+        $connected = get_option( 'appsero_connected_products', [] );
+
         foreach( $order->get_items( 'line_item' ) as $wooItem ) {
             $ordersObject = new Orders();
             $ordersObject->product_id = $wooItem->get_product_id();
-
-            $connected = get_option( 'appsero_connected_products', [] );
 
             // Check the product is connected with appsero
             if ( in_array( $ordersObject->product_id, $connected ) ) {
@@ -40,7 +40,6 @@ class SendRequests {
                 appsero_helper_remote_post( $route, $orderData );
             }
         }
-
     }
 
     /**
