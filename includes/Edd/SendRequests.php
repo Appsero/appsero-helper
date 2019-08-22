@@ -103,6 +103,14 @@ class SendRequests {
      * Send Delete request
      */
     private function send_delete_order_and_license_request( $payment, $download_id ) {
-        // TODO: Write code to send request
+        $connected = get_option( 'appsero_connected_products', [] );
+
+        // Check the product is connected with appsero
+        if ( in_array( $download_id, $connected ) ) {
+            $route = 'public/' . $download_id . '/delete-order/' . $payment->ID;
+
+            appsero_helper_remote_post( $route, [] );
+        }
     }
+
 }

@@ -15,6 +15,8 @@ class SendRequests {
     public function __construct() {
         // Add or Update order with license
         $this->action( 'woocommerce_order_status_changed', 'order_status_changed', 20, 4 );
+
+        $this->action( 'before_delete_post', 'delete_order', 8, 1 );
     }
 
     /**
@@ -51,6 +53,29 @@ class SendRequests {
         $licensesObject = new Licenses();
 
         return $this->get_order_item_licenses( $order, $product_id, $licensesObject, $wooItem );
+    }
+
+    /**
+     * Delete order
+     */
+    public function delete_order( $order_id ) {
+        // We check if the global post type isn't order and just return
+        global $post_type;
+        if ( $post_type != 'shop_order' ) return;
+
+        $order     = wc_get_order( $order_id );
+        $connected = get_option( 'appsero_connected_products', [] );
+
+        foreach ( $order->get_items( 'line_item' ) as $wooItem ) {
+            $product_id = $wooItem->get_product_id();
+
+            // Check the product is connected with appsero
+            if ( in_array( $product_id, $connected ) ) {
+                $route = 'public/' . $product_id . '/delete-order/' . $order_id;
+
+                appsero_helper_remote_post( $route, [] );
+            }
+        }
     }
 
 }
