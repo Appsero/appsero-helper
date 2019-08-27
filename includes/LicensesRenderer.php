@@ -23,7 +23,7 @@ class LicensesRenderer {
                 if ( count( $licenses ) > 0 ) :
                 foreach ( $licenses as $license ) :
 
-                $product = wc_get_product( $license['product_id'] );
+                $product = $this->get_license_product( $license['product_id'] );
 
                 list( $expires_on, $activations ) = $this->get_activations_and_expires( $license );
             ?>
@@ -36,7 +36,7 @@ class LicensesRenderer {
                     <div class="license-product-info">
                         <div class="license-product-title">
                             <h2><?php echo $product->get_name(); ?></h2>
-                            <p class="h3">Variation</p>
+                            <!-- <p class="h3">Variation</p> -->
                         </div>
                         <div class="license-product-expire">
                             <h4>Expires On</h4>
@@ -102,12 +102,7 @@ class LicensesRenderer {
     private function get_licenses() {
         $user_id = get_current_user_id();
 
-        $order_ids = wc_get_orders( [
-            'customer' => get_current_user_id(),
-            'return'   => 'ids',
-            'paginate' => false,
-            'limit'    => -1,
-        ] );
+        $order_ids = $this->get_order_ids( $user_id );
 
         // First try to get licenses from WP table
         $licenses = $this->get_stored_licenses( $user_id, $order_ids );
@@ -204,6 +199,47 @@ class LicensesRenderer {
                 'source_id'        => $license['source_id'],
             ] );
         }
+    }
+
+    /**
+     * Get order ids
+     */
+    private function get_order_ids( $user_id ) {
+        if ( class_exists( 'WooCommerce' ) ) {
+            return wc_get_orders( [
+                'customer' => $user_id,
+                'return'   => 'ids',
+                'paginate' => false,
+                'limit'    => -1,
+            ] );
+        }
+
+        if ( class_exists( 'Easy_Digital_Downloads' ) ) {
+            return edd_get_payments( [
+                'user'     => $user_id,
+                'nopaging' => true,
+                'status'   => 'publish',
+                'orderby'  => 'date',
+                'fields'   => 'ids'
+            ] );
+        }
+
+        return [];
+    }
+
+    /**
+     * Get product of license
+     */
+    private function get_license_product( $product_id ) {
+        if ( class_exists( 'WooCommerce' ) ) {
+            return wc_get_product( $product_id );
+        }
+
+        if ( class_exists( 'Easy_Digital_Downloads' ) ) {
+            return edd_get_download( $product_id );
+        }
+
+        return new \stdClass;
     }
 
 }
