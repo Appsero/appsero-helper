@@ -3,8 +3,12 @@ namespace Appsero\Helper;
 
 class LicensesRenderer {
 
-    public function show() {
-
+    /**
+     * Output licenses
+     *
+     * @return string
+     */
+    public function show( $order_id = null ) {
         wp_enqueue_style( 'ashp-my-account' );
         wp_enqueue_script( 'ashp-my-account' );
 
@@ -18,45 +22,14 @@ class LicensesRenderer {
         <div class="appsero-licenses">
 
             <?php
-                $licenses = $this->get_licenses();
+                $licenses = $this->get_licenses( $order_id );
 
                 if ( count( $licenses ) > 0 ) :
-                foreach ( $licenses as $license ) :
 
-                $product = $this->get_license_product( $license['product_id'] );
+                    foreach ( $licenses as $license ) {
+                        $this->single_license_output( $license );
+                    }
 
-                list( $expires_on, $activations ) = $this->get_activations_and_expires( $license );
-            ?>
-            <div class="appsero-license" data-showing="0"
-                data-sourceid="<?php echo $license['source_id']; ?>"
-                data-productid="<?php echo $license['product_id']; ?>"
-                data-licenseid="<?php echo $license['id']; ?>"
-            >
-                <div class="license-header">
-                    <div class="license-product-info">
-                        <div class="license-product-title">
-                            <h2><?php echo $product->get_name(); ?></h2>
-                            <!-- <p class="h3">Variation</p> -->
-                        </div>
-                        <div class="license-product-expire">
-                            <h4>Expires On</h4>
-                            <p class="h3"><?php echo $expires_on; ?></p>
-                        </div>
-                        <div class="license-product-activation">
-                            <h4>Activations Remaining</h4>
-                            <p class="h3"><?php echo $license['activation_limit'] - count( $activations ); ?></p>
-                        </div>
-                    </div>
-                    <div class="license-toggle-info">
-                        <i class="fas fa-angle-down"></i>
-                    </div>
-                </div>
-
-                <?php $this->print_activations( $license, $activations ); ?>
-
-            </div>
-            <?php
-                endforeach;
                 else:
             ?>
                 <div class="appsero-notice notice-info">No licenses found.</div>
@@ -99,10 +72,14 @@ class LicensesRenderer {
     /**
      * Licenses of an user
      */
-    private function get_licenses() {
+    public function get_licenses( $order_id = null ) {
         $user_id = get_current_user_id();
 
-        $order_ids = $this->get_order_ids( $user_id );
+        if ( $order_id ) {
+            $order_ids = [ $order_id ];
+        } else {
+            $order_ids = $this->get_order_ids( $user_id );
+        }
 
         // First try to get licenses from WP table
         $licenses = $this->get_stored_licenses( $user_id, $order_ids );
@@ -240,6 +217,45 @@ class LicensesRenderer {
         }
 
         return new \stdClass;
+    }
+
+    /**
+     * Print single license
+     */
+    public function single_license_output( $license ) {
+        $product = $this->get_license_product( $license['product_id'] );
+
+        list( $expires_on, $activations ) = $this->get_activations_and_expires( $license );
+        ?>
+        <div class="appsero-license" data-showing="0"
+            data-sourceid="<?php echo $license['source_id']; ?>"
+            data-productid="<?php echo $license['product_id']; ?>"
+            data-licenseid="<?php echo $license['id']; ?>"
+        >
+            <div class="license-header">
+                <div class="license-product-info">
+                    <div class="license-product-title">
+                        <h2><?php echo $product->get_name(); ?></h2>
+                        <!-- <p class="h3">Variation</p> -->
+                    </div>
+                    <div class="license-product-expire">
+                        <h4>Expires On</h4>
+                        <p class="h3"><?php echo $expires_on; ?></p>
+                    </div>
+                    <div class="license-product-activation">
+                        <h4>Activations Remaining</h4>
+                        <p class="h3"><?php echo $license['activation_limit'] - count( $activations ); ?></p>
+                    </div>
+                </div>
+                <div class="license-toggle-info">
+                    <i class="fas fa-angle-down"></i>
+                </div>
+            </div>
+
+            <?php $this->print_activations( $license, $activations ); ?>
+
+        </div>
+        <?php
     }
 
 }
