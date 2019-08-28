@@ -81,7 +81,12 @@ class SendRequests {
 
         $route = 'public/' . $download_id . '/update-order';
 
-        appsero_helper_remote_post( $route, $order );
+        $api_response = appsero_helper_remote_post( $route, $order );
+        $response = json_decode( wp_remote_retrieve_body( $api_response ), true );
+
+        if ( isset( $response['license'] ) ) {
+            $this->create_appsero_license( $response['license'], $order, $download_id );
+        }
     }
 
     /**
@@ -110,6 +115,45 @@ class SendRequests {
             $route = 'public/' . $download_id . '/delete-order/' . $payment->ID;
 
             appsero_helper_remote_post( $route, [] );
+        }
+    }
+
+    /**
+     * Create appsero license from response
+     */
+    private function create_appsero_license( $license, $orderData, $product_id ) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'appsero_licenses';
+
+        $appsero_license = $wpdb->get_row( "SELECT * FROM {$table_name} WHERE `source_id` = " . $license['id'] . " LIMIT 1", ARRAY_A );
+
+        if ( $appsero_license ) {
+            // Update
+            $wpdb->update( $table_name, [
+                'product_id'       => $product_id,
+                'variation_id'     => $orderData['variation_id'] ? $orderData['variation_id'] : null,
+                'order_id'         => $orderData['id'],
+                'user_id'          => $orderData['customer']['id'],
+                'key'              => $license['key'],
+                'status'           => $license['status'],
+                'activation_limit' => $license['activation_limit'],
+                'expire_date'      => $license['expire_date']['date'],
+            ], [
+                'id' => $appsero_license['id']
+            ]);
+        } else {
+            // Create
+            $wpdb->insert( $table_name, [
+                'product_id'       => $product_id,
+                'variation_id'     => $orderData['variation_id'] ? $orderData['variation_id'] : null,
+                'order_id'         => $orderData['id'],
+                'user_id'          => $orderData['customer']['id'],
+                'key'              => $license['key'],
+                'status'           => $license['status'],
+                'activation_limit' => $license['activation_limit'],
+                'expire_date'      => $license['expire_date']['date'],
+                'source_id'        => $license['id'],
+            ] );
         }
     }
 
