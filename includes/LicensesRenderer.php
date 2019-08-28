@@ -236,7 +236,7 @@ class LicensesRenderer {
                 <div class="license-product-info">
                     <div class="license-product-title">
                         <h2><?php echo $product->get_name(); ?></h2>
-                        <!-- <p class="h3">Variation</p> -->
+                        <p class="h3"><?php echo $this->get_variation_name( $product, $license ); ?></p>
                     </div>
                     <div class="license-product-expire">
                         <h4>Expires On</h4>
@@ -256,6 +256,83 @@ class LicensesRenderer {
 
         </div>
         <?php
+    }
+
+    /**
+     * Find variation name of product
+     */
+    private function get_variation_name( $product, $license ) {
+        // For EDD
+        if ( is_a( $product, 'EDD_Download' ) ) {
+            $payment = edd_get_payment( $license['order_id'] );
+            $variation_id = $this->get_edd_cart_variation_id( $payment->cart_details, $product->ID );
+
+            if ( $variation_id ) {
+                $prices = $product->get_prices();
+
+                return $prices[ $variation_id ]['name'];
+            }
+        }
+
+        // For Woo
+        if ( is_a( $product, 'WC_Product_Variable' ) ) {
+            $order = wc_get_order( $license['order_id'] );
+
+            return $this->get_woo_cart_variation_name( $order->get_items( 'line_item' ), $product );
+        }
+
+        return '-';
+    }
+
+    /**
+     * Get cart of this product
+     */
+    private function get_edd_cart_variation_id( $carts, $product_id ) {
+        $cart = false;
+        $variation_id = false;
+
+        foreach ( $carts as $cart_item ) {
+            if ( $cart_item['id'] == $product_id ) {
+                $cart = $cart_item;
+                break;
+            }
+        }
+
+        if ( false === $cart ) {
+            return false;
+        }
+
+        // Find variation ID
+        if ( isset( $cart['item_number']['options']['price_id'] ) && $cart['item_number']['options']['price_id'] ) {
+            $variation_id = $cart['item_number']['options']['price_id'];
+        }
+
+        return $variation_id;
+    }
+
+    /**
+     * Find varaition id of woo item
+     */
+    private function get_woo_cart_variation_name( $carts, $product ) {
+        $cart = false;
+
+        foreach ( $carts as $cart_item ) {
+            if ( $cart_item->get_product_id() == $product->get_id() ) {
+                $cart = $cart_item;
+                break;
+            }
+        }
+
+        if ( false === $cart ) {
+            return '-';
+        }
+
+        if ( $variation_id = $cart->get_variation_id() ) {
+            $variation = $product->get_available_variation( $variation_id );
+            return implode( ' - ', $variation['attributes'] );
+        }
+
+        return '-';
     }
 
 }
