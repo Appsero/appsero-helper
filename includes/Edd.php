@@ -20,7 +20,7 @@ class Edd {
     /**
      * Licenses REST API Class
      *
-     * @return Edd\Licenses
+     * @return Edd\Orders
      */
     public function orders() {
         require_once __DIR__ . '/Edd/Orders.php';
@@ -48,5 +48,16 @@ class Edd {
         require_once __DIR__ . '/Edd/Activations.php';
 
         return new Edd\Activations();
+    }
+
+    /**
+     * Subscriptions REST API Class
+     *
+     * @return Edd\Subscriptions
+     */
+    public function subscriptions() {
+        require_once __DIR__ . '/Edd/Subscriptions.php';
+
+        return new Edd\Subscriptions();
     }
 }

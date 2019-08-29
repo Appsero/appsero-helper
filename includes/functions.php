@@ -1,9 +1,9 @@
 <?php
 
 /**
- * [appsero_api_collection_params description]
+ * Collection default parameters
  *
- * @return [type] [description]
+ * @return array
  */
 function appsero_api_collection_params() {
     $params = [
@@ -31,11 +31,11 @@ function appsero_api_collection_params() {
 }
 
 /**
- * Get license with activation patameters
+ * Get collection patameters with product_id
  *
  * @return array
  */
-function appsero_api_get_licenses_params() {
+function appsero_api_params_with_product_id() {
     $collection_params = appsero_api_collection_params();
 
     $license_param = [

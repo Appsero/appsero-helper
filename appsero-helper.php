@@ -5,7 +5,7 @@
  * Description: Helper plugin to connect WordPress store to AppSero
  * Author: Appsero
  * Author URI: https://appsero.com
- * Version: 1.0.1
+ * Version: 1.0.2
  * Text Domain: appsero-helper
  */
 
@@ -24,7 +24,7 @@ class Appsero_Helper {
      *
      * @var string
      */
-    public $version = '1.0.1';
+    public $version = '1.0.2';
 
     /**
      * The single instance of the class.
@@ -41,8 +41,6 @@ class Appsero_Helper {
      * @uses add_action()
      */
     public function __construct() {
-        add_action( 'activated_plugin', [ $this, 'helper_activation' ], 12, 1 );
-
         $this->define_constants();
 
         add_action( 'plugins_loaded', [ $this, 'init_plugin' ] );
@@ -95,34 +93,42 @@ class Appsero_Helper {
      * @return void
      */
     public function includes() {
+        require_once __DIR__ . '/includes/functions.php';
 
         if ( ! class_exists( 'WooCommerce' ) && ! class_exists( 'Easy_Digital_Downloads' ) ) {
             add_action( 'admin_notices', array( $this, 'dependency_error' ) );
             return;
         }
 
-        require_once __DIR__ . '/includes/functions.php';
         require_once __DIR__ . '/includes/Traits/Hooker.php';
         require_once __DIR__ . '/includes/Traits/Rest.php';
+        require_once __DIR__ . '/includes/Traits/OrderHelper.php';
         require_once __DIR__ . '/includes/Api.php';
-        require_once __DIR__ . '/includes/SendRequests.php';
 
         if ( class_exists( 'WooCommerce' ) ) {
 
+            // Initialize WooCommerce API hooks
             require_once __DIR__ . '/includes/WooCommerce.php';
             $client = new Appsero\Helper\WooCommerce();
 
+            // Initialize WooCommerce requests hooks
+            require_once __DIR__ . '/includes/WooCommerce/SendRequests.php';
+            new Appsero\Helper\WooCommerce\SendRequests();
+
         } else if ( class_exists( 'Easy_Digital_Downloads' ) ) {
 
+            // Initialize Edd API hooks
             require_once __DIR__ . '/includes/Edd.php';
             $client = new Appsero\Helper\Edd();
+
+            // Initialize Edd requests hooks
+            require_once __DIR__ . '/includes/Edd/SendRequests.php';
+            new Appsero\Helper\Edd\SendRequests();
         }
 
         // Initialize API hooks
         new Appsero\Helper\Api( $client );
 
-        // Initialize request hooks
-        new Appsero\Helper\SendRequests();
     }
 
     /**
@@ -150,20 +156,6 @@ class Appsero_Helper {
         }
 
         echo '</div>';
-    }
-
-    /**
-     * Run this function after activate the plugin
-     *
-     * @uses plugin_basename()
-     * @uses wp_redirect()
-     * @uses admin_url()
-     */
-    public function helper_activation( $plugin ) {
-        if( $plugin == plugin_basename( __FILE__ ) ) {
-            wp_redirect( admin_url( 'options-general.php?page=appsero_helper' ) );
-            exit;
-        }
     }
 
 } // AppSero_Helper

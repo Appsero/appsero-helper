@@ -49,4 +49,15 @@ class WooCommerce {
 
         return new WooCommerce\Activations();
     }
+
+    /**
+     * Subscriptions REST API Class
+     *
+     * @return WooCommerce\Activations
+     */
+    public function subscriptions() {
+        require_once __DIR__ . '/WooCommerce/Subscriptions.php';
+
+        return new WooCommerce\Subscriptions();
+    }
 }

@@ -1,7 +1,6 @@
 <?php
 namespace Appsero\Helper\WooCommerce;
 
-use Appsero\Helper\RestController;
 use WP_Query;
 
 /**
@@ -21,7 +20,7 @@ class Products {
         $products   = [];
         $query_args = [
             'post_type'      => 'product',
-            'posts_per_page' => $request->get_param( 'per_page' ),
+            'posts_per_page' => -1,
             'paged'          => $request->get_param( 'page' ),
         ];
 

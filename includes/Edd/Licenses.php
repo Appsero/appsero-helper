@@ -85,22 +85,24 @@ class Licenses {
      *
      * @return array
      */
-    protected function get_license_data( $id ) {
-        $license = new EDD_SL_License( $id );
+    public function get_license_data( $id, $needActivations = true ) {
+        $license = is_numeric( $id ) ? new EDD_SL_License( $id ) : $id;
+
         $status     = ( 'active' == $license->status || 'inactive' == $license->status ) ? 1 : 2;
-        $expiration = $license->expiration ? date( 'Y-m-d H:i:s', (int) $license->expiration ) : null;
+        $expiration = empty( $license->expiration ) ? '' : date( 'Y-m-d H:i:s', $license->expiration );
         // `$license->sites` not fulfill my need
-        $activations = $this->get_activations( $license->id );
+        $activations = $needActivations ? $this->get_activations( $license->id ) : [];
 
         return [
-            'key'               => $license->license_key,
-            'status'            => $status,
-            'created_at'        => $license->date_created,
-            'expire_date'       => $expiration,
-            'activation_limit'  => $license->activation_limit ?: null,
-            'activations'       => $activations,
-            'variation_source'  => (int) $license->price_id ?: null,
-            'active_sites'      => (int) $license->activation_count,
+            'key'              => $license->license_key,
+            'status'           => $status,
+            'created_at'       => $license->date_created,
+            'expire_date'      => $expiration,
+            'activation_limit' => $license->activation_limit ?: '',
+            'activations'      => $activations,
+            'variation_source' => (int) $license->price_id ?: '',
+            'active_sites'     => (int) $license->activation_count,
+            'license_source'   => 'EDD',
         ];
     }
 
