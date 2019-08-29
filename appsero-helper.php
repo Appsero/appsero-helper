@@ -93,13 +93,13 @@ class Appsero_Helper {
      * @return void
      */
     public function includes() {
+        require_once __DIR__ . '/includes/functions.php';
 
         if ( ! class_exists( 'WooCommerce' ) && ! class_exists( 'Easy_Digital_Downloads' ) ) {
             add_action( 'admin_notices', array( $this, 'dependency_error' ) );
             return;
         }
 
-        require_once __DIR__ . '/includes/functions.php';
         require_once __DIR__ . '/includes/Traits/Hooker.php';
         require_once __DIR__ . '/includes/Traits/Rest.php';
         require_once __DIR__ . '/includes/Traits/OrderHelper.php';

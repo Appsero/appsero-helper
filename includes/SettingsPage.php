@@ -50,7 +50,7 @@ class SettingsPage {
 
     /**
      * Generate the `Appsero Helper` menu
-     * @return [type] [description]
+     * @return void
      */
     public function admin_menu() {
         add_options_page(
@@ -190,6 +190,7 @@ class SettingsPage {
         }
 
         $this->error = 'Unknown Error Occurred.';
+
         return $form;
     }
 
