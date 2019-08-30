@@ -240,3 +240,50 @@ function update_appsero_license( $id, $data ) {
 
     return false !== $result;
 }
+
+/**
+ * Format common license data
+ */
+function appsero_format_common_license_data( $license, $orderData ) {
+
+    return [
+        'key'              => $license['key'],
+        'status'           => $license['status'],
+        'activation_limit' => $license['activation_limit'],
+        'expire_date'      => $license['expire_date'],
+        'variation_id'     => $orderData['variation_id'] ? $orderData['variation_id'] : null,
+        'order_id'         => $orderData['id'],
+        'user_id'          => $orderData['customer']['id'],
+    ];
+}
+
+/**
+ * Get active activations sites
+ */
+function appsero_get_active_sites_by_license( $key ) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'appsero_licenses';
+
+    $key = sanitize_text_field( $key );
+
+    $appsero_license = $wpdb->get_row( "SELECT * FROM {$table_name} WHERE `key` = '" . $key . "' LIMIT 1", ARRAY_A );
+
+    if ( ! $appsero_license ) {
+        return [];
+    }
+
+    $activations = json_decode( $appsero_license['activations'], true );
+    $activations = ( ! is_array( $activations ) ) ? [] : $activations;
+
+    $active_sites = [];
+
+    foreach ( $activations as $activation ) {
+        if ( boolval( $activation['is_active'] ) ) {
+            $active_sites[] = $activation['site_url'];
+        }
+    }
+
+    sort( $active_sites );
+
+    return $active_sites;
+}

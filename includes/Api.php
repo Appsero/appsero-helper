@@ -102,6 +102,9 @@ class Api {
 
         // Disconnect Appsero projects with WP store
         $this->post( '/products/disconnect', [ $common, 'disconnect_products' ] );
+
+        // Disconnect Appsero projects with WP store
+        $this->post( '/native-licenses/(?P<source_id>[\d]+)/activations', [ $common, 'update_native_license_activations' ] );
     }
 
     /**

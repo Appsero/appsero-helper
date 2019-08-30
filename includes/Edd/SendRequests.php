@@ -127,33 +127,19 @@ class SendRequests {
 
         $appsero_license = $wpdb->get_row( "SELECT * FROM {$table_name} WHERE `source_id` = " . $license['id'] . " LIMIT 1", ARRAY_A );
 
+        $common = appsero_format_common_license_data( $license, $orderData );
+        $common['product_id'] = $product_id;
+
         if ( $appsero_license ) {
             // Update
-            $wpdb->update( $table_name, [
-                'product_id'       => $product_id,
-                'variation_id'     => $orderData['variation_id'] ? $orderData['variation_id'] : null,
-                'order_id'         => $orderData['id'],
-                'user_id'          => $orderData['customer']['id'],
-                'key'              => $license['key'],
-                'status'           => $license['status'],
-                'activation_limit' => $license['activation_limit'],
-                'expire_date'      => $license['expire_date']['date'],
-            ], [
+            $wpdb->update( $table_name, $common, [
                 'id' => $appsero_license['id']
             ]);
         } else {
+            $common['source_id'] = $license['source_id'];
+
             // Create
-            $wpdb->insert( $table_name, [
-                'product_id'       => $product_id,
-                'variation_id'     => $orderData['variation_id'] ? $orderData['variation_id'] : null,
-                'order_id'         => $orderData['id'],
-                'user_id'          => $orderData['customer']['id'],
-                'key'              => $license['key'],
-                'status'           => $license['status'],
-                'activation_limit' => $license['activation_limit'],
-                'expire_date'      => $license['expire_date']['date'],
-                'source_id'        => $license['id'],
-            ] );
+            $wpdb->insert( $table_name, $common );
         }
     }
 

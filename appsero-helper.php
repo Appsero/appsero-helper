@@ -219,28 +219,10 @@ class Appsero_Helper {
      * Create Database Tables
      */
     private function create_tables() {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'appsero_licenses';
 
-        $charset_collate = $wpdb->get_charset_collate();
+        require_once __DIR__ . '/includes/Create_Database_Tables.php';
 
-        $sql = "CREATE TABLE IF NOT EXISTS `{$table_name}` (
-            `id` INT(11) NOT NULL AUTO_INCREMENT,
-            `product_id` BIGINT(20) NOT NULL,
-            `variation_id` BIGINT(20) NULL DEFAULT NULL,
-            `order_id` BIGINT(20) NOT NULL,
-            `user_id` BIGINT(20) NOT NULL,
-            `key` VARCHAR(255) NOT NULL,
-            `status` TINYINT(1) NULL DEFAULT '1',
-            `activation_limit` SMALLINT(5) NULL DEFAULT '0',
-            `expire_date` DATETIME NULL DEFAULT NULL,
-            `activations` LONGTEXT NULL DEFAULT NULL,
-            `source_id` BIGINT(20) NOT NULL,
-            PRIMARY KEY (`id`)
-        ) {$charset_collate};";
-
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-        dbDelta( $sql );
+        new Appsero\Helper\Create_Database_Tables();
     }
 
     /**

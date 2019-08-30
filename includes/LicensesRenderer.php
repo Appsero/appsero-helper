@@ -124,6 +124,10 @@ class LicensesRenderer {
             $activations = ( ! is_array( $activations ) ) ? [] : $activations;
         }
 
+        $activations = array_filter( $activations, function( $item ) {
+            return boolval( $item['is_active'] );
+        } );
+
         return [ $expires_on, $activations ];
     }
 
@@ -174,6 +178,8 @@ class LicensesRenderer {
                 'expire_date'      => $license['expire_date'],
                 'activations'      => json_encode( $license['activations'] ),
                 'source_id'        => $license['source_id'],
+                'store_type'       => $license['store_type'],
+                'meta'             => json_encode( $license['meta'] ),
             ] );
         }
     }
