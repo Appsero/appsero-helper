@@ -5,6 +5,7 @@ use EDD_Payment;
 use EDD_SL_License;
 use EDD_SL_Download;
 use Appsero\Helper\Traits\Hooker;
+use Appsero\Helper\Native_License;
 use Appsero\Helper\Edd\UseCases\SendRequestsHelper;
 
 /**
@@ -127,7 +128,7 @@ class SendRequests {
 
         $appsero_license = $wpdb->get_row( "SELECT * FROM {$table_name} WHERE `source_id` = " . $license['id'] . " LIMIT 1", ARRAY_A );
 
-        $common = appsero_format_common_license_data( $license, $orderData );
+        $common = Native_License::format_common_license_data( $license, $orderData );
         $common['product_id'] = $product_id;
 
         if ( $appsero_license ) {

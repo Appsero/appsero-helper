@@ -103,8 +103,12 @@ class Api {
         // Disconnect Appsero projects with WP store
         $this->post( '/products/disconnect', [ $common, 'disconnect_products' ] );
 
-        // Disconnect Appsero projects with WP store
+        // Update activations & status of native license
         $this->post( '/native-licenses/(?P<source_id>[\d]+)/activations', [ $common, 'update_native_license_activations' ] );
+
+        // Create FastSpring licnese
+        $this->post( '/native-licenses', [ $common, 'create_native_license' ], $common->create_native_license_params() );
+
     }
 
     /**
