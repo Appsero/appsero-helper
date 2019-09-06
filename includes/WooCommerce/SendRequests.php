@@ -2,7 +2,7 @@
 namespace Appsero\Helper\WooCommerce;
 
 use Appsero\Helper\Traits\Hooker;
-use Appsero\Helper\Native_License;
+use Appsero\Helper\NativeLicense;
 
 /**
  * SendRequests Class
@@ -93,7 +93,7 @@ class SendRequests {
 
         $appsero_license = $wpdb->get_row( "SELECT * FROM {$table_name} WHERE `source_id` = " . $license['source_id'] . " LIMIT 1", ARRAY_A );
 
-        $common = Native_License::format_common_license_data( $license, $orderData );
+        $common = NativeLicense::format_common_license_data( $license, $orderData );
         $common['product_id'] = $product_id;
         $common['store_type'] = 'woo';
 

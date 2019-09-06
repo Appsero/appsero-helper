@@ -47,11 +47,11 @@ class Appsero_Helper {
 
         $this->define_constants();
 
+        $this->immediate_load();
+
         add_action( 'plugins_loaded', [ $this, 'init_plugin' ] );
 
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
-
-        $this->immediate_classes();
     }
 
     /**
@@ -86,11 +86,14 @@ class Appsero_Helper {
      * @return void
      */
     public function init_plugin() {
-        // Require API classes and Initialize
-        $this->includes();
 
-        // Initialize My Account page functionality
-        $this->init_user_licenses_page();
+        if ( ! class_exists( 'WooCommerce' ) && ! class_exists( 'Easy_Digital_Downloads' ) ) {
+            // add_action( 'admin_notices', array( $this, 'dependency_error' ) );
+            return;
+        }
+
+        // Require API classes and Initialize
+        $this->woo_and_edd_includes();
     }
 
     /**
@@ -98,16 +101,8 @@ class Appsero_Helper {
      *
      * @return void
      */
-    public function includes() {
+    public function woo_and_edd_includes() {
 
-        if ( ! class_exists( 'WooCommerce' ) && ! class_exists( 'Easy_Digital_Downloads' ) ) {
-            add_action( 'admin_notices', array( $this, 'dependency_error' ) );
-            return;
-        }
-
-        require_once __DIR__ . '/includes/functions.php';
-        require_once __DIR__ . '/includes/Traits/Hooker.php';
-        require_once __DIR__ . '/includes/Traits/Rest.php';
         require_once __DIR__ . '/includes/Traits/OrderHelper.php';
         require_once __DIR__ . '/includes/Api.php';
 
@@ -116,6 +111,7 @@ class Appsero_Helper {
             require_once __DIR__ . '/includes/WooCommerce/UseCases/SendRequestsHelper.php';
             require_once __DIR__ . '/includes/WooCommerce/SendRequests.php';
             require_once __DIR__ . '/includes/WooCommerce.php';
+            require_once __DIR__ . '/includes/WooCommerce/MyAccountPage.php';
 
             // Initialize WooCommerce API hooks
             $client = new Appsero\Helper\WooCommerce();
@@ -123,17 +119,24 @@ class Appsero_Helper {
             // Initialize WooCommerce requests hooks
             new Appsero\Helper\WooCommerce\SendRequests();
 
+            // WooCommerce My Account page
+            new Appsero\Helper\WooCommerce\MyAccountPage();
+
         } else if ( class_exists( 'Easy_Digital_Downloads' ) ) {
             // Include class files
             require_once __DIR__ . '/includes/Edd/UseCases/SendRequestsHelper.php';
             require_once __DIR__ . '/includes/Edd/SendRequests.php';
             require_once __DIR__ . '/includes/Edd.php';
+            require_once __DIR__ . '/includes/Edd/MyAccountPage.php';
 
             // Initialize Edd API hooks
             $client = new Appsero\Helper\Edd();
 
             // Initialize Edd requests hooks
             new Appsero\Helper\Edd\SendRequests();
+
+            // EDD My Account page
+            new Appsero\Helper\Edd\MyAccountPage();
         }
 
         // Initialize API hooks
@@ -169,23 +172,6 @@ class Appsero_Helper {
     }
 
     /**
-     * Run my account page funcitonality
-     */
-    private function init_user_licenses_page() {
-        if ( class_exists( 'WooCommerce' ) ) {
-            require_once __DIR__ . '/includes/WooCommerce/MyAccountPage.php';
-
-            new Appsero\Helper\WooCommerce\MyAccountPage();
-        }
-
-        if ( class_exists( 'Easy_Digital_Downloads' ) ) {
-            require_once __DIR__ . '/includes/Edd/MyAccountPage.php';
-
-            new Appsero\Helper\Edd\MyAccountPage();
-        }
-    }
-
-    /**
      * Plugin activation and deactivation hook
      */
     public function activation_and_deactivation_hook() {
@@ -201,7 +187,7 @@ class Appsero_Helper {
     public function enqueue_scripts() {
         wp_register_style( 'ashp-my-account', ASHP_ROOT_URL . 'assets/css/my-account.css' );
 
-        wp_register_script( 'ashp-my-account', ASHP_ROOT_URL . 'assets/js/my-account.js' );
+        wp_register_script( 'ashp-my-account', ASHP_ROOT_URL . 'assets/js/my-account.js', [ 'jquery' ] );
     }
 
     /**
@@ -228,7 +214,11 @@ class Appsero_Helper {
     /**
      * Run class on Appsero_Helper instantiate
      */
-    private function immediate_classes() {
+    private function immediate_load() {
+        // Helpers
+        require_once __DIR__ . '/includes/Traits/Hooker.php';
+        require_once __DIR__ . '/includes/Traits/Rest.php';
+        require_once __DIR__ . '/includes/functions.php';
 
         // Add settings page for set API key
         require_once __DIR__ . '/includes/SettingsPage.php';
@@ -244,6 +234,11 @@ class Appsero_Helper {
         require_once __DIR__ . '/includes/Shortcode.php';
 
         new Appsero\Helper\Shortcode();
+
+        // Common API
+        require_once __DIR__ . '/includes/Common/Api.php';
+
+        new Appsero\Helper\Common\Api();
     }
 
 } // Appsero_Helper

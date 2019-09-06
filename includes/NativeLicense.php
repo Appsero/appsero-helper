@@ -4,7 +4,7 @@ namespace Appsero\Helper;
 use WP_REST_Request;
 use WP_REST_Response;
 
-class Native_License {
+class NativeLicense {
 
     /**
      * Create native license

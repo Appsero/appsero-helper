@@ -115,3 +115,28 @@
 .appsero-notice.notice-error {
     background-color: #e2401c;
 }
+
+/* Orders */
+table.appsero-order-table  {
+    font-size: 17px;
+    border-spacing: 0;
+    width: 100%;
+    border-collapse: separate;
+}
+table.appsero-order-table thead th {
+    padding: 1.4em;
+}
+table.appsero-order-table tbody td {
+    background-color: #fdfdfd;
+}
+table.appsero-order-table tbody tr:nth-child(2n) td {
+    background-color: #fbfbfb;
+}
+table.appsero-order-table a {
+    color: #96588a;
+}
+table.appsero-order-table td, table.appsero-order-table th {
+    padding: 1em 1.4em;
+    text-align: left;
+    vertical-align: middle;
+}

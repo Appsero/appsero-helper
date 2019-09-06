@@ -20,18 +20,11 @@ class Api {
     private $app;
 
     /**
-     * REST Namespace
-     *
-     * @var string
-     */
-    public $namespace = 'appsero/v1';
-
-    /**
      * [__construct description]
      *
      * @param Object $client
      */
-    function __construct( $client ) {
+    public function __construct( $client ) {
         $this->app = $client;
 
         $this->action( 'rest_api_init', 'init_api' );
@@ -48,9 +41,6 @@ class Api {
         $licenses      = $this->app->licenses();
         $activations   = $this->app->activations();
         $subscriptions = $this->app->subscriptions();
-        $common        = $this->common_api();
-
-        $this->get( '/status', [ $this, 'app_status' ] );
 
         // Get all projects with pagination
         $this->get( '/products', [ $products, 'get_items' ], appsero_api_collection_params() );
@@ -97,40 +87,6 @@ class Api {
             appsero_api_params_with_product_id()
         );
 
-        // Connect Appsero projects with WP store
-        $this->post( '/products/connect', [ $common, 'connect_products' ] );
-
-        // Disconnect Appsero projects with WP store
-        $this->post( '/products/disconnect', [ $common, 'disconnect_products' ] );
-
-        // Update activations & status of native license
-        $this->post( '/native-licenses/(?P<source_id>[\d]+)/activations', [ $common, 'update_native_license_activations' ] );
-
-        // Create FastSpring licnese
-        $this->post( '/native-licenses', [ $common, 'create_native_license' ], $common->create_native_license_params() );
-
     }
 
-    /**
-     * Public app status
-     *
-     * @return \WP_REST_Response
-     */
-    public function app_status() {
-
-        return rest_ensure_response( [
-            'version' => ASHP_VERSION,
-            'php'     => phpversion(),
-        ] );
-    }
-
-    /**
-     * connect_products
-     */
-    private function common_api() {
-        // Initialize common API class
-        require_once __DIR__ . '/Common_Api.php';
-
-        return new Common_Api();
-    }
 }
