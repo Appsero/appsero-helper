@@ -15,13 +15,15 @@ class Native_License {
         global $wpdb;
         $table_name = $wpdb->prefix . 'appsero_licenses';
 
+        $user_id = $this->customer_first_or_create( $requested['customer'] );
+
         $license_data = [
             'source_id'        => $requested['id'],
             'key'              => $requested['key'],
             'activation_limit' => $requested['activation_limit'],
             'expire_date'      => $requested['expire_date'],
             'store_type'       => 'fastspring',
-            'user_id'          => $this->customer_first_or_create( $requested['customer'] ),
+            'user_id'          => $user_id,
             'meta'             => json_encode( [
                 'product_name'   => $requested['product_name'],
                 'variation_name' => $requested['variation_name'],
@@ -32,6 +34,7 @@ class Native_License {
 
         return new WP_REST_Response( [
             'success' => true,
+            'user_id' => $user_id,
         ] );
     }
 

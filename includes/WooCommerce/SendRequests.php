@@ -95,6 +95,7 @@ class SendRequests {
 
         $common = Native_License::format_common_license_data( $license, $orderData );
         $common['product_id'] = $product_id;
+        $common['store_type'] = 'woo';
 
         if ( $appsero_license ) {
             // Update

@@ -75,18 +75,12 @@ class LicensesRenderer {
     public function get_licenses( $order_id = null ) {
         $user_id = get_current_user_id();
 
-        if ( $order_id ) {
-            $order_ids = [ $order_id ];
-        } else {
-            $order_ids = $this->get_order_ids( $user_id );
-        }
-
         // First try to get licenses from WP table
-        $licenses = $this->get_stored_licenses( $user_id, $order_ids );
+        $licenses = $this->get_stored_licenses( $user_id, $order_id );
 
         // If no data found then get from appsero API
         if ( empty( $licenses ) ) {
-            $licenses = $this->get_appsero_licenses( $user_id, $order_ids );
+            $licenses = $this->get_appsero_licenses( $user_id );
         }
 
         return $licenses;
@@ -95,14 +89,18 @@ class LicensesRenderer {
     /**
      * Get licenses from WP database
      */
-    private function get_stored_licenses( $user_id, $order_ids ) {
+    private function get_stored_licenses( $user_id, $order_id = null ) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'appsero_licenses';
-        $sql = "
-            SELECT * FROM {$table_name}
-            WHERE `user_id` = {$user_id}
-            AND `order_id` IN ( " . implode( $order_ids, ',' ) . " )
-        ";
+
+        $sql = "SELECT * FROM {$table_name} WHERE `user_id` = " . intval( $user_id );
+
+        if ( $order_id ) {
+            $sql .= " AND `order_id` = " . intval( $order_id );
+        }
+
+        $sql .= " ORDER BY id DESC;";
+
         return $wpdb->get_results( $sql, ARRAY_A );
     }
 
@@ -134,10 +132,8 @@ class LicensesRenderer {
     /**
      * Get license from appsero API
      */
-    private function get_appsero_licenses( $user_id, $order_ids ) {
-        $query = http_build_query( [ 'orders_id' => $order_ids ] );
-
-        $route = 'public/users/' . $user_id . '/licenses?' . $query;
+    private function get_appsero_licenses( $user_id ) {
+        $route = 'public/users/' . $user_id . '/licenses';
 
         // Send request to appsero server
         $response = appsero_helper_remote_get( $route );
@@ -153,7 +149,7 @@ class LicensesRenderer {
             $this->store_appsero_licenses( $response['data'] );
 
             // Get newly stored licenses
-            return $this->get_stored_licenses( $user_id, $order_ids );
+            return $this->get_stored_licenses( $user_id );
         }
 
         return [];
@@ -185,51 +181,32 @@ class LicensesRenderer {
     }
 
     /**
-     * Get order ids
-     */
-    private function get_order_ids( $user_id ) {
-        if ( class_exists( 'WooCommerce' ) ) {
-            return wc_get_orders( [
-                'customer' => $user_id,
-                'return'   => 'ids',
-                'paginate' => false,
-                'limit'    => -1,
-            ] );
-        }
-
-        if ( class_exists( 'Easy_Digital_Downloads' ) ) {
-            return edd_get_payments( [
-                'user'     => $user_id,
-                'nopaging' => true,
-                'status'   => 'publish',
-                'orderby'  => 'date',
-                'fields'   => 'ids'
-            ] );
-        }
-
-        return [];
-    }
-
-    /**
      * Get product of license
      */
-    private function get_license_product( $product_id ) {
-        if ( class_exists( 'WooCommerce' ) ) {
-            return wc_get_product( $product_id );
+    private function get_license_product( $license ) {
+
+        if ( 'woo' == $license['store_type'] && class_exists( 'WooCommerce' ) ) {
+            return wc_get_product( $license['product_id'] );
         }
 
-        if ( class_exists( 'Easy_Digital_Downloads' ) ) {
-            return edd_get_download( $product_id );
+        if ( 'edd' == $license['store_type'] && class_exists( 'Easy_Digital_Downloads' ) ) {
+            return edd_get_download( $license['product_id'] );
         }
 
-        return new \stdClass;
+        $stdClass                 = new \stdClass;
+        $meta                     = json_decode( $license['meta'], true );
+        $stdClass->product_name   = isset( $meta['product_name'] ) ? $meta['product_name'] : '-';
+        $stdClass->variation_name = isset( $meta['variation_name'] ) ? $meta['variation_name'] : '-';
+
+        return $stdClass;
     }
 
     /**
      * Print single license
      */
     public function single_license_output( $license ) {
-        $product = $this->get_license_product( $license['product_id'] );
+        $product = $this->get_license_product( $license );
+        $product_name = isset( $product->product_name ) ? $product->product_name : $product->get_name();
 
         list( $expires_on, $activations ) = $this->get_activations_and_expires( $license );
         ?>
@@ -241,7 +218,7 @@ class LicensesRenderer {
             <div class="license-header">
                 <div class="license-product-info">
                     <div class="license-product-title">
-                        <h2><?php echo $product->get_name(); ?></h2>
+                        <h2><?php echo $product_name; ?></h2>
                         <p class="h3"><?php echo $this->get_variation_name( $product, $license ); ?></p>
                     </div>
                     <div class="license-product-expire">
@@ -250,7 +227,11 @@ class LicensesRenderer {
                     </div>
                     <div class="license-product-activation">
                         <h4>Activations Remaining</h4>
-                        <p class="h3"><?php echo $license['activation_limit'] - count( $activations ); ?></p>
+                        <?php if ( $license['activation_limit'] && 0 < $license['activation_limit'] ) : ?>
+                            <p class="h3"><?php echo $license['activation_limit'] - count( $activations ); ?></p>
+                        <?php else: ?>
+                            <p class="h3">Unlimited</p>
+                        <?php endif ?>
                     </div>
                 </div>
                 <div class="license-toggle-info">
@@ -268,6 +249,11 @@ class LicensesRenderer {
      * Find variation name of product
      */
     private function get_variation_name( $product, $license ) {
+        // FastSpring
+        if ( 'fastspring' == $license['store_type'] ) {
+            return $product->variation_name;
+        }
+
         // For EDD
         if ( is_a( $product, 'EDD_Download' ) ) {
             $payment = edd_get_payment( $license['order_id'] );
