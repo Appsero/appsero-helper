@@ -31,28 +31,16 @@ class OrdersRenderer {
                 <tbody>
                     <?php
                         $orders = $this->get_orders();
+                        if ( count( $orders ) > 0 ) :
 
                         foreach ( $orders as $order ) {
-
                             $this->single_order_output( $order );
-
                         }
-                    ?>
 
-                    <tr>
-                        <td>#123</td>
-                        <td>August 30, 2019</td>
-                        <td>Completed</td>
-                        <td>0.00</td>
-                        <td><a href="#">View Invoice</a></td>
-                    </tr>
-                    <tr>
-                        <td>#123</td>
-                        <td>August 30, 2019</td>
-                        <td>Completed</td>
-                        <td>0.00</td>
-                        <td><a href="#">View Invoice</a></td>
-                    </tr>
+                        else:
+                    ?>
+                    <div class="appsero-notice notice-info">No orders found.</div>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -67,11 +55,11 @@ class OrdersRenderer {
     private function single_order_output( $order ) {
         ?>
         <tr>
-            <td>#123</td>
-            <td>August 30, 2019</td>
-            <td>Completed</td>
-            <td>0.00</td>
-            <td><a href="#">View Invoice</a></td>
+            <td>#<?php echo $order['id']; ?></td>
+            <td><?php echo $order['ordered_at']; ?></td>
+            <td><?php echo $order['status']; ?></td>
+            <td><?php echo $order['total']; ?></td>
+            <td><a href="<?php echo $order['invoice_url']; ?>">View Invoice</a></td>
         </tr>
         <?php
     }
@@ -80,7 +68,8 @@ class OrdersRenderer {
      * Get orders from appsero API
      */
     private function get_orders() {
-        $route = 'public/users/' . $user_id . '/orders';
+        $user_id = get_current_user_id();
+        $route   = 'public/users/' . $user_id . '/orders';
 
         // Send request to appsero server
         $response = appsero_helper_remote_get( $route );
@@ -89,6 +78,8 @@ class OrdersRenderer {
             return [];
         }
 
-        return json_decode( wp_remote_retrieve_body( $response ), true );
+        $body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+        return isset( $body['data'] ) ? $body['data'] : [];
     }
 }

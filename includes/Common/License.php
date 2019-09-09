@@ -65,7 +65,8 @@ class License {
             'activation_limit' => [
                 'description'       => __( 'Limit for license activation limit.', 'appsero-helper' ),
                 'type'              => 'integer',
-                'required'          => true,
+                'required'          => false,
+                'default'           => 0,
                 'sanitize_callback' => 'absint',
             ],
             'status' => [

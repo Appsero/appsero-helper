@@ -251,7 +251,7 @@ class LicensesRenderer {
     private function get_variation_name( $product, $license ) {
         // FastSpring
         if ( 'fastspring' == $license['store_type'] ) {
-            return $product->variation_name;
+            return $product->variation_name ? $product->variation_name : '-';
         }
 
         // For EDD
