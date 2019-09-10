@@ -24,20 +24,23 @@ class Ajax_Requsts {
 
         $body = [
             'user_id'    => get_current_user_id(),
-            'product_id' => $_POST['product_id'],
         ];
 
         $response = appsero_helper_remote_post( $route, $body, 'DELETE' );
-        $response_code = wp_remote_retrieve_response_code( $response );
+        // $response_code = wp_remote_retrieve_response_code( $response );
         $response = json_decode( wp_remote_retrieve_body( $response ), true );
 
         if ( isset( $response['success'] ) && $response['success'] ) {
             // Delete local DB record
             $license = get_appsero_license( $_POST['license_id'] );
 
-            $new_activations = array_filter( $license['activations'], function ( $activation ) {
-                return $_POST['activation_id'] != $activation['id'];
-            } );
+            $new_activations = array_map( function ( $activation ) {
+                if ( $_POST['activation_id'] == $activation['id'] ) {
+                    $activation['is_active'] = 0;
+                }
+
+                return $activation;
+            }, $license['activations'] );
 
             update_appsero_license( $license['id'], [
                 'activations' => json_encode( $new_activations ),

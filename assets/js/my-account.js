@@ -30,8 +30,6 @@ jQuery( document ).ready( function () {
         };
 
         if ( isRemove ) {
-            console.log('Yes');
-            // TODO: send delete request
             jQuery.ajax({
                 method: "POST",
                 data: data,
