@@ -69,9 +69,9 @@ class MyAccountPage {
      * Licenses page HTML content.
      */
     public function my_licenses_content() {
-        require_once ASHP_ROOT_PATH . 'includes/LicensesRenderer.php';
+        require_once ASHP_ROOT_PATH . 'includes/Renderer/LicensesRenderer.php';
 
-        $renderer = new \Appsero\Helper\LicensesRenderer();
+        $renderer = new \Appsero\Helper\Renderer\LicensesRenderer();
 
         echo $renderer->show();
     }

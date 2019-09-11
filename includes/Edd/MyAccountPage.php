@@ -55,9 +55,9 @@ class MyAccountPage {
 
             echo '<p><a href="'. $back_url .'" class="edd-manage-license-back edd-submit button gray">Go back</a></p>';
 
-            require_once ASHP_ROOT_PATH . 'includes/LicensesRenderer.php';
+            require_once ASHP_ROOT_PATH . 'includes/Renderer/LicensesRenderer.php';
 
-            $renderer = new \Appsero\Helper\LicensesRenderer();
+            $renderer = new \Appsero\Helper\Renderer\LicensesRenderer();
 
             echo $renderer->show( intval( $_GET['order_id'] ) );
 

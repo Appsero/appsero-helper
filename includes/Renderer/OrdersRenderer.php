@@ -1,5 +1,5 @@
 <?php
-namespace Appsero\Helper;
+namespace Appsero\Helper\Renderer;
 
 class OrdersRenderer {
 
@@ -18,6 +18,10 @@ class OrdersRenderer {
         ob_start();
         ?>
         <div class="appsero-orders">
+            <?php
+                $orders = $this->get_orders();
+                if ( count( $orders ) > 0 ) :
+            ?>
             <table class="appsero-order-table">
                 <thead>
                     <tr>
@@ -30,19 +34,15 @@ class OrdersRenderer {
                 </thead>
                 <tbody>
                     <?php
-                        $orders = $this->get_orders();
-                        if ( count( $orders ) > 0 ) :
-
                         foreach ( $orders as $order ) {
                             $this->single_order_output( $order );
                         }
-
-                        else:
                     ?>
-                    <div class="appsero-notice notice-info">No orders found.</div>
-                    <?php endif; ?>
                 </tbody>
             </table>
+            <?php else: ?>
+                <div class="appsero-notice notice-info">No orders found.</div>
+            <?php endif; ?>
         </div>
         <?php
 

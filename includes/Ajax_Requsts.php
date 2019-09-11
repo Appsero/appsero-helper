@@ -26,7 +26,7 @@ class Ajax_Requsts {
             'user_id'    => get_current_user_id(),
         ];
 
-        $response = appsero_helper_remote_post( $route, $body, 'DELETE' );
+        $response = appsero_helper_remote_post( $route, $body, 'PATCH' );
         // $response_code = wp_remote_retrieve_response_code( $response );
         $response = json_decode( wp_remote_retrieve_body( $response ), true );
 

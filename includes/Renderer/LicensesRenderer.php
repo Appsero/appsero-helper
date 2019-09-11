@@ -1,5 +1,5 @@
 <?php
-namespace Appsero\Helper;
+namespace Appsero\Helper\Renderer;
 
 class LicensesRenderer {
 

@@ -18,10 +18,10 @@ class NativeLicense {
         $user_id = $this->customer_first_or_create( $requested['customer'] );
 
         $license_data = [
-            'source_id'        => $requested['id'],
             'key'              => $requested['key'],
             'activation_limit' => $requested['activation_limit'],
             'expire_date'      => $requested['expire_date'],
+            'status'           => $requested['status'],
             'store_type'       => 'fastspring',
             'user_id'          => $user_id,
             'meta'             => json_encode( [
@@ -30,7 +30,19 @@ class NativeLicense {
             ] ),
         ];
 
-        $wpdb->insert( $table_name, $license_data );
+        $appsero_license = $wpdb->get_row( "SELECT * FROM {$table_name} WHERE `source_id` = " . $requested['id'] . " LIMIT 1", ARRAY_A );
+
+        if ( $appsero_license ) {
+            // Update
+            $wpdb->update( $table_name, $license_data, [
+                'id' => $appsero_license['id']
+            ]);
+        } else {
+            $license_data['source_id'] = $requested['id'];
+
+            // Create
+            $wpdb->insert( $table_name, $license_data );
+        }
 
         return new WP_REST_Response( [
             'success' => true,
