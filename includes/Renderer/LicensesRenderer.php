@@ -218,7 +218,7 @@ class LicensesRenderer {
             <div class="license-header">
                 <div class="license-product-info">
                     <div class="license-product-title">
-                        <h2><?php echo $product_name; ?></h2>
+                        <h2><?php echo $product_name; ?> <?php $this->license_status( $license ); ?></h2>
                         <p class="h3"><?php echo $this->get_variation_name( $product, $license ); ?></p>
                     </div>
                     <div class="license-product-expire">
@@ -325,6 +325,19 @@ class LicensesRenderer {
         }
 
         return '-';
+    }
+
+    /**
+     * Show license status
+     */
+    private function license_status( $license ) {
+        if ( 0 == $license['status'] ) {
+            echo '<small class="license-status">Inactive</small>';
+        }
+
+        if ( 2 == $license['status'] ) {
+            echo '<small class="license-status">Disabled</small>';
+        }
     }
 
 }
