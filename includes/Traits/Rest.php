@@ -12,6 +12,13 @@ use WP_Error;
 trait Rest {
 
     /**
+     * REST Namespace
+     *
+     * @var string
+     */
+    protected $namespace = 'appsero/v1';
+
+    /**
      * Register GET route
      *
      * @since 1.0.0

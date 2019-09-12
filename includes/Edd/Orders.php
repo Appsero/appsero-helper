@@ -5,13 +5,14 @@ use WP_Query;
 use EDD_Payments_Query;
 use EDD_Subscriptions_DB;
 use Appsero\Helper\Traits\OrderHelper;
+use Appsero\Helper\Edd\UseCases\SendRequestsHelper;
 
 /**
  * Licenses
  */
 class Orders {
 
-    use OrderHelper;
+    use OrderHelper, SendRequestsHelper;
 
     /**
      * Product id to get orders
@@ -64,6 +65,13 @@ class Orders {
 
         $cart = $this->get_cart_details( $payment->cart_details );
 
+        // Find variation ID
+        if ( isset( $cart['item_number']['options']['price_id'] ) && $cart['item_number']['options']['price_id'] ) {
+            $variation_id = $cart['item_number']['options']['price_id'];
+        } else {
+            $variation_id = '';
+        }
+
         // Calculate fee for this item
         $fee = 0;
         if ( ! empty( $payment->subtotal ) && ! empty( $payment->fees_total ) ) {
@@ -85,6 +93,8 @@ class Orders {
             'customer'       => $this->edd_customer_data( $payment ),
             'order_type'     => '',
             'subscription'   => [],
+            'licenses'       => $this->get_order_licenses( $payment->ID, $this->download_id ),
+            'variation_id'   => $variation_id,
         ];
 
         // Check if EDD Recurring Payments active and this order has subscription
