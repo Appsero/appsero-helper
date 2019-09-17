@@ -75,33 +75,7 @@ class LicensesRenderer {
     public function get_licenses( $order_id = null ) {
         $user_id = get_current_user_id();
 
-        // First try to get licenses from WP table
-        $licenses = $this->get_stored_licenses( $user_id, $order_id );
-
-        // If no data found then get from appsero API
-        if ( empty( $licenses ) ) {
-            $licenses = $this->get_appsero_licenses( $user_id );
-        }
-
-        return $licenses;
-    }
-
-    /**
-     * Get licenses from WP database
-     */
-    private function get_stored_licenses( $user_id, $order_id = null ) {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'appsero_licenses';
-
-        $sql = "SELECT * FROM {$table_name} WHERE `user_id` = " . intval( $user_id );
-
-        if ( $order_id ) {
-            $sql .= " AND `order_id` = " . intval( $order_id );
-        }
-
-        $sql .= " ORDER BY id DESC;";
-
-        return $wpdb->get_results( $sql, ARRAY_A );
+        return $this->get_appsero_licenses( $user_id, $order_id );
     }
 
     /**
@@ -132,8 +106,8 @@ class LicensesRenderer {
     /**
      * Get license from appsero API
      */
-    private function get_appsero_licenses( $user_id ) {
-        $route = 'public/users/' . $user_id . '/licenses';
+    private function get_appsero_licenses( $user_id, $order_id ) {
+        $route = 'public/users/' . $user_id . '/licenses/?order_source_id=' . $order_id;
 
         // Send request to appsero server
         $response = appsero_helper_remote_get( $route );
@@ -146,38 +120,10 @@ class LicensesRenderer {
 
         // Store licenses
         if ( isset( $response['data'] ) && ! empty( $response['data'] ) ) {
-            $this->store_appsero_licenses( $response['data'] );
-
-            // Get newly stored licenses
-            return $this->get_stored_licenses( $user_id );
+            return $response['data'];
         }
 
         return [];
-    }
-
-    /**
-     * Store licenses that are received from appsero
-     */
-    private function store_appsero_licenses( $licenses ) {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'appsero_licenses';
-
-        foreach ( $licenses as $license ) {
-            $wpdb->insert( $table_name, [
-                'product_id'       => $license['product_id'],
-                'variation_id'     => $license['variation_id'],
-                'order_id'         => $license['order_id'],
-                'user_id'          => $license['user_id'],
-                'key'              => $license['key'],
-                'status'           => $license['status'],
-                'activation_limit' => $license['activation_limit'],
-                'expire_date'      => $license['expire_date'],
-                'activations'      => json_encode( $license['activations'] ),
-                'source_id'        => $license['source_id'],
-                'store_type'       => $license['store_type'],
-                'meta'             => json_encode( $license['meta'] ),
-            ] );
-        }
     }
 
     /**
@@ -194,7 +140,7 @@ class LicensesRenderer {
         }
 
         $stdClass                 = new \stdClass;
-        $meta                     = json_decode( $license['meta'], true );
+        $meta                     = $license['meta'];
         $stdClass->product_name   = isset( $meta['product_name'] ) ? $meta['product_name'] : '-';
         $stdClass->variation_name = isset( $meta['variation_name'] ) ? $meta['variation_name'] : '-';
 
@@ -213,7 +159,6 @@ class LicensesRenderer {
         <div class="appsero-license" data-showing="0"
             data-sourceid="<?php echo $license['source_id']; ?>"
             data-productid="<?php echo $license['product_id']; ?>"
-            data-licenseid="<?php echo $license['id']; ?>"
         >
             <div class="license-header">
                 <div class="license-product-info">

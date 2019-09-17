@@ -25,7 +25,6 @@ jQuery( document ).ready( function () {
             action: "appsero_remove_activation",
             activation_id: aTag.data('activationid'),
             source_id: licenseParent.data('sourceid'),
-            license_id: licenseParent.data('licenseid'),
             product_id: licenseParent.data('productid'),
         };
 
@@ -33,11 +32,17 @@ jQuery( document ).ready( function () {
             jQuery.ajax({
                 method: "POST",
                 data: data,
-                url: woocommerce_params.ajax_url,
+                url: appseroHelper.ajaxUrl,
                 success: function ( response ) {
                     if ( response.success ) {
-                        window.location.reload();
+                        aTag.parents('.appsero-activation-item').hide();
+                        alert("Site has been removed.");
+                    } else {
+                        alert("Unable to remove site.");
                     }
+                },
+                error: function ( xhr, status, errors ) {
+                    alert("Unable to remove site.");
                 }
             });
         }

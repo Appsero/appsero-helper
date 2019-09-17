@@ -152,7 +152,7 @@ function appsero_helper_remote_post( $route, $body, $method = 'POST' ) {
         'redirection' => 5,
         'body'        => $body,
         'headers'     => [
-            'user-agent' => 'AppSero/' . md5( esc_url( home_url() ) ) . ';',
+            'user-agent' => 'Appsero/' . md5( esc_url( home_url() ) ) . ';',
             'Accept'     => 'application/json',
             'X-Api-Key'  => $api_key,
         ],
@@ -177,7 +177,7 @@ function appsero_helper_remote_get( $route ) {
         'timeout'     => 15,
         'redirection' => 5,
         'headers'     => [
-            'user-agent' => 'AppSero/' . md5( esc_url( home_url() ) ) . ';',
+            'user-agent' => 'Appsero/' . md5( esc_url( home_url() ) ) . ';',
             'Accept'     => 'application/json',
             'X-Api-Key'  => $api_key,
         ],

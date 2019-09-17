@@ -8,7 +8,7 @@ class Create_Database_Tables {
      */
     public function __construct() {
 
-        $this->create_licenses_table();
+        // $this->create_licenses_table();
     }
 
     /**
