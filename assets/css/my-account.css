@@ -1,3 +1,7 @@
+.entry .entry-content .appsero-licenses,
+.appsero-licenses {
+    max-width: initial;
+}
 .appsero-license {
     border: 1px solid #E1DDE0;
     margin-bottom: 30px;
@@ -7,6 +11,10 @@
     width: calc(100% - 80px);
     display: flex;
     border-right: 1px solid #E1DDE0;
+}
+.license-product-info h2:after,
+.license-product-info h2:before {
+    display: none;
 }
 .license-product-info h2 {
     color: #A04E8C;
@@ -42,6 +50,16 @@
     justify-content: center;
     font-size: 25px;
     cursor: pointer;
+}
+.license-toggle-info svg {
+    width: 25px;
+    height: 25px;
+    fill: #333333;
+}
+.license-toggle-info.license-button-toggled svg {
+    -webkit-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 .license-product-title {
     width: 50%;
