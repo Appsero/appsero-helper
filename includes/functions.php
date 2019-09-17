@@ -239,24 +239,18 @@ function update_appsero_license( $id, $data ) {
  * Get active activations sites
  */
 function appsero_get_active_sites_by_license( $key ) {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'appsero_licenses';
-
     $key = sanitize_text_field( $key );
 
-    $appsero_license = $wpdb->get_row( "SELECT * FROM {$table_name} WHERE `key` = '" . $key . "' LIMIT 1", ARRAY_A );
+    $appsero_license = appsero_get_license_by_key( $key );
 
     if ( ! $appsero_license ) {
         return [];
     }
 
-    $activations = json_decode( $appsero_license['activations'], true );
-    $activations = ( ! is_array( $activations ) ) ? [] : $activations;
-
     $active_sites = [];
 
-    foreach ( $activations as $activation ) {
-        if ( boolval( $activation['is_active'] ) ) {
+    foreach ( (array) $appsero_license['activations'] as $activation ) {
+        if ( isset( $activation['is_active'] ) && 1 == $activation['is_active'] ) {
             $active_sites[] = $activation['site_url'];
         }
     }
@@ -307,4 +301,27 @@ function appsero_object_validate_callback( $value, $request, $param = '' ) {
     }
 
     return true;
+}
+
+
+/**
+ * Get active activations sites
+ */
+function appsero_get_license_by_key( $key ) {
+    $route = 'public/licenses/' . $key;
+
+    // Send request to appsero server
+    $response = appsero_helper_remote_get( $route );
+
+    if ( wp_remote_retrieve_response_code( $response ) != 200 ) {
+        return false;
+    }
+
+    $response_body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+    if ( empty( $response_body['data'] ) ) {
+        return false;
+    }
+
+    return $response_body['data'];
 }

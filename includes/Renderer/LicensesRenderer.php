@@ -97,7 +97,7 @@ class LicensesRenderer {
         }
 
         $activations = array_filter( $activations, function( $item ) {
-            return boolval( $item['is_active'] );
+            return 1 == $item['is_active'];
         } );
 
         return [ $expires_on, $activations ];
