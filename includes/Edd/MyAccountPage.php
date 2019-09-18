@@ -7,11 +7,13 @@ class MyAccountPage {
      * Constructor of EDD MyAccountPage class
      */
     public function __construct() {
-        add_action( 'edd_purchase_history_header_after', [ $this, 'table_header_row' ] );
+        if ( ! class_exists( 'EDD_SL_License' ) ) {
+            add_action( 'edd_purchase_history_header_after', [ $this, 'table_header_row' ] );
 
-        add_action( 'edd_purchase_history_row_end', [ $this, 'table_body_rows' ], 10, 2 );
+            add_action( 'edd_purchase_history_row_end', [ $this, 'table_body_rows' ], 10, 2 );
 
-        add_filter( 'edd_allow_template_part_history_purchases', [ $this, 'history_purchases_template' ] );
+            add_filter( 'edd_allow_template_part_history_purchases', [ $this, 'history_purchases_template' ] );
+        }
     }
 
     /**
@@ -27,23 +29,12 @@ class MyAccountPage {
      * Inside the tr of tbody
      */
     public function table_body_rows( $payment_id, $payment_meta ) {
-        global $wpdb;
-        $table = $wpdb->prefix . 'appsero_licenses';
-        $license = $wpdb->get_row( "
-                        SELECT * FROM {$table} WHERE
-                        `order_id` = {$payment_id}
-                        LIMIT 1;
-                    " );
-        echo '<td class="appsero_licenses_col">';
-
-        if ( $license ) {
-            $license_url = esc_url( add_query_arg( [ 'license' => 'appsero', 'order_id' => $payment_id ] ) );
-            echo '<a href="' . $license_url . '">View Licenses</a>';
-        } else {
-            echo '-';
-        }
-
-        echo '</td>';
+        $license_url = esc_url( add_query_arg( [ 'license' => 'appsero', 'order_id' => $payment_id ] ) );
+        ?>
+            <td class="appsero_licenses_col">
+                <a href="<?php echo $license_url; ?>">View Licenses</a>
+            </td>
+        <?php
     }
 
     /**
