@@ -58,7 +58,10 @@ class OrdersRenderer {
             <td>#<?php echo $order['id']; ?></td>
             <td><?php echo $order['ordered_at']; ?></td>
             <td><?php echo $order['status']; ?></td>
-            <td><?php echo $order['total']; ?></td>
+            <td><?php
+                echo isset( $order['currency'] ) ? $order['currency'] : '';
+                echo $order['total'];
+            ?></td>
             <td><a href="<?php echo $order['invoice_url']; ?>">View Invoice</a></td>
         </tr>
         <?php
