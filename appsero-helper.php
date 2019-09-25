@@ -2,10 +2,10 @@
 /**
  * Plugin Name: Appsero Helper
  * Plugin URI: https://wordpress.org/plugins/appsero-helper
- * Description: Helper plugin to connect WordPress store to AppSero
+ * Description: Helper plugin to connect WordPress store to Appsero
  * Author: Appsero
  * Author URI: https://appsero.com
- * Version: 1.0.2
+ * Version: 1.1.0
  * Text Domain: appsero-helper
  */
 
@@ -24,7 +24,7 @@ class Appsero_Helper {
      *
      * @var string
      */
-    public $version = '1.0.2';
+    public $version = '1.1.0';
 
     /**
      * The single instance of the class.
@@ -41,20 +41,21 @@ class Appsero_Helper {
      * @uses add_action()
      */
     public function __construct() {
+
+        register_activation_hook( __FILE__, [ $this, 'activation_hook' ] );
+        register_deactivation_hook( __FILE__, [ $this, 'activation_and_deactivation_hook' ] );
+
         $this->define_constants();
+
+        $this->immediate_load();
 
         add_action( 'plugins_loaded', [ $this, 'init_plugin' ] );
 
-        add_action( 'wp_ajax_connect_with_appsero', [ $this, 'connect_with_appsero' ] );
-
-        // Add settings page for set API key
-        require_once __DIR__ . '/includes/SettingsPage.php';
-
-        new Appsero\Helper\SettingsPage();
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
     }
 
     /**
-     * Initializes the AppSero_Helper() class
+     * Initializes the Appsero_Helper() class
      *
      * Checks for an existing AppSero_Helper() instance
      * and if it doesn't find one, creates it.
@@ -76,6 +77,7 @@ class Appsero_Helper {
     public function define_constants() {
         define( 'ASHP_VERSION', $this->version );
         define( 'ASHP_ROOT_PATH', plugin_dir_path( __FILE__ ) );
+        define( 'ASHP_ROOT_URL', plugins_url( '/', __FILE__ ) );
     }
 
     /**
@@ -84,7 +86,14 @@ class Appsero_Helper {
      * @return void
      */
     public function init_plugin() {
-        $this->includes();
+
+        if ( ! class_exists( 'WooCommerce' ) && ! class_exists( 'Easy_Digital_Downloads' ) ) {
+            // add_action( 'admin_notices', array( $this, 'dependency_error' ) );
+            return;
+        }
+
+        // Require API classes and Initialize
+        $this->woo_and_edd_includes();
     }
 
     /**
@@ -92,38 +101,42 @@ class Appsero_Helper {
      *
      * @return void
      */
-    public function includes() {
-        require_once __DIR__ . '/includes/functions.php';
+    public function woo_and_edd_includes() {
 
-        if ( ! class_exists( 'WooCommerce' ) && ! class_exists( 'Easy_Digital_Downloads' ) ) {
-            add_action( 'admin_notices', array( $this, 'dependency_error' ) );
-            return;
-        }
-
-        require_once __DIR__ . '/includes/Traits/Hooker.php';
-        require_once __DIR__ . '/includes/Traits/Rest.php';
         require_once __DIR__ . '/includes/Traits/OrderHelper.php';
         require_once __DIR__ . '/includes/Api.php';
 
         if ( class_exists( 'WooCommerce' ) ) {
+            // Include class files
+            require_once __DIR__ . '/includes/WooCommerce/UseCases/SendRequestsHelper.php';
+            require_once __DIR__ . '/includes/WooCommerce/SendRequests.php';
+            require_once __DIR__ . '/includes/WooCommerce.php';
+            require_once __DIR__ . '/includes/WooCommerce/MyAccountPage.php';
 
             // Initialize WooCommerce API hooks
-            require_once __DIR__ . '/includes/WooCommerce.php';
             $client = new Appsero\Helper\WooCommerce();
 
             // Initialize WooCommerce requests hooks
-            require_once __DIR__ . '/includes/WooCommerce/SendRequests.php';
             new Appsero\Helper\WooCommerce\SendRequests();
 
+            // WooCommerce My Account page
+            new Appsero\Helper\WooCommerce\MyAccountPage();
+
         } else if ( class_exists( 'Easy_Digital_Downloads' ) ) {
+            // Include class files
+            require_once __DIR__ . '/includes/Edd/UseCases/SendRequestsHelper.php';
+            require_once __DIR__ . '/includes/Edd/SendRequests.php';
+            require_once __DIR__ . '/includes/Edd.php';
+            require_once __DIR__ . '/includes/Edd/MyAccountPage.php';
 
             // Initialize Edd API hooks
-            require_once __DIR__ . '/includes/Edd.php';
             $client = new Appsero\Helper\Edd();
 
             // Initialize Edd requests hooks
-            require_once __DIR__ . '/includes/Edd/SendRequests.php';
             new Appsero\Helper\Edd\SendRequests();
+
+            // EDD My Account page
+            new Appsero\Helper\Edd\MyAccountPage();
         }
 
         // Initialize API hooks
@@ -158,6 +171,80 @@ class Appsero_Helper {
         echo '</div>';
     }
 
-} // AppSero_Helper
+    /**
+     * Plugin activation and deactivation hook
+     */
+    public function activation_and_deactivation_hook() {
+        // Flush rewrite rules on plugin activation
+        add_rewrite_endpoint( 'my-licenses', EP_ROOT | EP_PAGES );
+
+        flush_rewrite_rules();
+    }
+
+    /**
+     * Enqueue CSS and JS
+     */
+    public function enqueue_scripts() {
+        wp_register_style( 'ashp-my-account', ASHP_ROOT_URL . 'assets/css/my-account.css' );
+
+        wp_register_script( 'ashp-my-account', ASHP_ROOT_URL . 'assets/js/my-account.js', [ 'jquery' ] );
+
+        wp_localize_script( 'ashp-my-account', 'appseroHelper', [
+            'ajaxUrl' => admin_url( 'admin-ajax.php' )
+        ] );
+    }
+
+    /**
+     * Activation Hook
+     */
+    public function activation_hook() {
+        // Create tables
+        $this->create_tables();
+
+        // Run common functionality
+        $this->activation_and_deactivation_hook();
+    }
+
+    /**
+     * Create Database Tables
+     */
+    private function create_tables() {
+
+        require_once __DIR__ . '/includes/Create_Database_Tables.php';
+
+        new Appsero\Helper\Create_Database_Tables();
+    }
+
+    /**
+     * Run class on Appsero_Helper instantiate
+     */
+    private function immediate_load() {
+        // Helpers
+        require_once __DIR__ . '/includes/Traits/Hooker.php';
+        require_once __DIR__ . '/includes/Traits/Rest.php';
+        require_once __DIR__ . '/includes/functions.php';
+
+        // Add settings page for set API key
+        require_once __DIR__ . '/includes/SettingsPage.php';
+
+        new Appsero\Helper\SettingsPage();
+
+        // Manage ajax requests
+        require_once __DIR__ . '/includes/Ajax_Requsts.php';
+
+        new Appsero\Helper\Ajax_Requsts();
+
+        // Manage shortcode
+        require_once __DIR__ . '/includes/Shortcode.php';
+
+        new Appsero\Helper\Shortcode();
+
+        // Common API
+        require_once __DIR__ . '/includes/Common/Api.php';
+
+        new Appsero\Helper\Common\Api();
+    }
+
+} // Appsero_Helper
 
 Appsero_Helper::instance();

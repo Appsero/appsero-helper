@@ -2,6 +2,7 @@
 namespace Appsero\Helper\WooCommerce;
 
 use Appsero\Helper\Traits\Hooker;
+use Appsero\Helper\NativeLicense;
 
 /**
  * SendRequests Class
@@ -10,11 +11,13 @@ use Appsero\Helper\Traits\Hooker;
 class SendRequests {
 
     use Hooker;
+    use UseCases\SendRequestsHelper;
 
     public function __construct() {
-
         // Add or Update order with license
         $this->action( 'woocommerce_order_status_changed', 'order_status_changed', 20, 4 );
+
+        $this->action( 'before_delete_post', 'delete_order', 8, 1 );
     }
 
     /**
@@ -23,17 +26,28 @@ class SendRequests {
     public function order_status_changed( $order_id, $status_from, $status_to, $order ) {
         require_once __DIR__ . '/Orders.php';
 
+        $connected = get_option( 'appsero_connected_products', [] );
+
         foreach( $order->get_items( 'line_item' ) as $wooItem ) {
             $ordersObject = new Orders();
             $ordersObject->product_id = $wooItem->get_product_id();
-            $orderData = $ordersObject->get_order_data( $order );
-            $orderData['licenses'] = $this->get_order_licenses( $order, $ordersObject->product_id, $wooItem );
 
-            $route = 'public/' . $ordersObject->product_id . '/update-order';
+            // Check the product is connected with appsero
+            if ( in_array( $ordersObject->product_id, $connected ) ) {
+                $orderData = $ordersObject->get_order_data( $order, $wooItem );
 
-            appsero_helper_remote_post( $route, $orderData );
+                $orderData['licenses'] = $this->get_order_licenses( $order, $ordersObject->product_id, $wooItem );
+
+                $route = 'public/' . $ordersObject->product_id . '/update-order';
+
+                $api_response = appsero_helper_remote_post( $route, $orderData );
+                $response = json_decode( wp_remote_retrieve_body( $api_response ), true );
+
+                if ( isset( $response['data'] ) && isset( $response['data']['source_id'] ) ) {
+                    $this->create_appsero_license( $response['data'], $orderData, $ordersObject->product_id );
+                }
+            }
         }
-
     }
 
     /**
@@ -43,97 +57,57 @@ class SendRequests {
         require_once __DIR__ . '/Licenses.php';
 
         $licensesObject = new Licenses();
-        $status = $order->get_status() == 'completed' ? 1 : 0;
 
-        // if WooCommerce Software Addon Exists
-        if ( class_exists( 'WC_Software' ) ) {
-            return $this->woo_sa_licenses( $order, $product_id, $licensesObject, $status );
-        }
+        return $this->get_order_item_licenses( $order, $product_id, $licensesObject, $wooItem );
+    }
 
-        // if WooCommerce API Manager Exists
-        if ( class_exists( 'WooCommerce_API_Manager' ) ) {
-            // If version 1.*
-            if ( function_exists( 'WC_AM_HELPERS' ) ) {
-                return $this->woo_legacy_api_licenses( $order, $product_id, $licensesObject, $status, $wooItem );
+    /**
+     * Delete order
+     */
+    public function delete_order( $order_id ) {
+        // We check if the global post type isn't order and just return
+        global $post_type;
+        if ( $post_type != 'shop_order' ) return;
+
+        $order     = wc_get_order( $order_id );
+        $connected = get_option( 'appsero_connected_products', [] );
+
+        foreach ( $order->get_items( 'line_item' ) as $wooItem ) {
+            $product_id = $wooItem->get_product_id();
+
+            // Check the product is connected with appsero
+            if ( in_array( $product_id, $connected ) ) {
+                $route = 'public/' . $product_id . '/delete-order/' . $order_id;
+
+                appsero_helper_remote_post( $route, [] );
             }
-
-            // If version above 2.*
-            if ( version_compare( WCAM()->version, '2.0.0', '>=' ) ) {
-                return $this->woo_api_licenses( $order, $product_id, $licensesObject );
-            }
         }
-
-        return [];
     }
 
     /**
-     * WooCommerce SA license
+     * Create appsero license from response
      */
-    private function woo_sa_licenses( $order, $product_id, $licensesObject ) {
+    private function create_appsero_license( $license, $orderData, $product_id ) {
         global $wpdb;
+        $table_name = $wpdb->prefix . 'appsero_licenses';
 
-        $order_id = $order->get_id();
-        $software_id = get_post_meta( $product_id, '_software_product_id', true);
+        $appsero_license = $wpdb->get_row( "SELECT * FROM {$table_name} WHERE `source_id` = " . $license['source_id'] . " LIMIT 1", ARRAY_A );
 
-        $query = "SELECT * FROM {$wpdb->wc_software_licenses} WHERE `order_id` = {$order_id} AND `software_product_id` = '{$software_id}' ";
-        $licenses = $wpdb->get_results( $query, ARRAY_A );
+        $common = NativeLicense::format_common_license_data( $license, $orderData );
+        $common['product_id'] = $product_id;
+        $common['store_type'] = 'woo';
 
-        foreach ( $licenses as $license ) {
-            $licensesObject->get_woo_sa_license_data( $license, false, $status );
+        if ( $appsero_license ) {
+            // Update
+            $wpdb->update( $table_name, $common, [
+                'id' => $appsero_license['id']
+            ]);
+        } else {
+            $common['source_id'] = $license['source_id'];
+
+            // Create
+            $wpdb->insert( $table_name, $common );
         }
-
-        return $licensesObject->licenses;
-    }
-
-    /**
-     * WooCommerce API licenses for V1
-     */
-    private function woo_legacy_api_licenses( $order, $product_id, $licensesObject, $status, $wooItem ) {
-        global $wpdb;
-
-        $order_id = $order->get_id();
-        $api_keys_exist = WC_AM_HELPERS()->order_api_keys_exist( $order_id );
-
-        if ( $api_keys_exist && WC_AM_HELPERS()->is_api( $product_id ) ) {
-            $quantity = $wooItem->get_quantity();
-            $user_id = $order->get_user_id();
-
-            for ( $loop = 0; $loop < $quantity; $loop++ ) {
-                $metakey = '_api_license_key_' . $loop;
-                $license_key = get_post_meta( $order_id, $metakey, true );
-                $license_data = get_user_meta( $user_id, $wpdb->get_blog_prefix() . WC_AM_HELPERS()->user_meta_key_orders, true );
-
-                if ( ! empty( $license_key ) && ! empty( $license_data ) ) {
-                    $licensesObject->get_woo_legacy_api_license_data( $license_key, false, $status, $license_data );
-                }
-            } // End for
-        }
-
-        return $licensesObject->licenses;
-    }
-
-    /**
-     * Get WooCommerce API manager licenses for a specific product
-     */
-    private function woo_api_licenses( $order, $product_id, $licensesObject ) {
-        global $wpdb;
-
-        $table_name = $wpdb->prefix . WC_AM_USER()->get_api_resource_table_name();
-        $order_id   = $order->get_id();
-
-        $sql = "
-            SELECT * FROM {$table_name}
-            WHERE order_id = %d
-            AND product_id = %d
-        ";
-
-        $resources = $wpdb->get_results( $wpdb->prepare( $sql, $order_id, $product_id ), ARRAY_A );
-
-        foreach( $resources as $resource ) {
-             $licensesObject->generate_woo_api_license_data( $resource, false );
-        }
-
-        return $licensesObject->licenses;
     }
 
 }

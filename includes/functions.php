@@ -12,7 +12,6 @@ function appsero_api_collection_params() {
             'type'               => 'integer',
             'default'            => 1,
             'sanitize_callback'  => 'absint',
-            'validate_callback'  => 'rest_validate_request_arg',
             'minimum'            => 1,
         ],
 
@@ -23,7 +22,6 @@ function appsero_api_collection_params() {
             'minimum'            => 1,
             'maximum'            => 100,
             'sanitize_callback'  => 'absint',
-            'validate_callback'  => 'rest_validate_request_arg',
         ]
     ];
 
@@ -61,7 +59,7 @@ function appsero_api_update_or_create_activations_params() {
             'type'        => 'integer',
         ],
         'license_key' => [
-            'description'       => __( 'Unique identifier for the license.', 'appsero-helper' ),
+            'description'       => __( 'Unique hash for the license.', 'appsero-helper' ),
             'type'              => 'string',
             'sanitize_callback' => 'sanitize_text_field',
         ],
@@ -69,7 +67,6 @@ function appsero_api_update_or_create_activations_params() {
             'description'       => __( 'Site URL of active license.', 'appsero-helper' ),
             'type'              => 'string',
             'required'          => true,
-            'validate_callback' => 'rest_validate_request_arg',
             'sanitize_callback' => 'sanitize_text_field',
         ],
         'status' => [
@@ -77,7 +74,6 @@ function appsero_api_update_or_create_activations_params() {
             'type'              => 'integer',
             'default'           => null,
             'sanitize_callback' => 'absint',
-            'validate_callback' => 'rest_validate_request_arg',
         ]
     ];
 
@@ -104,7 +100,6 @@ function appsero_api_delete_activations_params() {
             'description'       => __( 'Site URL of active license.', 'appsero-helper' ),
             'type'              => 'string',
             'required'          => true,
-            'validate_callback' => 'rest_validate_request_arg',
             'sanitize_callback' => 'sanitize_text_field',
         ],
     ];
@@ -133,7 +128,6 @@ function appsero_api_change_license_status_params() {
             'description'       => __( 'Status of license.', 'appsero-helper' ),
             'type'              => 'integer',
             'required'          => true,
-            'validate_callback' => 'rest_validate_request_arg',
             'sanitize_callback' => 'absint',
         ],
     ];
@@ -144,7 +138,7 @@ function appsero_api_change_license_status_params() {
 /**
  * HTTP request function
  */
-function appsero_helper_remote_post( $route, $body ) {
+function appsero_helper_remote_post( $route, $body, $method = 'POST' ) {
     $endpoint = apply_filters( 'appsero_endpoint', 'https://api.appsero.com' );
     $endpoint = trailingslashit( $endpoint );
 
@@ -153,12 +147,12 @@ function appsero_helper_remote_post( $route, $body ) {
     $api_key = appsero_helper_connection_token();
 
     $args = [
-        'method'      => 'POST',
+        'method'      => $method,
         'timeout'     => 15,
         'redirection' => 5,
         'body'        => $body,
         'headers'     => [
-            'user-agent' => 'AppSero/' . md5( esc_url( home_url() ) ) . ';',
+            'user-agent' => 'Appsero/' . md5( esc_url( home_url() ) ) . ';',
             'Accept'     => 'application/json',
             'X-Api-Key'  => $api_key,
         ],
@@ -166,6 +160,31 @@ function appsero_helper_remote_post( $route, $body ) {
     ];
 
     return wp_remote_post( $url, $args );
+}
+
+/**
+ * Appsero API GET request
+ */
+function appsero_helper_remote_get( $route ) {
+    $endpoint = apply_filters( 'appsero_endpoint', 'https://api.appsero.com' );
+    $endpoint = trailingslashit( $endpoint );
+
+    $url = $endpoint . $route;
+
+    $api_key = appsero_helper_connection_token();
+
+    $args = [
+        'timeout'     => 15,
+        'redirection' => 5,
+        'headers'     => [
+            'user-agent' => 'Appsero/' . md5( esc_url( home_url() ) ) . ';',
+            'Accept'     => 'application/json',
+            'X-Api-Key'  => $api_key,
+        ],
+        'httpversion' => '1.0',
+    ];
+
+    return wp_remote_get( $url, $args );
 }
 
 /**
@@ -182,4 +201,127 @@ function appsero_helper_connection_token() {
     }
 
     return $api_key;
+}
+
+/**
+ * Get appsero license
+ */
+function get_appsero_license( $id ) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'appsero_licenses';
+
+    $sql = "
+        SELECT * FROM {$table_name}
+        WHERE `id` = {$id}
+        LIMIT 1
+    ";
+
+    $license = $wpdb->get_row( $sql, ARRAY_A );
+
+    $license['activations'] = json_decode( $license['activations'], true );
+
+    return $license;
+}
+
+/**
+ * Update appsero license
+ */
+function update_appsero_license( $id, $data ) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'appsero_licenses';
+
+    $result = $wpdb->update( $table_name, $data, [ 'id' => $id ] );
+
+    return false !== $result;
+}
+
+/**
+ * Get active activations sites
+ */
+function appsero_get_active_sites_by_license( $key ) {
+    $key = sanitize_text_field( $key );
+
+    $appsero_license = appsero_get_license_by_key( $key );
+
+    if ( ! $appsero_license ) {
+        return [];
+    }
+
+    $active_sites = [];
+
+    foreach ( (array) $appsero_license['activations'] as $activation ) {
+        if ( isset( $activation['is_active'] ) && 1 == $activation['is_active'] ) {
+            $active_sites[] = $activation['site_url'];
+        }
+    }
+
+    sort( $active_sites );
+
+    return $active_sites;
+}
+
+/**
+ * Convert full name to first name last name
+ */
+function appsero_split_name( $name ) {
+    $name       = trim( $name );
+    $last_name  = ( strpos( $name, ' ' ) === false ) ? '' : preg_replace( '#.*\s([\w-]*)$#', '$1', $name );
+    $first_name = trim( preg_replace( '#'.$last_name.'#', '', $name ) );
+
+    return [ $first_name, $last_name ];
+}
+
+/**
+ * sanitize expire date data
+ */
+function sanitize_expire_date_field( $date ) {
+    $date = sanitize_text_field( $date );
+
+    if ( preg_match( "/^\d{4}\-[0-1][1-9]\-\d{2}.*$/", $date ) ) {
+        return $date;
+    }
+
+    return null;
+}
+
+/**
+ * Validate object type of data in rest
+ */
+function appsero_object_validate_callback( $value, $request, $param = '' ) {
+    $attributes = $request->get_attributes();
+    $args = $attributes['args'][ $param ];
+
+    foreach ( $args['properties'] as $key => $property ) {
+        if ( isset( $property['required'] ) && $property['required'] && ! isset( $value[ $key ] ) ) {
+            return new WP_Error(
+                $param . '.' . $key,
+                $param . ' ' . $key . ' not found.'
+            );
+        }
+    }
+
+    return true;
+}
+
+
+/**
+ * Get active activations sites
+ */
+function appsero_get_license_by_key( $key ) {
+    $route = 'public/licenses/' . $key;
+
+    // Send request to appsero server
+    $response = appsero_helper_remote_get( $route );
+
+    if ( wp_remote_retrieve_response_code( $response ) != 200 ) {
+        return false;
+    }
+
+    $response_body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+    if ( empty( $response_body['data'] ) ) {
+        return false;
+    }
+
+    return $response_body['data'];
 }
