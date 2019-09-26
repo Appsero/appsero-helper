@@ -4,7 +4,7 @@ Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
 Tested up to: 5.2.3
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -45,6 +45,11 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= V1.1.1 – (26th Sep, 2019) =
+Show orders using shortcode
+Show licneses using shortcode
+Show downloads using shortcode
 
 = v1.0.2 - (29th Aug, 2019) =
 
