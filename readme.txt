@@ -46,10 +46,10 @@ It has both free and premium services which you can avail by [registering](https
 
 == Changelog ==
 
-= V1.1.1 – (26th Sep, 2019) =
-Show orders using shortcode
-Show licneses using shortcode
-Show downloads using shortcode
+= v1.1.1 – (26th Sep, 2019) =
+- **New:** Show orders using shortcode
+- **New:** Show licneses using shortcode
+- **New:** Show downloads using shortcode
 
 = v1.0.2 - (29th Aug, 2019) =
 

@@ -60,7 +60,7 @@ class Products {
             'price'         => $product->get_price(),
             'permalink'     => $product->get_permalink(),
             'type'          => $product->get_type(),
-            'has_variation' => 'variable' == $product->get_type(),
+            'has_variation' => $this->is_variable_product( $product->get_type() ),
             'total_sales'   => $product->get_total_sales(),
             'variations'    => $this->get_variations( $product ),
         ];
@@ -106,6 +106,23 @@ class Products {
         }
 
         return $prices;
+    }
+
+    /**
+     *
+     */
+    private function is_variable_product( $type ) {
+        $types = [
+            'variable',
+            'variable-subscription',
+            'subscription_variation',
+        ];
+
+        if ( in_array( $type, $types ) ) {
+            return true;
+        }
+
+        return false;
     }
 
 }
