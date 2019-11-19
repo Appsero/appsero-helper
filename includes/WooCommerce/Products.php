@@ -76,7 +76,7 @@ class Products {
     private function get_variations( $product ) {
 
         // If this is a variable product or manage using Woo SA
-        if ( ! is_a( $product, 'WC_Product_Variable' ) || class_exists( 'WC_Software' ) ) {
+        if ( ! is_a( $product, 'WC_Product_Variable' ) ) {
             return [];
         }
 
