@@ -4,7 +4,7 @@ Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
 Tested up to: 5.3
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -45,6 +45,9 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= v1.1.3 – (19th Nov, 2019) =
+- **Fix:** Variation receiving issue if WC Software active
 
 = v1.1.2 – (18th Nov, 2019) =
 - **Fix:** Variations not showing for variable subscription product
