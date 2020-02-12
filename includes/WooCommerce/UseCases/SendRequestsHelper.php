@@ -44,7 +44,7 @@ trait SendRequestsHelper {
         $licenses = $wpdb->get_results( $query, ARRAY_A );
 
         foreach ( $licenses as $license ) {
-            $licensesObject->get_woo_sa_license_data( $license, false, $status );
+            $licensesObject->get_woo_sa_license_data( $license, true, $status );
         }
 
         return $licensesObject->licenses;
@@ -69,7 +69,7 @@ trait SendRequestsHelper {
                 $license_data = get_user_meta( $user_id, $wpdb->get_blog_prefix() . WC_AM_HELPERS()->user_meta_key_orders, true );
 
                 if ( ! empty( $license_key ) && ! empty( $license_data ) ) {
-                    $licensesObject->get_woo_legacy_api_license_data( $license_key, false, $status, $license_data );
+                    $licensesObject->get_woo_legacy_api_license_data( $license_key, true, $status, $license_data );
                 }
             } // End for
         }
@@ -95,7 +95,7 @@ trait SendRequestsHelper {
         $resources = $wpdb->get_results( $wpdb->prepare( $sql, $order_id, $product_id ), ARRAY_A );
 
         foreach( $resources as $resource ) {
-             $licensesObject->generate_woo_api_license_data( $resource, false );
+             $licensesObject->generate_woo_api_license_data( $resource, true );
         }
 
         return $licensesObject->licenses;

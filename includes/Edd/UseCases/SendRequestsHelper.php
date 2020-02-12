@@ -24,7 +24,7 @@ trait SendRequestsHelper {
             $licensesObject = new \Appsero\Helper\Edd\Licenses();
 
             foreach( $licenses as $license ) {
-                $items[] = $licensesObject->get_license_data( $license, false );
+                $items[] = $licensesObject->get_license_data( $license, true );
             }
         }
 
