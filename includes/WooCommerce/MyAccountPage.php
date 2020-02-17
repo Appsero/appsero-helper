@@ -16,6 +16,9 @@ class MyAccountPage {
 
             add_filter( 'query_vars', [ $this, 'custom_query_vars' ] );
 
+            remove_action( 'woocommerce_account_downloads_endpoint', 'woocommerce_account_downloads', 10 );
+            add_action( 'woocommerce_account_downloads_endpoint', [ $this, 'downloads_content' ], 20 );
+
             add_action( 'woocommerce_account_my-licenses_endpoint', [ $this, 'my_licenses_content' ] );
 
             add_filter( 'the_title', [ $this, 'my_licenses_title' ] );
@@ -97,4 +100,14 @@ class MyAccountPage {
         return $title;
     }
 
+    /**
+     * Downloads page content
+     */
+    public function downloads_content() {
+        require_once ASHP_ROOT_PATH . 'includes/Renderer/DownloadsRenderer.php';
+
+        $renderer = new \Appsero\Helper\Renderer\DownloadsRenderer();
+
+        echo $renderer->show();
+    }
 }
