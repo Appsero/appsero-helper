@@ -3,8 +3,8 @@ Contributors: tareq1988, wedevs, nizamuddinbabu, sourovroy, almamunsarkar
 Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
-Tested up to: 5.3
-Stable tag: 1.1.3
+Tested up to: 5.3.2
+Stable tag: 1.1.4
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -45,6 +45,10 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= v1.1.4 – (19th Feb, 2020) =
+- **Improvement:** WooCommerce My Account page downloads move to appsero downloads
+- **Improvement:** Enable activations list during order sync
 
 = v1.1.3 – (19th Nov, 2019) =
 - **Fix:** Variation receiving issue if WC Software active
