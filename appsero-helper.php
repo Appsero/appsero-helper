@@ -108,19 +108,10 @@ class Appsero_Helper {
 
         if ( class_exists( 'WooCommerce' ) ) {
             // Include class files
-            require_once __DIR__ . '/includes/WooCommerce/UseCases/SendRequestsHelper.php';
-            require_once __DIR__ . '/includes/WooCommerce/SendRequests.php';
             require_once __DIR__ . '/includes/WooCommerce.php';
-            require_once __DIR__ . '/includes/WooCommerce/MyAccountPage.php';
 
             // Initialize WooCommerce API hooks
             $client = new Appsero\Helper\WooCommerce();
-
-            // Initialize WooCommerce requests hooks
-            new Appsero\Helper\WooCommerce\SendRequests();
-
-            // WooCommerce My Account page
-            new Appsero\Helper\WooCommerce\MyAccountPage();
 
         } else if ( class_exists( 'Easy_Digital_Downloads' ) ) {
             // Include class files

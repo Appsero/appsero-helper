@@ -4,7 +4,7 @@ namespace Appsero\Helper\WooCommerce;
 class MyAccountPage {
 
     /**
-     * Constructor of EDD MyAccountPage class
+     * Constructor
      */
     public function __construct() {
 

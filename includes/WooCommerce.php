@@ -7,6 +7,25 @@ namespace Appsero\Helper;
 class WooCommerce {
 
     /**
+     * Constructor
+     */
+    public function __construct() {
+        require_once __DIR__ . '/WooCommerce/UseCases/SendRequestsHelper.php';
+        require_once __DIR__ . '/WooCommerce/SendRequests.php';
+        require_once __DIR__ . '/WooCommerce/MyAccountPage.php';
+        require_once __DIR__ . '/WooCommerce/ThankYouPage.php';
+
+        // Initialize WooCommerce requests hooks
+        new WooCommerce\SendRequests();
+
+        // WooCommerce My Account page
+        new WooCommerce\MyAccountPage();
+
+        // WooCommerce Thank You page
+        new WooCommerce\ThankYouPage();
+    }
+
+    /**
      * Products REST API Class
      *
      * @return WooCommerce\Downloads
