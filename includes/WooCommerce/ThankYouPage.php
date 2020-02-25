@@ -37,7 +37,7 @@ class ThankYouPage {
 
                             $license = get_post_meta( $order_id, $key, true );
 
-                            if ( 1 != $license['status'] ) {
+                            if ( ! isset( $license['status'] ) || 1 != $license['status'] ) {
                                 continue;
                             }
                     ?>

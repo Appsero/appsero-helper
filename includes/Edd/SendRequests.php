@@ -20,9 +20,11 @@ class SendRequests {
      * Constructor of EDD SendRequests class
      */
     public function __construct() {
-
+        // TODO: edd_complete_purchase
         // EDD add new order and license
-        $this->action( 'edd_complete_download_purchase', 'add_new_order_and_license', 20, 5 );
+        //$this->action( 'edd_complete_download_purchase', 'add_new_order_and_license', 20, 5 );
+        $this->action( 'edd_complete_purchase', 'complete_purchase', 20, 3 );
+        $this->action( 'edd_subscription_post_create', 'subscription_post_create', 20, 2 );
 
         // EDD update order and license status
         $this->action( 'edd_update_payment_status', 'update_order_and_license', 20, 3 );
@@ -85,9 +87,7 @@ class SendRequests {
         $api_response = appsero_helper_remote_post( $route, $order );
         $response = json_decode( wp_remote_retrieve_body( $api_response ), true );
 
-        if ( isset( $response['license'] ) ) {
-            $this->create_appsero_license( $response['license'], $order, $download_id );
-        }
+        $this->save_license_response( $response, $payment->ID, $download_id );
     }
 
     /**
@@ -120,28 +120,46 @@ class SendRequests {
     }
 
     /**
-     * Create appsero license from response
+     * Save order license
      */
-    private function create_appsero_license( $license, $orderData, $product_id ) {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'appsero_licenses';
+    private function save_license_response( $response, $payment_id, $download_id ) {
+        if ( isset( $response['data'] ) && isset( $response['data']['source_id'] ) ) {
+            $key = '_appsero_order_license_for_product_' . $download_id;
 
-        $appsero_license = $wpdb->get_row( "SELECT * FROM {$table_name} WHERE `source_id` = " . $license['id'] . " LIMIT 1", ARRAY_A );
+            update_post_meta( $payment_id, $key, [
+                'source_id'    => $response['data']['source_id'],
+                'key'          => $response['data']['key'],
+                'status'       => $response['data']['status'],
+                'download_url' => $response['data']['download_url'],
+                'expire_date'  => $response['data']['expire_date'],
+            ] );
+        }
+    }
 
-        $common = NativeLicense::format_common_license_data( $license, $orderData );
-        $common['product_id'] = $product_id;
-        $common['store_type'] = 'edd';
+    /**
+     * Complete Purchase
+     */
+    public function complete_purchase( $payment_id, $payment, $customer ) {
+        $connected = get_option( 'appsero_connected_products', [] );
 
-        if ( $appsero_license ) {
-            // Update
-            $wpdb->update( $table_name, $common, [
-                'id' => $appsero_license['id']
-            ]);
-        } else {
-            $common['source_id'] = $license['source_id'];
+        foreach ( $payment->downloads as $download ) {
+            // Check the product is connected with appsero
+            if ( in_array( $download['id'], $connected ) ) {
+                $this->add_or_update_order_and_license( $payment, $download['id'] );
+            }
+        }
+    }
 
-            // Create
-            $wpdb->insert( $table_name, $common );
+    /**
+     * After EDD subscription setup
+     */
+    public function subscription_post_create( $subscription_id, $args ) {
+        $connected = get_option( 'appsero_connected_products', [] );
+
+        // Check the product is connected with appsero
+        if ( in_array( $args['product_id'], $connected ) ) {
+            $payment = new EDD_Payment( $args['parent_payment_id'] );
+            $this->add_or_update_order_and_license( $payment, $args['product_id'] );
         }
     }
 

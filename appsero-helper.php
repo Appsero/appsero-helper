@@ -115,24 +115,14 @@ class Appsero_Helper {
 
         } else if ( class_exists( 'Easy_Digital_Downloads' ) ) {
             // Include class files
-            require_once __DIR__ . '/includes/Edd/UseCases/SendRequestsHelper.php';
-            require_once __DIR__ . '/includes/Edd/SendRequests.php';
             require_once __DIR__ . '/includes/Edd.php';
-            require_once __DIR__ . '/includes/Edd/MyAccountPage.php';
 
             // Initialize Edd API hooks
             $client = new Appsero\Helper\Edd();
-
-            // Initialize Edd requests hooks
-            new Appsero\Helper\Edd\SendRequests();
-
-            // EDD My Account page
-            new Appsero\Helper\Edd\MyAccountPage();
         }
 
         // Initialize API hooks
         new Appsero\Helper\Api( $client );
-
     }
 
     /**

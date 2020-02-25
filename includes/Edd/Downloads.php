@@ -16,8 +16,6 @@ class Downloads {
      * @return WP_Error|WP_REST_Response
      */
     public function get_items( $request ) {
-
-        $products   = [];
         $query_args = [
             'post_type'      => 'download',
             'posts_per_page' => $request->get_param( 'per_page' ),
@@ -26,12 +24,13 @@ class Downloads {
 
         $posts_query  = new WP_Query();
         $query_result = $posts_query->query( $query_args );
+        $downloads    = [];
 
         foreach ( $query_result as $download ) {
             $downloads[] = $this->get_download_data( $download );
         }
 
-        $response    = rest_ensure_response( $downloads );
+        $response = rest_ensure_response( $downloads );
 
         $page        = (int) $query_args['paged'];
         $total_posts = $posts_query->found_posts;
