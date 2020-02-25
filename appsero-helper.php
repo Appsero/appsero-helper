@@ -5,7 +5,7 @@
  * Description: Helper plugin to connect WordPress store to Appsero
  * Author: Appsero
  * Author URI: https://appsero.com
- * Version: 1.1.4
+ * Version: 1.1.5
  * Text Domain: appsero-helper
  */
 
@@ -24,7 +24,7 @@ class Appsero_Helper {
      *
      * @var string
      */
-    public $version = '1.1.4';
+    public $version = '1.1.5';
 
     /**
      * The single instance of the class.
@@ -108,40 +108,21 @@ class Appsero_Helper {
 
         if ( class_exists( 'WooCommerce' ) ) {
             // Include class files
-            require_once __DIR__ . '/includes/WooCommerce/UseCases/SendRequestsHelper.php';
-            require_once __DIR__ . '/includes/WooCommerce/SendRequests.php';
             require_once __DIR__ . '/includes/WooCommerce.php';
-            require_once __DIR__ . '/includes/WooCommerce/MyAccountPage.php';
 
             // Initialize WooCommerce API hooks
             $client = new Appsero\Helper\WooCommerce();
 
-            // Initialize WooCommerce requests hooks
-            new Appsero\Helper\WooCommerce\SendRequests();
-
-            // WooCommerce My Account page
-            new Appsero\Helper\WooCommerce\MyAccountPage();
-
         } else if ( class_exists( 'Easy_Digital_Downloads' ) ) {
             // Include class files
-            require_once __DIR__ . '/includes/Edd/UseCases/SendRequestsHelper.php';
-            require_once __DIR__ . '/includes/Edd/SendRequests.php';
             require_once __DIR__ . '/includes/Edd.php';
-            require_once __DIR__ . '/includes/Edd/MyAccountPage.php';
 
             // Initialize Edd API hooks
             $client = new Appsero\Helper\Edd();
-
-            // Initialize Edd requests hooks
-            new Appsero\Helper\Edd\SendRequests();
-
-            // EDD My Account page
-            new Appsero\Helper\Edd\MyAccountPage();
         }
 
         // Initialize API hooks
         new Appsero\Helper\Api( $client );
-
     }
 
     /**

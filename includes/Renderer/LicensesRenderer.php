@@ -215,6 +215,10 @@ class LicensesRenderer {
         if ( is_a( $product, 'WC_Product_Variable' ) ) {
             $order = wc_get_order( $license['order_id'] );
 
+            if ( ! $order ) {
+                return '-';
+            }
+
             return $this->get_woo_cart_variation_name( $order->get_items( 'line_item' ), $product );
         }
 

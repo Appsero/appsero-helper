@@ -6,6 +6,22 @@ namespace Appsero\Helper;
  */
 class Edd {
 
+    public function __construct() {
+        require_once __DIR__ . '/Edd/UseCases/SendRequestsHelper.php';
+        require_once __DIR__ . '/Edd/SendRequests.php';
+        require_once __DIR__ . '/Edd/MyAccountPage.php';
+        require_once __DIR__ . '/Edd/ThankYouPage.php';
+
+        // Initialize Edd requests hooks
+        new Edd\SendRequests();
+
+        // EDD My Account page
+        new Edd\MyAccountPage();
+
+        // EDD Thank You page
+        new EDD\ThankYouPage();
+    }
+
     /**
      * Products REST API Class
      *

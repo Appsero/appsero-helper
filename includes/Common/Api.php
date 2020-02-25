@@ -23,8 +23,7 @@ class Api {
      */
     public function api_init() {
         $product_class = $this->get_product_class();
-        // $license_class = $this->get_license_class();
-        $user_class = $this->get_user_class();
+        $user_class    = $this->get_user_class();
 
         // Site status
         $this->get( '/status', [ $this, 'app_status' ] );
@@ -38,11 +37,6 @@ class Api {
         // Create FastSpring license
         $this->post( '/native-users', [ $user_class, 'create_native_user' ], $user_class->create_native_user_params() );
 
-        // Create FastSpring license
-        // $this->post( '/native-licenses', [ $license_class, 'create_native_license' ], $license_class->create_native_license_params() );
-
-        // Update activations & status of native license
-        // $this->post( '/native-licenses/(?P<source_id>[\d]+)/activations', [ $license_class, 'update_native_license_activations' ] );
     }
 
     /**
@@ -65,15 +59,6 @@ class Api {
         require_once __DIR__ . '/Product.php';
 
         return new Product();
-    }
-
-    /**
-     * Get license class
-     */
-    private function get_license_class() {
-        require_once __DIR__ . '/License.php';
-
-        return new License();
     }
 
     /**

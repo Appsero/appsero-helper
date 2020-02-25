@@ -2,7 +2,6 @@
 namespace Appsero\Helper\WooCommerce;
 
 use Appsero\Helper\Traits\Hooker;
-use Appsero\Helper\NativeLicense;
 
 /**
  * SendRequests Class
@@ -43,9 +42,7 @@ class SendRequests {
                 $api_response = appsero_helper_remote_post( $route, $orderData );
                 $response = json_decode( wp_remote_retrieve_body( $api_response ), true );
 
-                if ( isset( $response['data'] ) && isset( $response['data']['source_id'] ) ) {
-                    $this->create_appsero_license( $response['data'], $orderData, $ordersObject->product_id );
-                }
+                $this->save_license_response( $response, $order_id, $ordersObject->product_id );
             }
         }
     }
@@ -85,28 +82,19 @@ class SendRequests {
     }
 
     /**
-     * Create appsero license from response
+     * Save order license
      */
-    private function create_appsero_license( $license, $orderData, $product_id ) {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'appsero_licenses';
+    private function save_license_response( $response, $order_id, $product_id ) {
+        if ( isset( $response['data'] ) && isset( $response['data']['source_id'] ) ) {
+            $key = '_appsero_order_license_for_product_' . $product_id;
 
-        $appsero_license = $wpdb->get_row( "SELECT * FROM {$table_name} WHERE `source_id` = " . $license['source_id'] . " LIMIT 1", ARRAY_A );
-
-        $common = NativeLicense::format_common_license_data( $license, $orderData );
-        $common['product_id'] = $product_id;
-        $common['store_type'] = 'woo';
-
-        if ( $appsero_license ) {
-            // Update
-            $wpdb->update( $table_name, $common, [
-                'id' => $appsero_license['id']
-            ]);
-        } else {
-            $common['source_id'] = $license['source_id'];
-
-            // Create
-            $wpdb->insert( $table_name, $common );
+            update_post_meta( $order_id, $key, [
+                'source_id'    => $response['data']['source_id'],
+                'key'          => $response['data']['key'],
+                'status'       => $response['data']['status'],
+                'download_url' => $response['data']['download_url'],
+                'expire_date'  => $response['data']['expire_date'],
+            ] );
         }
     }
 
