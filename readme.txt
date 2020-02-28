@@ -13,11 +13,19 @@ Helper plugin to connect WordPress site to Appsero
 
 == Description ==
 
-> **Note:** This plugin is only really of use to you if you have a Appsero account. You can set one up for free (currently invitation only). [**Join**](https://appsero.com/?ref=wporg) our waiting list if you are interested.
+> **Note:** This plugin is only really of use to you if you have a Appsero account. You can set one up for free. [**Join Appsero**](https://appsero.com/?ref=wporg) if you are interested.
 
 Appsero Helper provides a connection between Appsero service and your site.
 
 Appsero offers analytics, licensing and release system for free/premium plugins and themes.
+
+= Shortcodes =
+
+Shortcodes will be used in any pages.
+
+1. [appsero_licenses] show licenses
+2. [appsero_orders] show orders
+3. [appsero_downloads] show downloads
 
 == Installation ==
 
