@@ -11,3 +11,11 @@ AppSero offers Analytics, Licensing and Release system for Premium Plugins and T
 3. Visit the 'Settings > Appsero Helper' menu item in your admin sidebar
 
 On Appsero Helper settings page you have to connect your store with AppSero using API key.
+
+## Shortcodes
+
+Shortcodes will be used in any pages.
+
+- [appsero_licenses] show licenses
+- [appsero_orders] show orders
+- [appsero_downloads] show downloads

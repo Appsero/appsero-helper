@@ -87,9 +87,9 @@ class Appsero_Helper {
      */
     public function init_plugin() {
 
-        if ( ! class_exists( 'WooCommerce' ) && ! class_exists( 'Easy_Digital_Downloads' ) ) {
-            // add_action( 'admin_notices', array( $this, 'dependency_error' ) );
-            return;
+        // Dashbaord specific functionality
+        if ( is_admin() ) {
+            $this->admin_notices();
         }
 
         // Require API classes and Initialize
@@ -102,23 +102,13 @@ class Appsero_Helper {
      * @return void
      */
     public function woo_and_edd_includes() {
-
         require_once __DIR__ . '/includes/Traits/OrderHelper.php';
         require_once __DIR__ . '/includes/Api.php';
 
-        if ( class_exists( 'WooCommerce' ) ) {
-            // Include class files
-            require_once __DIR__ . '/includes/WooCommerce.php';
+        $client = $this->get_selling_client();
 
-            // Initialize WooCommerce API hooks
-            $client = new Appsero\Helper\WooCommerce();
-
-        } else if ( class_exists( 'Easy_Digital_Downloads' ) ) {
-            // Include class files
-            require_once __DIR__ . '/includes/Edd.php';
-
-            // Initialize Edd API hooks
-            $client = new Appsero\Helper\Edd();
+        if ( ! $client ) {
+            return;
         }
 
         // Initialize API hooks
@@ -224,6 +214,88 @@ class Appsero_Helper {
         require_once __DIR__ . '/includes/Common/Api.php';
 
         new Appsero\Helper\Common\Api();
+    }
+
+    /**
+     * Admin notices
+     */
+    private function admin_notices() {
+        // If EDD and Woo both install
+        if ( class_exists( 'WooCommerce' ) && class_exists( 'Easy_Digital_Downloads' ) ) {
+            add_action( 'admin_notices', [ $this, 'edd_and_woo_both_install_error' ] );
+        }
+    }
+
+    /**
+     * EDD and Woo both install error message
+     */
+    public function edd_and_woo_both_install_error() {
+        $has_plugin = get_option( 'appsero_selling_plugin', '' );
+
+        if ( $has_plugin && ( $has_plugin === 'woo' || $has_plugin === 'edd' ) ) {
+            return;
+        }
+
+        $security = wp_create_nonce( 'appsero-selling-plugin' );
+        $action_url = admin_url( 'admin-ajax.php' );
+        $action_url .= '?action=appsero_set_selling_plugin';
+        $action_url .= '&security=' . $security . '&selected=';
+        ?>
+        <div class="notice notice-error">
+            <p>You have installed both WooCommerce and Easy Digital Downloads, Please choose you selling plugin.</p>
+            <p><a href="<?php echo $action_url . 'woo'; ?>" class="button">WooCommerce</a> or <a href="<?php echo $action_url . 'edd'; ?>" class="button">Easy Digital Downloads</a></p>
+        </div>
+        <?php
+    }
+
+    /**
+     * Include and return woocommerce api client
+     */
+    private function get_woocommerce_api_client() {
+        // Include class files
+        require_once __DIR__ . '/includes/WooCommerce.php';
+
+        // Initialize WooCommerce API hooks
+        return new Appsero\Helper\WooCommerce();
+    }
+
+    /**
+     * Include and return edd api client
+     */
+    private function get_edd_api_client() {
+        // Include class files
+        require_once __DIR__ . '/includes/Edd.php';
+
+        // Initialize Edd API hooks
+        return new Appsero\Helper\Edd();
+    }
+
+    /**
+     * Get selling client to build API
+     */
+    private function get_selling_client() {
+        // If woocommerce and edd both are installed
+        if ( class_exists( 'WooCommerce' ) && class_exists( 'Easy_Digital_Downloads' ) ) {
+            $has_plugin = get_option( 'appsero_selling_plugin', '' );
+
+            if ( $has_plugin === 'woo' ) {
+                return $this->get_woocommerce_api_client();
+            }
+
+            if ( $has_plugin === 'edd' ) {
+                return $this->get_edd_api_client();
+            }
+        }
+
+        if ( class_exists( 'WooCommerce' ) ) {
+            return $this->get_woocommerce_api_client();
+        }
+
+        if ( class_exists( 'Easy_Digital_Downloads' ) ) {
+            return $this->get_edd_api_client();
+        }
+
+        return false;
     }
 
 } // Appsero_Helper

@@ -7,9 +7,11 @@ class Ajax_Requsts {
      * Constructor
      */
     public function __construct() {
-
+        // Remove activation from license page
         add_action( 'wp_ajax_appsero_remove_activation', [ $this, 'remove_activation' ] );
 
+        // Appsero plugin choose; woo or edd
+        add_action( 'wp_ajax_appsero_set_selling_plugin', [ $this, 'set_selling_plugin' ] );
     }
 
     /**
@@ -35,6 +37,20 @@ class Ajax_Requsts {
         }
 
         wp_send_json_error();
+    }
+
+    /**
+     * Set selling plugin if both plugin installed
+     */
+    public function set_selling_plugin() {
+        check_ajax_referer( 'appsero-selling-plugin', 'security' );
+
+        if ( ! empty( $_GET['selected'] ) ) {
+            update_option( 'appsero_selling_plugin', sanitize_text_field( $_GET['selected'] ) );
+        }
+
+        wp_safe_redirect( wp_get_referer() );
+        exit;
     }
 
 }

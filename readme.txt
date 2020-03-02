@@ -23,9 +23,9 @@ Appsero offers analytics, licensing and release system for free/premium plugins 
 
 Shortcodes will be used in any pages.
 
-1. [appsero_licenses] show licenses
-2. [appsero_orders] show orders
-3. [appsero_downloads] show downloads
+- [appsero_licenses] show licenses
+- [appsero_orders] show orders
+- [appsero_downloads] show downloads
 
 == Installation ==
 
