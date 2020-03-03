@@ -89,7 +89,9 @@ class Appsero_Helper {
 
         // Dashbaord specific functionality
         if ( is_admin() ) {
-            $this->admin_notices();
+            require_once __DIR__ . '/includes/Admin_Notice.php';
+
+            new Appsero\Helper\Admin_Notice();
         }
 
         // Require API classes and Initialize
@@ -214,38 +216,11 @@ class Appsero_Helper {
         require_once __DIR__ . '/includes/Common/Api.php';
 
         new Appsero\Helper\Common\Api();
-    }
 
-    /**
-     * Admin notices
-     */
-    private function admin_notices() {
-        // If EDD and Woo both install
-        if ( class_exists( 'WooCommerce' ) && class_exists( 'Easy_Digital_Downloads' ) ) {
-            add_action( 'admin_notices', [ $this, 'edd_and_woo_both_install_error' ] );
-        }
-    }
+        // Filters
+        require_once __DIR__ . '/includes/Common/Filter_Hook.php';
 
-    /**
-     * EDD and Woo both install error message
-     */
-    public function edd_and_woo_both_install_error() {
-        $has_plugin = get_option( 'appsero_selling_plugin', '' );
-
-        if ( $has_plugin && ( $has_plugin === 'woo' || $has_plugin === 'edd' ) ) {
-            return;
-        }
-
-        $security = wp_create_nonce( 'appsero-selling-plugin' );
-        $action_url = admin_url( 'admin-ajax.php' );
-        $action_url .= '?action=appsero_set_selling_plugin';
-        $action_url .= '&security=' . $security . '&selected=';
-        ?>
-        <div class="notice notice-error">
-            <p>You have installed both WooCommerce and Easy Digital Downloads, Please choose you selling plugin.</p>
-            <p><a href="<?php echo $action_url . 'woo'; ?>" class="button">WooCommerce</a> or <a href="<?php echo $action_url . 'edd'; ?>" class="button">Easy Digital Downloads</a></p>
-        </div>
-        <?php
+        new Appsero\Helper\Common\Filter_Hook();
     }
 
     /**
@@ -277,6 +252,10 @@ class Appsero_Helper {
         // If woocommerce and edd both are installed
         if ( class_exists( 'WooCommerce' ) && class_exists( 'Easy_Digital_Downloads' ) ) {
             $has_plugin = get_option( 'appsero_selling_plugin', '' );
+
+            if ( $has_plugin === 'appsero' ) {
+                return false;
+            }
 
             if ( $has_plugin === 'woo' ) {
                 return $this->get_woocommerce_api_client();
