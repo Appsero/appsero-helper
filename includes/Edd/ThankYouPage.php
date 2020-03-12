@@ -55,11 +55,11 @@ class ThankYouPage {
         }
         ?>
         <tr>
-            <td><?php echo $license['key']; ?></td>
-            <td><?php echo date( 'M d, Y', strtotime( $license['expire_date'] ) ); ?></td>
+            <td><?php echo esc_html( $license['key'] ); ?></td>
+            <td><?php echo esc_html( date( 'M d, Y', strtotime( $license['expire_date'] ) ) ); ?></td>
             <td>
-                <a href="<?php echo $license['download_url']; ?>" class="button">
-                    <?php echo sanitize_title( $download->get_name() . ' ' . $price_name ); ?>.zip
+                <a href="<?php echo esc_url( $license['download_url'] ); ?>" class="button">
+                    <?php echo esc_html( sanitize_title( $download->get_name() . ' ' . $price_name ) ); ?>.zip
                 </a>
             </td>
         </tr>

@@ -21,11 +21,14 @@ class Ajax_Requsts {
      * Remove activation
      */
     public function remove_activation() {
+        check_ajax_referer( 'appsero-store-myaccount', 'security' );
+
         if ( ! isset( $_POST['source_id'], $_POST['activation_id'], $_POST['product_id'] ) ) {
             wp_send_json_error();
         }
 
-        $route = 'public/licenses/' . $_POST['source_id'] . '/activations/' . $_POST['activation_id'];
+        $route = 'public/licenses/' . sanitize_text_field( wp_unslash( $_POST['source_id'] ) );
+        $route .= '/activations/' . sanitize_text_field( wp_unslash( $_POST['activation_id'] ) );
 
         $body = [
             'user_id' => get_current_user_id(),
@@ -49,7 +52,7 @@ class Ajax_Requsts {
         check_ajax_referer( 'appsero-selling-plugin', 'security' );
 
         if ( ! empty( $_GET['selected'] ) ) {
-            update_option( 'appsero_selling_plugin', sanitize_text_field( $_GET['selected'] ) );
+            update_option( 'appsero_selling_plugin', sanitize_text_field( wp_unslash( $_GET['selected'] ) ) );
         }
 
         wp_safe_redirect( wp_get_referer() );

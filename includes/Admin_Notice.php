@@ -34,11 +34,11 @@ class Admin_Notice {
         $security = wp_create_nonce( 'appsero-selling-plugin' );
         $action_url = admin_url( 'admin-ajax.php' );
         $action_url .= '?action=appsero_set_selling_plugin';
-        $action_url .= '&security=' . $security . '&selected=';
+        $action_url .= '&security=' . $security . '&selected=%s';
         ?>
         <div class="notice notice-error">
             <p>You have installed both WooCommerce and Easy Digital Downloads, Please choose your selling plugin.</p>
-            <p><a href="<?php echo $action_url . 'woo'; ?>" class="button">WooCommerce</a> or <a href="<?php echo $action_url . 'edd'; ?>" class="button">Easy Digital Downloads</a></p>
+            <p><a href="<?php echo esc_url( sprintf( $action_url, 'woo' ) ); ?>" class="button">WooCommerce</a> or <a href="<?php echo esc_url( sprintf( $action_url, 'edd' ) ); ?>" class="button">Easy Digital Downloads</a></p>
         </div>
         <?php
     }
@@ -60,7 +60,7 @@ class Admin_Notice {
         ?>
         <div class="notice notice-info">
             <p>Show Orders, Licenses and Downloads from Appsero pages. Do you want to create Appsero pages?</p>
-            <p><a href="<?php echo $url; ?>" class="button">Create Pages</a> <a href="<?php echo $url; ?>&cancel=true" class="button button-link-delete">Cancel</a></p>
+            <p><a href="<?php echo esc_url( $url ); ?>" class="button">Create Pages</a> <a href="<?php echo esc_url( $url ); ?>&cancel=true" class="button button-link-delete">Cancel</a></p>
         </div>
         <?php
     }

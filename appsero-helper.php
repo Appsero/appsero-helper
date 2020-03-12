@@ -135,10 +135,10 @@ class Appsero_Helper {
         $install = sprintf( '<p><a href="%s" class="button">Install WooCommerce</a> or <a href="%s" class="button">Install Easy Digital Downloads</a></p>', $woo, $edd );
 
         echo '<div class="notice notice-error">';
-        echo '<p>Appsero Helper requires ' . $needed . ' to be installed and active.</p>';
+        echo '<p>Appsero Helper requires ' . wp_kses_post( $needed ) . ' to be installed and active.</p>';
 
         if ( current_user_can( 'install_plugins' ) ) {
-            echo $install;
+            echo wp_kses_post( $install );
         }
 
         echo '</div>';
@@ -163,7 +163,8 @@ class Appsero_Helper {
         wp_register_script( 'ashp-my-account', ASHP_ROOT_URL . 'assets/js/my-account.js', [ 'jquery' ] );
 
         wp_localize_script( 'ashp-my-account', 'appseroHelper', [
-            'ajaxUrl' => admin_url( 'admin-ajax.php' )
+            'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
+            'ajaxNonce' => wp_create_nonce( 'appsero-store-myaccount' ),
         ] );
     }
 

@@ -21,7 +21,7 @@ class MyAccountPage {
      */
     public function table_header_row() {
         ?>
-        <th class="appsero_licenses_col"><?php _e( 'License', 'appsero-helper' ); ?></th>
+        <th class="appsero_licenses_col"><?php esc_html_e( 'License', 'appsero-helper' ); ?></th>
         <?php
     }
 
@@ -32,7 +32,7 @@ class MyAccountPage {
         $license_url = esc_url( add_query_arg( [ 'license' => 'appsero', 'order_id' => $payment_id ] ) );
         ?>
             <td class="appsero_licenses_col">
-                <a href="<?php echo $license_url; ?>">View Licenses</a>
+                <a href="<?php echo esc_url( $license_url ); ?>">View Licenses</a>
             </td>
         <?php
     }
@@ -44,13 +44,13 @@ class MyAccountPage {
         if ( isset( $_GET['license'], $_GET['order_id'] ) && $_GET['license'] == 'appsero' ) {
             $back_url = esc_url( remove_query_arg( [ 'license', 'order_id' ] ) );
 
-            echo '<p><a href="'. $back_url .'" class="edd-manage-license-back edd-submit button gray">Go back</a></p>';
+            echo '<p><a href="'. esc_url( $back_url ) .'" class="edd-manage-license-back edd-submit button gray">Go back</a></p>';
 
             require_once ASHP_ROOT_PATH . 'includes/Renderer/LicensesRenderer.php';
 
             $renderer = new \Appsero\Helper\Renderer\LicensesRenderer();
 
-            echo $renderer->show( intval( $_GET['order_id'] ) );
+            echo wp_kses_post( $renderer->show( intval( $_GET['order_id'] ) ) );
 
             return false;
         }
