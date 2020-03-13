@@ -19,6 +19,8 @@ class Admin_Notice {
 
             add_action( 'admin_notices', [ $this, 'pages_created_success_notice' ] );
         }
+
+        add_action( 'admin_notices', [ $this, 'no_product_warning' ] );
     }
 
     /**
@@ -76,6 +78,55 @@ class Admin_Notice {
             </div>
         <?php
         endif;
+    }
+
+    /**
+     * Show no product warning
+     */
+    public function no_product_warning() {
+        global $pagenow;
+
+        if ( 'post-new.php' == $pagenow && isset( $_GET['post_type'] ) ) {
+            return;
+        }
+
+        $plugin = appsero_get_selling_plugin();
+
+        if ( $plugin === 'woo' ) {
+            $products = get_posts( [
+                'fields'      => 'ids',
+                'post_type'   => 'product',
+                'post_status' => 'publish',
+            ] );
+
+            if ( ! empty( $products ) ) {
+                return;
+            }
+            ?>
+            <div class="notice notice-warning">
+                <p>No product found in your WooCommerce store, Please create product to connect with Appsero.</p>
+                <p><a href="<?php echo esc_url( admin_url() ); ?>post-new.php?post_type=product" class="button">Create Product</a></p>
+            </div>
+            <?php
+        }
+
+        if ( $plugin === 'edd' ) {
+            $downloads = get_posts( [
+                'fields'      => 'ids',
+                'post_type'   => 'download',
+                'post_status' => 'publish',
+            ] );
+
+            if ( ! empty( $downloads ) ) {
+                return;
+            }
+            ?>
+            <div class="notice notice-warning">
+                <p>No product found in your Easy Digital Downloads store, Please create product to connect with Appsero.</p>
+                <p><a href="<?php echo esc_url( admin_url() ); ?>post-new.php?post_type=download" class="button">Create Product</a></p>
+            </div>
+            <?php
+        }
     }
 
 }

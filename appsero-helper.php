@@ -250,28 +250,13 @@ class Appsero_Helper {
      * Get selling client to build API
      */
     private function get_selling_client() {
-        // If woocommerce and edd both are installed
-        if ( class_exists( 'WooCommerce' ) && class_exists( 'Easy_Digital_Downloads' ) ) {
-            $has_plugin = get_option( 'appsero_selling_plugin', '' );
+        $plugin = appsero_get_selling_plugin();
 
-            if ( $has_plugin === 'appsero' ) {
-                return false;
-            }
-
-            if ( $has_plugin === 'woo' ) {
-                return $this->get_woocommerce_api_client();
-            }
-
-            if ( $has_plugin === 'edd' ) {
-                return $this->get_edd_api_client();
-            }
-        }
-
-        if ( class_exists( 'WooCommerce' ) ) {
+        if ( $plugin === 'woo' ) {
             return $this->get_woocommerce_api_client();
         }
 
-        if ( class_exists( 'Easy_Digital_Downloads' ) ) {
+        if ( $plugin === 'edd' ) {
             return $this->get_edd_api_client();
         }
 

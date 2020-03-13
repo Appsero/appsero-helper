@@ -325,3 +325,31 @@ function appsero_get_license_by_key( $key ) {
 
     return $response_body['data'];
 }
+
+/**
+ * Get selling plugin
+ */
+function appsero_get_selling_plugin() {
+    // If woocommerce and edd both are installed
+    if ( class_exists( 'WooCommerce' ) && class_exists( 'Easy_Digital_Downloads' ) ) {
+        $has_plugin = get_option( 'appsero_selling_plugin', '' );
+
+        if ( $has_plugin === 'woo' ) {
+            return 'woo';
+        }
+
+        if ( $has_plugin === 'edd' ) {
+            return 'edd';
+        }
+    }
+
+    if ( class_exists( 'WooCommerce' ) ) {
+        return 'woo';
+    }
+
+    if ( class_exists( 'Easy_Digital_Downloads' ) ) {
+        return 'edd';
+    }
+
+    return 'appsero';
+}
