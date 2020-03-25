@@ -353,3 +353,33 @@ function appsero_get_selling_plugin() {
 
     return 'appsero';
 }
+
+/**
+ * Appsero create customer
+ */
+function appsero_create_customer( $email, $first_name, $last_name ) {
+    $exists = email_exists( $email );
+
+    if ( $exists ) {
+        return $exists;
+    }
+
+    $random_password = wp_generate_password( 12, false );
+
+    $userdata = [
+        'user_pass'     => $random_password,
+        'display_name'  => $first_name,
+        'user_nicename' => $first_name,
+        'first_name'    => $first_name,
+        'last_name'     => $last_name,
+        'user_login'    => $email,
+        'user_email'    => $email,
+        'role'          => 'subscriber',
+    ];
+
+    $user_id = wp_insert_user( $userdata );
+
+    wp_send_new_user_notifications( $user_id, 'user' );
+
+    return $user_id;
+}

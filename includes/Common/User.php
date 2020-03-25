@@ -25,31 +25,13 @@ class User {
      * Get user id or create new
      */
     private function customer_first_or_create( $customer ) {
-        $exists = email_exists( $customer['email'] );
+        $name = appsero_split_name( $customer['name'] );
 
-        if ( $exists ) {
-            return $exists;
-        }
-
-        $name            = appsero_split_name( $customer['name'] );
-        $random_password = wp_generate_password( 12, false );
-
-        $userdata = [
-            'user_pass'     => $random_password,
-            'display_name'  => $name[0],
-            'user_nicename' => $name[0],
-            'first_name'    => $name[0],
-            'last_name'     => $name[1],
-            'user_login'    => $customer['email'],
-            'user_email'    => $customer['email'],
-            'role'          => 'subscriber',
-        ];
-
-        $user_id = wp_insert_user( $userdata );
-
-        wp_send_new_user_notifications( $user_id, 'user' );
-
-        return $user_id;
+        return appsero_create_customer(
+            $customer['email'],
+            $name[0],
+            $name[1]
+        );
     }
 
     /**

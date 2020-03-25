@@ -107,8 +107,7 @@ class SettingsPage {
                 <div class="appsero-widget-logo">
                     <img src="<?php echo ASHP_ROOT_URL; ?>assets/images/appsero-logo.png" alt="Appsero Logo">
                 </div>
-                <p>Create an API key on Appsero `<strong>API Key</strong>` page under top right navigation to connect this store with Appsero.</p>
-
+                <p>Create an API key on Appsero from the `<strong>API Key</strong>` page from left navigation pane or by adding a new product. With the API key, you can connect this store with Appsero.</p>
                 <form class="apikey-input-fields" method="post" autocomplete="off">
                     <div class="apikey-input-key">
                         <svg enable-background="new 0 0 512 512" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" width="22">
@@ -162,7 +161,7 @@ class SettingsPage {
         ?>
         <div class="notice notice-warning">
             <p>
-                You have not connected with Appsero in order to work <a href="<?php echo $appsero_helper_url; ?>">Apsero Helper</a>,
+                You have not connected your website with <a href="<?php echo $appsero_helper_url; ?>">Appsero Helper</a>.
                 Please <a href="<?php echo $appsero_helper_url; ?>">connect</a> using API key.
             </p>
         </div>

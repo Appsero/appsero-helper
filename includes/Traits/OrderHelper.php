@@ -83,8 +83,18 @@ trait OrderHelper {
      * @return array
      */
     private function edd_customer_data( $payment ) {
+        if ( function_exists( 'edd_software_licensing' ) ) {
+            $user_id = $payment->customer_id;
+        } else {
+            $user_id = appsero_create_customer(
+                $payment->user_info['email'],
+                $payment->user_info['first_name'],
+                $payment->user_info['last_name']
+            );
+        }
+
         return [
-            'id'       => (int) $payment->customer_id,
+            'id'       => (int) $user_id,
             'email'    => $payment->user_info['email'],
             'name'     => $payment->user_info['first_name'] .' '. $payment->user_info['last_name'],
             'address'  => $payment->address['line1'] .' '. $payment->address['line2'],
