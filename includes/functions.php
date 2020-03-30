@@ -358,6 +358,12 @@ function appsero_get_selling_plugin() {
  * Appsero create customer
  */
 function appsero_create_customer( $email, $first_name, $last_name ) {
+    $exists = username_exists( $email );
+
+    if ( $exists ) {
+        return $exists;
+    }
+
     $exists = email_exists( $email );
 
     if ( $exists ) {
