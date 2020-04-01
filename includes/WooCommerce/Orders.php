@@ -140,7 +140,7 @@ class Orders {
             $order_response = $this->add_subscription_response( $order_response, $order, $order_data );
         }
 
-        return $order_response;
+        return apply_filters( 'appsero_woocommerce_order', $order_response, $order_data, $cart );
     }
 
     /**
