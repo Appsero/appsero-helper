@@ -93,7 +93,7 @@ class Licenses {
         // `$license->sites` not fulfill my need
         $activations = $needActivations ? $this->get_activations( $license->id ) : [];
 
-        return [
+        $license_data = [
             'key'              => $license->license_key,
             'status'           => $status,
             'created_at'       => $license->date_created,
@@ -104,6 +104,8 @@ class Licenses {
             'active_sites'     => (int) $license->activation_count,
             'license_source'   => 'EDD',
         ];
+
+        return apply_filters( 'appsero_edd_license', $license_data, $license );
     }
 
     /**

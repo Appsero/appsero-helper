@@ -232,17 +232,19 @@ class Licenses {
     public function get_woo_sa_license_data( $item, $needActivations = true, $status = null ) {
         $activations = $needActivations ? $this->get_woo_sa_activations( $item['key_id'] ) : [];
 
-        $this->licenses[] = [
+        $license = [
             'key'              => $item['license_key'],
             'status'           => ( null === $status ) ? 1 : $status,
             'created_at'       => $item['created'],
             'expire_date'      => '',
-            'activation_limit' => $item['activations_limit'] ?: '',
+            'activation_limit' => empty( $item['activations_limit'] ) ? '' : intval( $item['activations_limit'] ),
             'activations'      => $activations,
             'variation_source' => '',
             'active_sites'     => $this->get_active_sites_count( $activations ),
             'license_source'   => 'Woo SA',
         ];
+
+        $this->licenses[] = apply_filters( 'appsero_woo_sa_license', $license, $item );
     }
 
     /**
@@ -319,7 +321,7 @@ class Licenses {
 
         $activations = $needActivations ? $this->get_woo_api_activations( $resource ) : [];
 
-        $this->licenses[] = [
+        $license = [
             'key'              => $resource['product_order_api_key'],
             'status'           => empty( $resource['active'] ) ? 0 : 1,
             'created_at'       => $created_at,
@@ -330,6 +332,8 @@ class Licenses {
             'active_sites'     => $resource['activations_total'],
             'license_source'   => 'Woo API',
         ];
+
+        $this->licenses[] = apply_filters( 'appsero_woo_api_license', $license, $resource );
     }
 
     /**
