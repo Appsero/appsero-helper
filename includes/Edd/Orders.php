@@ -102,7 +102,7 @@ class Orders {
             $order_response = $this->add_subscription_response( $order_response, $payment );
         }
 
-        return $order_response;
+        return apply_filters( 'appsero_edd_order', $order_response, $payment, $cart );
     }
 
     /**
