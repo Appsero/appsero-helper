@@ -5,7 +5,7 @@
  * Description: Helper plugin to connect WordPress store to Appsero
  * Author: Appsero
  * Author URI: https://appsero.com
- * Version: 1.1.6
+ * Version: 1.1.7
  * Text Domain: appsero-helper
  */
 
@@ -24,7 +24,7 @@ class Appsero_Helper {
      *
      * @var string
      */
-    public $version = '1.1.5';
+    public $version = '1.1.7';
 
     /**
      * The single instance of the class.
