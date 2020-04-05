@@ -4,7 +4,7 @@ Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
 Tested up to: 5.4
-Stable tag: 1.1.6
+Stable tag: 1.1.7
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -53,6 +53,11 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= v1.1.7 – (5th Apr, 2020) =
+- **Improvement:** Update settings page UI
+- **New:** Choose selling plugin when WooCommerce and Easy Digital Downloads both installed
+- **Fix:** Easy Digital Downloads customer creation issue
 
 = v1.1.6 – (1st Apr, 2020) =
 - **New:** Add filter hook to WooCommerce order and license API data
