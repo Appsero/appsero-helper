@@ -4,7 +4,7 @@ Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
 Tested up to: 5.4
-Stable tag: 1.1.6
+Stable tag: 1.1.7
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -13,11 +13,19 @@ Helper plugin to connect WordPress site to Appsero
 
 == Description ==
 
-> **Note:** This plugin is only really of use to you if you have a Appsero account. You can set one up for free (currently invitation only). [**Join**](https://appsero.com/?ref=wporg) our waiting list if you are interested.
+> **Note:** This plugin is only really of use to you if you have a Appsero account. You can set one up for free. [**Join Appsero**](https://appsero.com/?ref=wporg) if you are interested.
 
 Appsero Helper provides a connection between Appsero service and your site.
 
 Appsero offers analytics, licensing and release system for free/premium plugins and themes.
+
+= Shortcodes =
+
+Shortcodes will be used in any pages.
+
+- [appsero_licenses] show licenses
+- [appsero_orders] show orders
+- [appsero_downloads] show downloads
 
 == Installation ==
 
@@ -45,6 +53,11 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= v1.1.7 – (5th Apr, 2020) =
+- **Improvement:** Update settings page UI
+- **New:** Choose selling plugin when WooCommerce and Easy Digital Downloads both installed
+- **Fix:** Easy Digital Downloads customer creation issue
 
 = v1.1.6 – (1st Apr, 2020) =
 - **New:** Add filter hook to WooCommerce order and license API data

@@ -53,69 +53,99 @@ class SettingsPage {
      * @return void
      */
     public function admin_menu() {
-        add_options_page(
+        $appsero_page = add_options_page(
             'Appsero Helper',
             'Appsero Helper',
             'manage_options',
             'appsero_helper',
             [ $this, 'page_output' ]
         );
+
+        add_action( $appsero_page, [ $this, 'appsero_page_scripts' ] );
     }
 
     /**
      * HTML output of the `Appsero Helper` page
      */
     public function page_output() {
-        if ( isset( $_POST['submit'] ) ) {
+        if ( isset( $_POST['apikey_submit'] ) ) {
             $this->connection = $this->connect_with_appsero( $_POST );
         }
 
+        if ( isset( $_POST['settings_submit'] ) ) {
+            $this->save_settings_fields( $_POST );
+        }
+
         $token = isset( $this->connection['token'] ) ? $this->connection['token'] : '';
+        $button_class = '';
 
         if ( $this->connection && isset( $this->connection['status'] ) && 'connected' == $this->connection['status'] ) {
             $action      = 'Disconnect';
-            $button_type = 'link-delete';
+            $button_class = 'disconnect-button';
         } else {
-            $action      = 'Connect';
-            $button_type = 'primary';
+            $action = 'Connect';
         }
         ?>
         <div class="wrap">
             <h1>Appsero Helper</h1>
 
             <?php if ( ! empty( $this->error ) ) : ?>
-            <div class="notice notice-error is-dismissible" style="max-width: 745px;">
+            <div class="notice notice-error is-dismissible" style="max-width: 852px;">
                 <p><?php echo $this->error; ?></p>
             </div>
             <?php endif; ?>
 
             <?php if ( ! empty( $this->success ) ) : ?>
-            <div class="notice notice-success is-dismissible" style="max-width: 745px;">
+            <div class="notice notice-success is-dismissible" style="max-width: 852px;">
                 <p><?php echo $this->success; ?></p>
             </div>
             <?php endif; ?>
 
             <br />
 
-            <div class="widget open" style="max-width: 800px; margin: 0;">
-                <div class="widget-top">
-                    <div class="widget-title"><h3>Connect With Appsero</h3></div>
+            <div class="appsero-widget">
+                <div class="appsero-widget-logo">
+                    <img src="<?php echo ASHP_ROOT_URL; ?>assets/images/appsero-logo.png" alt="Appsero Logo">
                 </div>
-                <div class="widget-inside" style="display: block; padding: 5px 15px;">
-                    <p>Create an API key on Appsero `API Key` page under top right navigation to connect this store with Appsero.</p>
-                    <form method="post" autocomplete="off">
-                        <input type="text" value="<?php echo $token; ?>" class="regular-text code"
+                <p>Create an API key on Appsero from the `<strong>API Key</strong>` page from left navigation pane or by adding a new product. With the API key, you can connect this store with Appsero.</p>
+                <form class="apikey-input-fields" method="post" autocomplete="off">
+                    <div class="apikey-input-key">
+                        <svg enable-background="new 0 0 512 512" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" width="22">
+                            <path d="m463.75 48.251c-64.336-64.336-169.01-64.335-233.35 1e-3 -43.945 43.945-59.209 108.71-40.181 167.46l-185.82 185.82c-2.813 2.813-4.395 6.621-4.395 10.606v84.858c0 8.291 6.709 15 15 15h84.858c3.984 0 7.793-1.582 10.605-4.395l21.211-21.226c3.237-3.237 4.819-7.778 4.292-12.334l-2.637-22.793 31.582-2.974c7.178-0.674 12.847-6.343 13.521-13.521l2.974-31.582 22.793 2.651c4.233 0.571 8.496-0.85 11.704-3.691 3.193-2.856 5.024-6.929 5.024-11.206v-27.929h27.422c3.984 0 7.793-1.582 10.605-4.395l38.467-37.958c58.74 19.043 122.38 4.929 166.33-39.046 64.336-64.335 64.336-169.01 0-233.35zm-42.435 106.07c-17.549 17.549-46.084 17.549-63.633 0s-17.549-46.084 0-63.633 46.084-17.549 63.633 0 17.548 46.084 0 63.633z"></path>
+                        </svg>
+                        <input type="text" value="<?php echo $token; ?>"
                             placeholder="API key" name="token"
                             <?php echo ( 'Disconnect' == $action ) ? 'readonly="readonly"' : ''; ?>
                         />
                         <input type="hidden" name="_action" value="<?php echo $action; ?>">
-                        <p>
-                            <button type="submit" name="submit" class="button button-<?php echo $button_type; ?>">
-                                <?php echo $action; ?>
-                            </button>
-                        </p>
-                    </form>
-                </div>
+                    </div>
+                    <button type="submit" name="apikey_submit" class="<?php echo $button_class; ?>"><?php echo $action; ?></button>
+                </form>
+
+                <?php if ( class_exists( 'WooCommerce' ) && class_exists( 'Easy_Digital_Downloads' ) ) : ?>
+                <form method="post" autocomplete="off" class="appsero-settings-form">
+                    <h2 class="title">Settings</h2>
+                    <table class="form-table">
+                        <tbody>
+                            <tr>
+                                <th scope="row"><label>Selling Plugin</label></th>
+                                <td>
+                                    <?php $selling_plugin = get_option( 'appsero_selling_plugin', '' ); ?>
+                                    <select name="selling_plugin">
+                                        <option value="">Choose Plugin</option>
+                                        <option value="appsero" <?php selected( $selling_plugin, 'appsero' ); ?> >Appsero With FastSpring</option>
+                                        <option value="woo" <?php selected( $selling_plugin, 'woo' ); ?> >WooCommerce</option>
+                                        <option value="edd" <?php selected( $selling_plugin, 'edd' ); ?> >Easy Digital Downloads</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <?php submit_button( 'Save Settings', 'primary', 'settings_submit' ); ?>
+                </form>
+                <?php endif; ?>
+
             </div>
         </div>
         <?php
@@ -131,7 +161,7 @@ class SettingsPage {
         ?>
         <div class="notice notice-warning">
             <p>
-                You have not connected with Appsero in order to work <a href="<?php echo $appsero_helper_url; ?>">Apsero Helper</a>,
+                You have not connected your website with <a href="<?php echo $appsero_helper_url; ?>">Appsero Helper</a>.
                 Please <a href="<?php echo $appsero_helper_url; ?>">connect</a> using API key.
             </p>
         </div>
@@ -192,6 +222,24 @@ class SettingsPage {
         $this->error = 'Unknown Error Occurred.';
 
         return $form;
+    }
+
+    /**
+     * Appsero page CSS and JS
+     */
+    public function appsero_page_scripts() {
+        $version = filemtime( ASHP_ROOT_PATH . 'assets/css/settings-page.css' );
+
+        wp_enqueue_style( 'appsero_settings_page_style', ASHP_ROOT_URL . 'assets/css/settings-page.css', [], $version );
+    }
+
+    /**
+     * Save settings field
+     */
+    private function save_settings_fields( $post ) {
+        if ( ! empty( $post['selling_plugin'] ) ) {
+            update_option( 'appsero_selling_plugin', sanitize_text_field( $post['selling_plugin'] ) );
+        }
     }
 
 }

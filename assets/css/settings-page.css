@@ -1,0 +1,82 @@
+.appsero-widget {
+    padding: 30px;
+    background-color: #FFFFFF;
+    max-width: 850px;
+}
+.appsero-widget p {
+    font-size: 16px;
+}
+.appsero-widget-logo img {
+    width: 200px;
+    height: auto;
+}
+.apikey-input-key {
+    position: relative;
+    flex: 0 0 72%;
+    max-width: 72%;
+}
+.apikey-input-key input {
+    background-color: #F9F9F9;
+    padding: 10px 15px 10px 48px;
+    border: 1px solid #E8E5E5;
+    border-radius: 3px;
+    height: 45px;
+    font-size: 16px;
+    color: #71777D;
+    width: 100%;
+    box-shadow: 0 0 0 transparent;
+}
+.apikey-input-key input:focus {
+    outline: 0 none;
+    border: 1px solid #E8E5E5;
+    box-shadow: 0 0 0 transparent;
+}
+.apikey-input-key svg {
+    width: 22px;
+    height: 22px;
+    fill: #0082BF;
+    position: absolute;
+    left: 14px;
+    top: 13px;
+}
+.apikey-input-fields {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    width: 100%;
+}
+.apikey-input-fields button {
+    color: #fff;
+    font-size: 17px;
+    padding: 8px;
+    height: 46px;
+    background-color: #0082BF;
+    border-radius: 3px;
+    cursor: pointer;
+    flex: 0 0 25%;
+    max-width: 25%;
+    border: 1px solid #0082BF;
+}
+.apikey-input-fields button.disconnect-button {
+    background-color: #f3f5f6;
+    color: #862424;
+}
+.apikey-input-fields button:focus {
+    outline: 0 none;
+}
+
+.appsero-settings-form {
+    margin-top: 30px;
+    border-top: 1px solid #e8e5e5;
+    padding-top: 22px;
+}
+.appsero-settings-form h2.title {
+    margin: 0;
+}
+.appsero-settings-form table.form-table {
+    margin: 0;
+}
+.appsero-settings-form p.submit {
+    margin: 0;
+    padding: 0;
+}

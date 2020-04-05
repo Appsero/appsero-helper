@@ -26,6 +26,7 @@ jQuery( document ).ready( function () {
             activation_id: aTag.data('activationid'),
             source_id: licenseParent.data('sourceid'),
             product_id: licenseParent.data('productid'),
+            security: appseroHelper.ajaxNonce,
         };
 
         if ( isRemove ) {

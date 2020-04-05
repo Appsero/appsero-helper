@@ -5,7 +5,7 @@
  * Description: Helper plugin to connect WordPress store to Appsero
  * Author: Appsero
  * Author URI: https://appsero.com
- * Version: 1.1.6
+ * Version: 1.1.7
  * Text Domain: appsero-helper
  */
 
@@ -24,7 +24,7 @@ class Appsero_Helper {
      *
      * @var string
      */
-    public $version = '1.1.5';
+    public $version = '1.1.7';
 
     /**
      * The single instance of the class.
@@ -87,9 +87,11 @@ class Appsero_Helper {
      */
     public function init_plugin() {
 
-        if ( ! class_exists( 'WooCommerce' ) && ! class_exists( 'Easy_Digital_Downloads' ) ) {
-            // add_action( 'admin_notices', array( $this, 'dependency_error' ) );
-            return;
+        // Dashbaord specific functionality
+        if ( is_admin() ) {
+            require_once __DIR__ . '/includes/Admin_Notice.php';
+
+            new Appsero\Helper\Admin_Notice();
         }
 
         // Require API classes and Initialize
@@ -102,23 +104,13 @@ class Appsero_Helper {
      * @return void
      */
     public function woo_and_edd_includes() {
-
         require_once __DIR__ . '/includes/Traits/OrderHelper.php';
         require_once __DIR__ . '/includes/Api.php';
 
-        if ( class_exists( 'WooCommerce' ) ) {
-            // Include class files
-            require_once __DIR__ . '/includes/WooCommerce.php';
+        $client = $this->get_selling_client();
 
-            // Initialize WooCommerce API hooks
-            $client = new Appsero\Helper\WooCommerce();
-
-        } else if ( class_exists( 'Easy_Digital_Downloads' ) ) {
-            // Include class files
-            require_once __DIR__ . '/includes/Edd.php';
-
-            // Initialize Edd API hooks
-            $client = new Appsero\Helper\Edd();
+        if ( ! $client ) {
+            return;
         }
 
         // Initialize API hooks
@@ -143,10 +135,10 @@ class Appsero_Helper {
         $install = sprintf( '<p><a href="%s" class="button">Install WooCommerce</a> or <a href="%s" class="button">Install Easy Digital Downloads</a></p>', $woo, $edd );
 
         echo '<div class="notice notice-error">';
-        echo '<p>Appsero Helper requires ' . $needed . ' to be installed and active.</p>';
+        echo '<p>Appsero Helper requires ' . wp_kses_post( $needed ) . ' to be installed and active.</p>';
 
         if ( current_user_can( 'install_plugins' ) ) {
-            echo $install;
+            echo wp_kses_post( $install );
         }
 
         echo '</div>';
@@ -171,7 +163,8 @@ class Appsero_Helper {
         wp_register_script( 'ashp-my-account', ASHP_ROOT_URL . 'assets/js/my-account.js', [ 'jquery' ] );
 
         wp_localize_script( 'ashp-my-account', 'appseroHelper', [
-            'ajaxUrl' => admin_url( 'admin-ajax.php' )
+            'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
+            'ajaxNonce' => wp_create_nonce( 'appsero-store-myaccount' ),
         ] );
     }
 
@@ -224,6 +217,50 @@ class Appsero_Helper {
         require_once __DIR__ . '/includes/Common/Api.php';
 
         new Appsero\Helper\Common\Api();
+
+        // Filters
+        require_once __DIR__ . '/includes/Common/Filter_Hook.php';
+
+        new Appsero\Helper\Common\Filter_Hook();
+    }
+
+    /**
+     * Include and return woocommerce api client
+     */
+    private function get_woocommerce_api_client() {
+        // Include class files
+        require_once __DIR__ . '/includes/WooCommerce.php';
+
+        // Initialize WooCommerce API hooks
+        return new Appsero\Helper\WooCommerce();
+    }
+
+    /**
+     * Include and return edd api client
+     */
+    private function get_edd_api_client() {
+        // Include class files
+        require_once __DIR__ . '/includes/Edd.php';
+
+        // Initialize Edd API hooks
+        return new Appsero\Helper\Edd();
+    }
+
+    /**
+     * Get selling client to build API
+     */
+    private function get_selling_client() {
+        $plugin = appsero_get_selling_plugin();
+
+        if ( $plugin === 'woo' ) {
+            return $this->get_woocommerce_api_client();
+        }
+
+        if ( $plugin === 'edd' ) {
+            return $this->get_edd_api_client();
+        }
+
+        return false;
     }
 
 } // Appsero_Helper

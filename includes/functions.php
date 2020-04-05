@@ -325,3 +325,67 @@ function appsero_get_license_by_key( $key ) {
 
     return $response_body['data'];
 }
+
+/**
+ * Get selling plugin
+ */
+function appsero_get_selling_plugin() {
+    // If woocommerce and edd both are installed
+    if ( class_exists( 'WooCommerce' ) && class_exists( 'Easy_Digital_Downloads' ) ) {
+        $has_plugin = get_option( 'appsero_selling_plugin', '' );
+
+        if ( $has_plugin === 'woo' ) {
+            return 'woo';
+        }
+
+        if ( $has_plugin === 'edd' ) {
+            return 'edd';
+        }
+    }
+
+    if ( class_exists( 'WooCommerce' ) ) {
+        return 'woo';
+    }
+
+    if ( class_exists( 'Easy_Digital_Downloads' ) ) {
+        return 'edd';
+    }
+
+    return 'appsero';
+}
+
+/**
+ * Appsero create customer
+ */
+function appsero_create_customer( $email, $first_name, $last_name ) {
+    $exists = username_exists( $email );
+
+    if ( $exists ) {
+        return $exists;
+    }
+
+    $exists = email_exists( $email );
+
+    if ( $exists ) {
+        return $exists;
+    }
+
+    $random_password = wp_generate_password( 12, false );
+
+    $userdata = [
+        'user_pass'     => $random_password,
+        'display_name'  => $first_name,
+        'user_nicename' => $first_name,
+        'first_name'    => $first_name,
+        'last_name'     => $last_name,
+        'user_login'    => $email,
+        'user_email'    => $email,
+        'role'          => 'subscriber',
+    ];
+
+    $user_id = wp_insert_user( $userdata );
+
+    wp_send_new_user_notifications( $user_id, 'user' );
+
+    return $user_id;
+}
