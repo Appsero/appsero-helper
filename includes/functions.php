@@ -139,10 +139,7 @@ function appsero_api_change_license_status_params() {
  * HTTP request function
  */
 function appsero_helper_remote_post( $route, $body, $method = 'POST' ) {
-    $endpoint = apply_filters( 'appsero_endpoint', 'https://api.appsero.com' );
-    $endpoint = trailingslashit( $endpoint );
-
-    $url = $endpoint . $route;
+    $url = get_appsero_api_url() . $route;
 
     $api_key = appsero_helper_connection_token();
 
@@ -166,10 +163,7 @@ function appsero_helper_remote_post( $route, $body, $method = 'POST' ) {
  * Appsero API GET request
  */
 function appsero_helper_remote_get( $route ) {
-    $endpoint = apply_filters( 'appsero_endpoint', 'https://api.appsero.com' );
-    $endpoint = trailingslashit( $endpoint );
-
-    $url = $endpoint . $route;
+    $url = get_appsero_api_url() . $route;
 
     $api_key = appsero_helper_connection_token();
 
@@ -388,4 +382,13 @@ function appsero_create_customer( $email, $first_name, $last_name ) {
     wp_send_new_user_notifications( $user_id, 'user' );
 
     return $user_id;
+}
+
+/**
+ * Get appsero API URL
+ */
+function get_appsero_api_url() {
+    $endpoint = apply_filters( 'appsero_endpoint', 'https://api.appsero.com' );
+
+    return trailingslashit( $endpoint );
 }

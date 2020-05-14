@@ -14,6 +14,7 @@ class WooCommerce {
         require_once __DIR__ . '/WooCommerce/SendRequests.php';
         require_once __DIR__ . '/WooCommerce/MyAccountPage.php';
         require_once __DIR__ . '/WooCommerce/ThankYouPage.php';
+        require_once __DIR__ . '/WooCommerce/MetaBox.php';
 
         // Initialize WooCommerce requests hooks
         new WooCommerce\SendRequests();
@@ -23,6 +24,9 @@ class WooCommerce {
 
         // WooCommerce Thank You page
         new WooCommerce\ThankYouPage();
+
+        // WooCommerce meta boxes
+        new WooCommerce\MetaBox();
     }
 
     /**
