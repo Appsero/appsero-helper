@@ -388,7 +388,7 @@ function appsero_create_customer( $email, $first_name, $last_name ) {
  * Get appsero API URL
  */
 function get_appsero_api_url() {
-    $endpoint = apply_filters( 'appsero_endpoint', 'https://api.appsero.com' );
+    $endpoint = apply_filters( 'appsero_endpoint', 'https://staging.api.appsero.com' );
 
     return trailingslashit( $endpoint );
 }
