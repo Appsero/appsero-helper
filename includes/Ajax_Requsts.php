@@ -15,6 +15,9 @@ class Ajax_Requsts {
 
         // Create Appsero pages
         add_action( 'wp_ajax_appsero_create_shortcode_pages', [ $this, 'create_shortcode_pages' ] );
+
+        // Create order in Appsero so that user can view them
+        add_action( 'wp_ajax_create_in_appsero_for_view', [ $this, 'create_in_appsero_for_view' ] );
     }
 
     /**
@@ -103,6 +106,34 @@ class Ajax_Requsts {
         ] );
 
         wp_safe_redirect( admin_url( 'edit.php?post_type=page&appsero=pages_created' ) );
+        exit;
+    }
+
+    /**
+     * Create order in Appsero
+     */
+    public function create_in_appsero_for_view() {
+
+        if ( ! isset( $_GET['order_id'], $_GET['product_id'] ) ) {
+            wp_die( 'No order found.' );
+        }
+
+        $order = wc_get_order( $_GET['order_id'] );
+
+        if ( ! is_a( $order, 'WC_Abstract_Order' ) ) {
+            wp_die( 'Could not find any order associated with your given order ID.' );
+        }
+
+        $request = new \Appsero\Helper\WooCommerce\SendRequests();
+
+        // Update order on Appsero
+        $request->order_status_changed( $order->get_id(), null, null, $order );
+
+        $url     = get_appsero_api_url();
+        $api_key = appsero_helper_connection_token();
+        $url     = sprintf( '%spublic/view-orders/%d/products/%d?store_token=%s', $url, $order->get_id(), $_GET['product_id'], $api_key );
+
+        wp_redirect( $url );
         exit;
     }
 

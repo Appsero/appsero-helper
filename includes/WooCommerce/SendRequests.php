@@ -20,7 +20,7 @@ class SendRequests {
     }
 
     /**
-     * Order status chnage
+     * Order status change
      */
     public function order_status_changed( $order_id, $status_from, $status_to, $order ) {
         require_once __DIR__ . '/Orders.php';
