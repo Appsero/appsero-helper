@@ -4,7 +4,7 @@ Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
 Tested up to: 5.4
-Stable tag: 1.1.7
+Stable tag: 1.1.8
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -53,6 +53,10 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= v1.1.8 – (4th Jun, 2020) =
+- **New:** Add option to view order in Appsero from WooCommerce order details
+- **Fix:** Lifetime license on thank you page
 
 = v1.1.7 – (5th Apr, 2020) =
 - **Improvement:** Update settings page UI
