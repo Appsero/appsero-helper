@@ -122,7 +122,6 @@ class SettingsPage {
                     <button type="submit" name="apikey_submit" class="<?php echo $button_class; ?>"><?php echo $action; ?></button>
                 </form>
 
-                <?php if ( class_exists( 'WooCommerce' ) && class_exists( 'Easy_Digital_Downloads' ) ) : ?>
                 <form method="post" autocomplete="off" class="appsero-settings-form">
                     <h2 class="title">Settings</h2>
                     <table class="form-table">
@@ -133,10 +132,34 @@ class SettingsPage {
                                     <?php $selling_plugin = get_option( 'appsero_selling_plugin', '' ); ?>
                                     <select name="selling_plugin">
                                         <option value="">Choose Plugin</option>
-                                        <option value="appsero" <?php selected( $selling_plugin, 'appsero' ); ?> >Appsero With FastSpring</option>
-                                        <option value="woo" <?php selected( $selling_plugin, 'woo' ); ?> >WooCommerce</option>
-                                        <option value="edd" <?php selected( $selling_plugin, 'edd' ); ?> >Easy Digital Downloads</option>
+
+                                        <?php foreach( $this->selling_plugins() as $key => $option ) : ?>
+                                        <option value="<?php echo $key; ?>" <?php selected( $selling_plugin, $key ); ?> ><?php echo $option; ?></option>
+                                        <?php endforeach; ?>
                                     </select>
+                                </td>
+                            </tr>
+                            <tr class="row-fastspring-fields <?php echo $selling_plugin === 'fastspring' ? '' : 'display-none'; ?>">
+                                <th scope="row"><label>FastSpring Storefront Path</label></th>
+                                <td>
+                                    <?php $storefront = get_option( 'appsero_fastspring_storefront_path', '' ); ?>
+                                    <input name="fastspring_storefront_path" type="text" value="<?php echo $storefront; ?>" class="regular-text" placeholder="Enter the value of data-storefront">
+                                    <p class="description">Enter the value of data-storefront, e.g. store.onfastspring.com/popup</p>
+                                </td>
+                            </tr>
+                            <tr class="row-fastspring-fields <?php echo $selling_plugin === 'fastspring' ? '' : 'display-none'; ?>">
+                                <th scope="row"><label>FastSpring API Username</label></th>
+                                <td>
+                                    <?php $userinfo = get_option( 'appsero_fastspring_user_auth_info', '' ); ?>
+                                    <input name="fastspring_username" type="text" value="<?php echo empty($userinfo['username']) ? '' : $userinfo['username']; ?>" class="regular-text" placeholder="Enter FastSpring API username">
+                                    <p class="description">Enter FastSpring API username from your API credentials</p>
+                                </td>
+                            </tr>
+                            <tr class="row-fastspring-fields <?php echo $selling_plugin === 'fastspring' ? '' : 'display-none'; ?>">
+                                <th scope="row"><label>FastSpring API Password</label></th>
+                                <td>
+                                    <input name="fastspring_password" type="password" value="<?php echo empty($userinfo['password']) ? '' : $userinfo['password']; ?>" class="regular-text" placeholder="Enter FastSpring API password">
+                                    <p class="description">Enter FastSpring API password from your API credentials</p>
                                 </td>
                             </tr>
                         </tbody>
@@ -144,10 +167,20 @@ class SettingsPage {
 
                     <?php submit_button( 'Save Settings', 'primary', 'settings_submit' ); ?>
                 </form>
-                <?php endif; ?>
 
             </div>
         </div>
+        <script type="text/javascript">
+            jQuery( function() {
+                jQuery('select[name="selling_plugin"]').change(function( event ) {
+                    if ( 'fastspring' == event.target.value ) {
+                        jQuery('tr.row-fastspring-fields').removeClass('display-none');
+                    } else {
+                        jQuery('tr.row-fastspring-fields').addClass('display-none');
+                    }
+                });
+            } );
+        </script>
         <?php
     }
 
@@ -237,9 +270,41 @@ class SettingsPage {
      * Save settings field
      */
     private function save_settings_fields( $post ) {
-        if ( ! empty( $post['selling_plugin'] ) ) {
+        if ( isset( $post['selling_plugin'] ) ) {
             update_option( 'appsero_selling_plugin', sanitize_text_field( $post['selling_plugin'] ) );
         }
+
+        if ( isset( $post['fastspring_storefront_path'] ) ) {
+            update_option( 'appsero_fastspring_storefront_path', sanitize_text_field( $post['fastspring_storefront_path'] ) );
+        }
+
+        if ( isset( $post['fastspring_username'], $post['fastspring_password'] ) ) {
+            $userinfo = [
+                'username' => sanitize_text_field( $post['fastspring_username'] ),
+                'password' => sanitize_text_field( $post['fastspring_password'] ),
+            ];
+
+            update_option( 'appsero_fastspring_user_auth_info', $userinfo, false );
+        }
+    }
+
+    /**
+     * Selling plugin list
+     */
+    private function selling_plugins() {
+        $plugins = [
+            'fastspring' => 'Appsero With FastSpring',
+        ];
+
+        if ( class_exists( 'WooCommerce' ) ) {
+            $plugins['woo'] = 'WooCommerce';
+        }
+
+        if ( class_exists( 'Easy_Digital_Downloads' ) ) {
+            $plugins['edd'] = 'Easy Digital Downloads';
+        }
+
+        return $plugins;
     }
 
 }
