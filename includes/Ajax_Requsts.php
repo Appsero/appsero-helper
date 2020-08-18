@@ -105,6 +105,16 @@ class Ajax_Requsts {
             ],
         ] );
 
+        wp_insert_post( [
+            'post_title'   => 'My Account',
+            'post_content' => '[appsero_my_account]',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'meta_input'   => [
+                'appsero_post_state' => 'Appsero My Account'
+            ],
+        ] );
+
         wp_safe_redirect( admin_url( 'edit.php?post_type=page&appsero=pages_created' ) );
         exit;
     }

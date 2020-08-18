@@ -12,6 +12,8 @@ class Shortcode {
         add_shortcode( 'appsero_orders', [ $this, 'appsero_orders' ] );
 
         add_shortcode( 'appsero_downloads', [ $this, 'appsero_downloads' ] );
+
+        add_shortcode( 'appsero_my_account', [ $this, 'my_account' ] );
     }
 
     /**
@@ -43,6 +45,17 @@ class Shortcode {
         require_once ASHP_ROOT_PATH . 'includes/Renderer/DownloadsRenderer.php';
 
         $renderer = new \Appsero\Helper\Renderer\DownloadsRenderer();
+
+        return $renderer->show();
+    }
+
+    /**
+     * Output of appsero My Account content
+     */
+    public function my_account() {
+        require_once ASHP_ROOT_PATH . 'includes/Renderer/MyAccount.php';
+
+        $renderer = new \Appsero\Helper\Renderer\MyAccount();
 
         return $renderer->show();
     }
