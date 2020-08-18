@@ -139,14 +139,31 @@ class SettingsPage {
                                     </select>
                                 </td>
                             </tr>
+                            <?php $general = get_option( 'appsero_general_settings', [] ); ?>
                             <tr class="row-fastspring-fields <?php echo $selling_plugin === 'fastspring' ? '' : 'display-none'; ?>">
                                 <th scope="row"><label>FastSpring Storefront Path</label></th>
                                 <td>
-                                    <?php $storefront = get_option( 'appsero_fastspring_storefront_path', '' ); ?>
-                                    <input name="fastspring_storefront_path" type="text" value="<?php echo $storefront; ?>" class="regular-text" placeholder="Enter the value of data-storefront">
+                                    <input name="fastspring_storefront_path" type="text" value="<?php echo empty($general['storefront_path']) ? '' : $general['storefront_path']; ?>" class="regular-text" placeholder="Enter the value of data-storefront">
                                     <p class="description">Enter the value of data-storefront, e.g. store.onfastspring.com/popup</p>
                                 </td>
                             </tr>
+                            <tr class="row-fastspring-fields <?php echo $selling_plugin === 'fastspring' ? '' : 'display-none'; ?>">
+                                <th scope="row"><label>Thank You Page</label></th>
+                                <td>
+                                    <select name="thank_you_page">
+                                        <option value="">Select a page</option>
+
+                                        <?php
+                                            $thankyou_page = empty( $general['thank_you_page'] ) ? '' : $general['thank_you_page'];
+                                            foreach( get_pages() as $page ) :
+                                        ?>
+                                        <option value="<?php echo $page->ID; ?>" <?php selected( $thankyou_page, $page->ID ); ?> ><?php echo $page->post_title; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <p class="description">After the order completed we will redirect the user to this page.</p>
+                                </td>
+                            </tr>
+                            <?php if ( class_exists( 'Affiliate_WP' ) ) : ?>
                             <tr class="row-fastspring-fields <?php echo $selling_plugin === 'fastspring' ? '' : 'display-none'; ?>">
                                 <th scope="row"><label>FastSpring API Username</label></th>
                                 <td>
@@ -162,6 +179,7 @@ class SettingsPage {
                                     <p class="description">Enter FastSpring API password from your API credentials</p>
                                 </td>
                             </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
 
@@ -275,7 +293,12 @@ class SettingsPage {
         }
 
         if ( isset( $post['fastspring_storefront_path'] ) ) {
-            update_option( 'appsero_fastspring_storefront_path', sanitize_text_field( $post['fastspring_storefront_path'] ) );
+            $fastspring = [
+                'storefront_path' => sanitize_text_field( $post['fastspring_storefront_path'] ),
+                'thank_you_page'  => sanitize_text_field( $post['thank_you_page'] ),
+            ];
+
+            update_option( 'appsero_general_settings', $fastspring );
         }
 
         if ( isset( $post['fastspring_username'], $post['fastspring_password'] ) ) {

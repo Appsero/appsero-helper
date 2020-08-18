@@ -68,12 +68,19 @@ class Handle  {
      * Load scripts to frontend
      */
     public function enqueue_scripts() {
+        $settings = get_option( 'appsero_general_settings', [] );
+
+        if ( empty( $settings['storefront_path'] ) ) {
+            return;
+        }
+
         wp_enqueue_script( 'fastspring-builder', 'https://d1f8f9xcsvx3ha.cloudfront.net/sbl/0.8.3/fastspring-builder.min.js', [], false, false );
 
         wp_enqueue_script( 'fastspring-affiliate-wp', ASHP_ROOT_URL . 'assets/js/fastspring-affiliate-wp.js', [ 'jquery' ], false, true );
 
         wp_localize_script( 'fastspring-affiliate-wp', 'appseroFastSpringAffwp', [
-            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+            'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
+            'thankYouPage' => empty( $settings['thank_you_page'] ) ? '#' : get_permalink( $settings['thank_you_page'] ),
         ] );
     }
 
@@ -82,7 +89,8 @@ class Handle  {
      */
     public function script_tag_loader( $tag, $handle, $src ) {
         if ( 'fastspring-builder' === $handle ) {
-            $storefront = get_option( 'appsero_fastspring_storefront_path', '' );
+            $settings = get_option( 'appsero_general_settings', [] );
+            $storefront = empty( $settings['storefront_path'] ) ? '' : $settings['storefront_path'];
 
             $tag = str_replace( 'src=', 'id="fsc-api" data-storefront="' . $storefront . '" data-popup-closed="appseroFastSpringPopupClosed" src=', $tag );
         }

@@ -15,5 +15,7 @@ function appseroFastSpringPopupClosed( order ) {
             id: order.id,
             action: 'appsero_affwp_fastspring_completed'
         },
+    }).always(function() {
+        window.location.href = appseroFastSpringAffwp.thankYouPage;
     });
 }
