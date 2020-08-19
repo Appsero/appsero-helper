@@ -14,6 +14,10 @@ class ThankYouPage {
      * Show license and download
      */
     public function show_license_and_download( $order_id ) {
+        if ( class_exists( 'WC_Software' ) || class_exists( 'WooCommerce_API_Manager' ) ) {
+            return;
+        }
+
         $order = wc_get_order( $order_id );
 
         if ( ! $order ) {
