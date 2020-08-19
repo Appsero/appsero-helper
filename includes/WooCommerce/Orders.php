@@ -131,14 +131,17 @@ class Orders {
             'customer'       => $this->woocommerce_customer( $order_data ),
             'order_type'     => '',
             'subscription'   => [],
-            'licenses'       => $this->get_order_licenses( $order ),
+            'licenses'       => [],
             'variation_id'   => $variation_id ? $variation_id : '',
         ];
 
         // Check if WooCommerce subscription active and this order has subscription
         if ( function_exists( 'wcs_order_contains_subscription' ) && wcs_order_contains_subscription( $order, [ 'any' ] ) ) {
+            $this->subscription = null;
             $order_response = $this->add_subscription_response( $order_response, $order, $order_data );
         }
+
+        $order_response['licenses'] = $this->get_order_licenses( $order );
 
         return apply_filters( 'appsero_woocommerce_order', $order_response, $order_data, $cart );
     }
@@ -203,6 +206,7 @@ class Orders {
         if ( ! empty( $subscriptions ) && count( $subscriptions ) == 1 ) {
             $subscription = array_shift( $subscriptions );
             if ( wcs_is_subscription( $subscription ) ) {
+                $this->subscription = $subscription;
                 require_once __DIR__ . '/Subscriptions.php';
                 $subscription_data = ( new Subscriptions() )->get_subscription_data( $subscription, false );
                 $order_response['subscription'] = $subscription_data;

@@ -4,6 +4,13 @@ namespace Appsero\Helper\WooCommerce\UseCases;
 trait SendRequestsHelper {
 
     /**
+     * Set subscription object if has
+     *
+     * @var WC_Subscription|null
+     */
+    public $subscription;
+
+    /**
      * Get licenses of an order
      */
     private function get_order_item_licenses( $order, $product_id, $licensesObject, $wooItem ) {
@@ -37,14 +44,20 @@ trait SendRequestsHelper {
     private function woo_sa_licenses( $order, $product_id, $licensesObject, $status ) {
         global $wpdb;
 
-        $order_id = $order->get_id();
+        // Get parent order ID
+        if ( function_exists( 'wcs_is_subscription' ) && wcs_is_subscription( $this->subscription ) ) {
+            $order_id = $this->subscription->get_parent_id();
+        } else {
+            $order_id = $order->get_id();
+        }
+
         $software_id = get_post_meta( $product_id, '_software_product_id', true);
 
         $query = "SELECT * FROM {$wpdb->wc_software_licenses} WHERE `order_id` = {$order_id} AND `software_product_id` = '{$software_id}' ";
         $licenses = $wpdb->get_results( $query, ARRAY_A );
 
         foreach ( $licenses as $license ) {
-            $licensesObject->get_woo_sa_license_data( $license, true, $status );
+            $licensesObject->get_woo_sa_license_data( $license, $product_id, $status, $order );
         }
 
         return $licensesObject->licenses;

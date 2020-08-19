@@ -212,7 +212,7 @@ class Licenses {
         $total_items = $wpdb->get_var( 'SELECT FOUND_ROWS()' );
 
         foreach ( $items as $item ) {
-            $this->get_woo_sa_license_data( $item );
+            $this->get_woo_sa_license_data( $item, $product_id );
         }
 
         $response = rest_ensure_response( $this->licenses );
@@ -227,16 +227,16 @@ class Licenses {
     /**
      * Get single license data for Woo SA
      *
-     * @return array|false
+     * @return void
      */
-    public function get_woo_sa_license_data( $item, $needActivations = true, $status = null ) {
-        $activations = $needActivations ? $this->get_woo_sa_activations( $item['key_id'] ) : [];
+    public function get_woo_sa_license_data( $item, $product_id, $status = null, $order = null ) {
+        $activations = $this->get_woo_sa_activations( $item['key_id'] );
 
         $license = [
             'key'              => $item['license_key'],
             'status'           => ( null === $status ) ? 1 : $status,
             'created_at'       => $item['created'],
-            'expire_date'      => '',
+            'expire_date'      => $this->get_woo_sa_license_expire_date( $product_id, $item, $order ),
             'activation_limit' => empty( $item['activations_limit'] ) ? '' : intval( $item['activations_limit'] ),
             'activations'      => $activations,
             'variation_source' => '',
@@ -384,6 +384,38 @@ class Licenses {
         }
 
         return ( ! filter_var( $ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) );
+    }
+
+    /**
+     * Find expire data of license
+     */
+    private function get_woo_sa_license_expire_date( $product_id, $item, $order ) {
+        // Check if WooCommerce Subscription active
+        if ( ! function_exists( 'wcs_get_subscriptions_for_order' ) ) {
+            return '';
+        }
+
+        if ( ! is_a( $order, 'WC_Abstract_Order' ) ) {
+            $order = wc_get_order( $item['order_id'] );
+        }
+
+        $subscriptions = wcs_get_subscriptions_for_order( $order, [
+            'product_id' => $product_id,
+            'order_type' => 'any',
+        ] );
+
+        // If no subscription found
+        if ( count( $subscriptions ) < 1 ) {
+            return '';
+        }
+
+        $subscription = array_shift( $subscriptions );
+
+        if ( ! wcs_is_subscription( $subscription ) ) {
+            return '';
+        }
+
+        return $subscription->get_date( 'next_payment' );
     }
 
 }
