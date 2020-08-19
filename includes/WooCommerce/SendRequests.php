@@ -34,6 +34,7 @@ class SendRequests {
             // Check the product is connected with appsero
             if ( in_array( $ordersObject->product_id, $connected ) ) {
                 $orderData = $ordersObject->get_order_data( $order, $wooItem );
+                $this->subscription = $ordersObject->subscription;
 
                 $orderData['licenses'] = $this->get_order_licenses( $order, $ordersObject->product_id, $wooItem );
 
