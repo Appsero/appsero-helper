@@ -70,7 +70,7 @@ class Handle  {
     public function enqueue_scripts() {
         $settings = get_option( 'appsero_general_settings', [] );
 
-        if ( empty( $settings['storefront_path'] ) ) {
+        if ( empty( $settings['storefront_path'] ) || empty( $settings['redirect_purchases'] ) ) {
             return;
         }
 

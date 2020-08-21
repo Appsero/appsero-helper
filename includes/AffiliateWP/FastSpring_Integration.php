@@ -75,20 +75,26 @@ class FastSpring_Integration extends Affiliate_WP_Base {
 	public function plugin_is_active() {
         $selling_plugin = get_option( 'appsero_selling_plugin', '' );
 
-        return 'fastspring' === $selling_plugin;
+        if ( 'fastspring' !== $selling_plugin ) {
+            return false;
+        }
+
+        $affiliate = get_option( 'appsero_affiliate_wp_settings', [] );
+
+        return ! empty( $affiliate['enable_affiliates'] );
     }
 
     /**
      * Get FastSpring order and customer details
      */
     private function get_fastspring_customer( $order_id ) {
-        $userinfo = get_option( 'appsero_fastspring_user_auth_info', '' );
+        $userinfo = get_option( 'appsero_affiliate_wp_settings', [] );
 
-        if ( empty( $userinfo['username'] ) || empty( $userinfo['password'] ) ) {
+        if ( empty( $userinfo['fastspring_username'] ) || empty( $userinfo['fastspring_password'] ) ) {
             return false;
         }
 
-        $order = $this->fetch_fastspring_api_order( $userinfo['username'], $userinfo['password'], $order_id );
+        $order = $this->fetch_fastspring_api_order( $userinfo['fastspring_username'], $userinfo['fastspring_password'], $order_id );
 
         if ( ! $order ) {
             return false;

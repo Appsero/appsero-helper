@@ -17,6 +17,7 @@ class MyAccount {
             return;
         }
 
+        $affiliate = get_option( 'appsero_affiliate_wp_settings', '' );
         $tab = empty( $_GET['tab'] ) ? 'dashboard' : $_GET['tab'];
 
         ob_start();
@@ -27,6 +28,10 @@ class MyAccount {
                 <li><a href="?tab=orders" class="<?php echo $tab == 'orders' ? 'ama-active-tab' : ''; ?>">Orders</a></li>
                 <li><a href="?tab=licenses" class="<?php echo $tab == 'licenses' ? 'ama-active-tab' : ''; ?>">My Licenses</a></li>
                 <li><a href="?tab=downloads" class="<?php echo $tab == 'downloads' ? 'ama-active-tab' : ''; ?>">Downloads</a></li>
+
+                <?php if ( ! empty( $affiliate['affiliate_area_page'] ) ): ?>
+                <li><a href="<?php echo get_permalink( $affiliate['affiliate_area_page'] ); ?>">Affiliate Area</a></li>
+                <?php endif; ?>
             </ul>
             <div class="appsero-my-account-content">
                 <?php $this->show_tab_content( $tab ); ?>

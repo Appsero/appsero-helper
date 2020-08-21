@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @class Appsero_Helper The class that holds the entire Appsero_Helper plugin
  */
-class Appsero_Helper {
+final class Appsero_Helper {
 
     /**
      * Plugin version

@@ -139,49 +139,105 @@ class SettingsPage {
                                     </select>
                                 </td>
                             </tr>
-                            <?php $general = get_option( 'appsero_general_settings', [] ); ?>
-                            <tr class="row-fastspring-fields <?php echo $selling_plugin === 'fastspring' ? '' : 'display-none'; ?>">
-                                <th scope="row"><label>FastSpring Storefront Path</label></th>
-                                <td>
-                                    <input name="fastspring_storefront_path" type="text" value="<?php echo empty($general['storefront_path']) ? '' : $general['storefront_path']; ?>" class="regular-text" placeholder="Enter the value of data-storefront">
-                                    <p class="description">Enter the value of data-storefront, e.g. store.onfastspring.com/popup</p>
-                                </td>
-                            </tr>
-                            <tr class="row-fastspring-fields <?php echo $selling_plugin === 'fastspring' ? '' : 'display-none'; ?>">
-                                <th scope="row"><label>Thank You Page</label></th>
-                                <td>
-                                    <select name="thank_you_page">
-                                        <option value="">Select a page</option>
-
-                                        <?php
-                                            $thankyou_page = empty( $general['thank_you_page'] ) ? '' : $general['thank_you_page'];
-                                            foreach( get_pages() as $page ) :
-                                        ?>
-                                        <option value="<?php echo $page->ID; ?>" <?php selected( $thankyou_page, $page->ID ); ?> ><?php echo $page->post_title; ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <p class="description">After the order completed we will redirect the user to this page.</p>
-                                </td>
-                            </tr>
-                            <?php if ( class_exists( 'Affiliate_WP' ) ) : ?>
-                            <tr class="row-fastspring-fields <?php echo $selling_plugin === 'fastspring' ? '' : 'display-none'; ?>">
-                                <th scope="row"><label>FastSpring API Username</label></th>
-                                <td>
-                                    <?php $userinfo = get_option( 'appsero_fastspring_user_auth_info', '' ); ?>
-                                    <input name="fastspring_username" type="text" value="<?php echo empty($userinfo['username']) ? '' : $userinfo['username']; ?>" class="regular-text" placeholder="Enter FastSpring API username">
-                                    <p class="description">Enter FastSpring API username from your API credentials</p>
-                                </td>
-                            </tr>
-                            <tr class="row-fastspring-fields <?php echo $selling_plugin === 'fastspring' ? '' : 'display-none'; ?>">
-                                <th scope="row"><label>FastSpring API Password</label></th>
-                                <td>
-                                    <input name="fastspring_password" type="password" value="<?php echo empty($userinfo['password']) ? '' : $userinfo['password']; ?>" class="regular-text" placeholder="Enter FastSpring API password">
-                                    <p class="description">Enter FastSpring API password from your API credentials</p>
-                                </td>
-                            </tr>
-                            <?php endif; ?>
                         </tbody>
                     </table>
+
+                    <h2>Configure My Account page on Appsero Dashbaord</h2>
+                    <p>Copy the link of Appsero/EDD/WooCommerce My Account page and update it on your Appsero Dashbaord. Go to your <strong>Product > Email > Email Branding</strong> and paste the my account page link their.</p>
+                    <p>You can create Appsero my account page using <code>[appsero_my_account]</code> shortcode.</p>
+                    <br>
+
+                    <div class="appsero-fastspring-fields <?php echo $selling_plugin === 'fastspring' ? '' : 'display-none'; ?>">
+                        <h2>Configure Redirect After Successful Purchase</h2>
+                        <?php $appsero = get_option( 'appsero_general_settings', [] ); ?>
+                        <p>
+                            <label>
+                                <input type="checkbox" name="redirect_purchases" <?php checked( true, ! empty( $appsero['redirect_purchases'] ) ) ?> />
+                                Enable users to redirect to a Thank You page after successful purchases
+                            </label>
+                        </p>
+                        <table class="form-table redirect-purchases-fields <?php echo empty( $appsero['redirect_purchases'] ) ? 'display-none' : ''; ?>">
+                            <tbody>
+                                <tr>
+                                    <th scope="row"><label>FastSpring Storefront Path</label></th>
+                                    <td>
+                                        <input name="fastspring_storefront_path" type="text" value="<?php echo empty($appsero['storefront_path']) ? '' : $appsero['storefront_path']; ?>" class="regular-text" placeholder="Enter the value of data-storefront">
+                                        <p class="description">Enter the value of data-storefront, e.g. store.onfastspring.com/popup</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label>Thank You Page</label></th>
+                                    <td>
+                                        <select name="thank_you_page">
+                                            <option value="">Select Thank You Page</option>
+
+                                            <?php
+                                                $thankyou_page = empty( $appsero['thank_you_page'] ) ? '' : $appsero['thank_you_page'];
+                                                foreach( get_pages() as $page ) :
+                                            ?>
+                                            <option value="<?php echo $page->ID; ?>" <?php selected( $thankyou_page, $page->ID ); ?> ><?php echo $page->post_title; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <p class="description">After the order has been completed, the user will be redirected to this page.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br>
+                    </div>
+
+                    <div class="appsero-fastspring-fields <?php echo $selling_plugin === 'fastspring' ? '' : 'display-none'; ?>">
+                        <h2>Configure Affiliates with FastSpring sales</h2>
+                        <?php $affiliate = get_option( 'appsero_affiliate_wp_settings', '' ); ?>
+                        <p>
+                            <label>
+                                <input type="checkbox" name="enable_affiliates" <?php checked( true, ! empty( $affiliate['enable_affiliates'] ) ) ?> />
+                                Enable Affiliates with FastSpring sales
+                            </label>
+                        </p>
+
+                        <?php if ( ! class_exists( 'Affiliate_WP' ) ): ?>
+                        <p>You do not have AffiliateWP plugin installed. <a href="https://affiliatewp.com/" target="_blank">Install AffiliateWP</a> to enable affiliation from your FastSpring sales.</p>
+                        <?php endif; ?>
+
+                        <table class="form-table affiliate-wp-fields <?php echo empty( $affiliate['enable_affiliates'] ) ? 'display-none' : ''; ?>">
+                            <tbody>
+                                <tr>
+                                    <th scope="row"><label>Affiliate Area Page</label></th>
+                                    <td>
+                                        <select name="affiliate_area_page">
+                                            <option value="">Select Affiliate Area Page</option>
+
+                                            <?php
+                                                $affiliate_page = empty( $affiliate['affiliate_area_page'] ) ? '' : $affiliate['affiliate_area_page'];
+                                                foreach( get_pages() as $page ) :
+                                            ?>
+                                            <option value="<?php echo $page->ID; ?>" <?php selected( $affiliate_page, $page->ID ); ?> ><?php echo $page->post_title; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <p class="description">Select the same page that is selected as Affiliate Area page of AffiliateWP plugin.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label>FastSpring API Username</label></th>
+                                    <td>
+                                        <input name="fastspring_username" type="text" value="<?php echo empty($affiliate['fastspring_username']) ? '' : $affiliate['fastspring_username']; ?>" class="regular-text" placeholder="Enter FastSpring API username">
+                                        <p class="description">Enter FastSpring API username from your API credentials</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label>FastSpring API Password</label></th>
+                                    <td>
+                                        <input name="fastspring_password" type="password" value="<?php echo empty($affiliate['fastspring_password']) ? '' : $affiliate['fastspring_password']; ?>" class="regular-text" placeholder="Enter FastSpring API password">
+                                        <p class="description">Enter FastSpring API password from your API credentials</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2>Documentation & Support</h2>
+                    <p>Check <a href="https://appsero.com/docs/" target="_blank">Appsero Docs</a> to explore all the features of Appsero with in-depth tutorials. If you need any help, email to support@appsero.com</p>
 
                     <?php submit_button( 'Save Settings', 'primary', 'settings_submit' ); ?>
                 </form>
@@ -192,9 +248,25 @@ class SettingsPage {
             jQuery( function() {
                 jQuery('select[name="selling_plugin"]').change(function( event ) {
                     if ( 'fastspring' == event.target.value ) {
-                        jQuery('tr.row-fastspring-fields').removeClass('display-none');
+                        jQuery('.appsero-fastspring-fields').removeClass('display-none');
                     } else {
-                        jQuery('tr.row-fastspring-fields').addClass('display-none');
+                        jQuery('.appsero-fastspring-fields').addClass('display-none');
+                    }
+                });
+
+                jQuery('input[name="redirect_purchases"]').change(function( event ) {
+                    if ( event.target.checked ) {
+                        jQuery('.redirect-purchases-fields').removeClass('display-none');
+                    } else {
+                        jQuery('.redirect-purchases-fields').addClass('display-none');
+                    }
+                });
+
+                jQuery('input[name="enable_affiliates"]').change(function( event ) {
+                    if ( event.target.checked ) {
+                        jQuery('.affiliate-wp-fields').removeClass('display-none');
+                    } else {
+                        jQuery('.affiliate-wp-fields').addClass('display-none');
                     }
                 });
             } );
@@ -292,10 +364,11 @@ class SettingsPage {
             update_option( 'appsero_selling_plugin', sanitize_text_field( $post['selling_plugin'] ) );
         }
 
-        if ( isset( $post['fastspring_storefront_path'] ) ) {
+        if ( isset( $post['thank_you_page'] ) ) {
             $fastspring = [
-                'storefront_path' => sanitize_text_field( $post['fastspring_storefront_path'] ),
-                'thank_you_page'  => sanitize_text_field( $post['thank_you_page'] ),
+                'storefront_path'    => sanitize_text_field( $post['fastspring_storefront_path'] ),
+                'thank_you_page'     => sanitize_text_field( $post['thank_you_page'] ),
+                'redirect_purchases' => ! empty( $post['redirect_purchases'] ),
             ];
 
             update_option( 'appsero_general_settings', $fastspring );
@@ -303,11 +376,13 @@ class SettingsPage {
 
         if ( isset( $post['fastspring_username'], $post['fastspring_password'] ) ) {
             $userinfo = [
-                'username' => sanitize_text_field( $post['fastspring_username'] ),
-                'password' => sanitize_text_field( $post['fastspring_password'] ),
+                'fastspring_username' => sanitize_text_field( $post['fastspring_username'] ),
+                'fastspring_password' => sanitize_text_field( $post['fastspring_password'] ),
+                'enable_affiliates'   => ! empty( $post['enable_affiliates'] ),
+                'affiliate_area_page' => sanitize_text_field( $post['affiliate_area_page'] ),
             ];
 
-            update_option( 'appsero_fastspring_user_auth_info', $userinfo, false );
+            update_option( 'appsero_affiliate_wp_settings', $userinfo, false );
         }
     }
 

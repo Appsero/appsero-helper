@@ -3,7 +3,7 @@ Contributors: tareq1988, wedevs, nizamuddinbabu, sourovroy, almamunsarkar
 Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
-Tested up to: 5.4
+Tested up to: 5.5
 Stable tag: 1.1.9
 Requires PHP: 5.4
 License: GPLv2 or later
@@ -26,6 +26,7 @@ Shortcodes will be used in any pages.
 - [appsero_licenses] show licenses
 - [appsero_orders] show orders
 - [appsero_downloads] show downloads
+- [appsero_my_account] My Account page
 
 == Installation ==
 
