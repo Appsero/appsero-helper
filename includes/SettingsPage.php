@@ -107,14 +107,17 @@ class SettingsPage {
                 <div class="appsero-widget-logo">
                     <img src="<?php echo ASHP_ROOT_URL; ?>assets/images/appsero-logo.png" alt="Appsero Logo">
                 </div>
-                <p>Create an API key on Appsero from the `<strong>API Key</strong>` page from left navigation pane or by adding a new product. With the API key, you can connect this store with Appsero.</p>
+                <p class="darker-text">
+                    Create an API key on Appsero from the `<strong>API Key</strong>` page from left navigation pane or by adding a new product.<br>
+                    Activate Appsero with the API key to connect this store with Appsero dashboard.
+                </p>
                 <form class="apikey-input-fields" method="post" autocomplete="off">
                     <div class="apikey-input-key">
                         <svg enable-background="new 0 0 512 512" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" width="22">
                             <path d="m463.75 48.251c-64.336-64.336-169.01-64.335-233.35 1e-3 -43.945 43.945-59.209 108.71-40.181 167.46l-185.82 185.82c-2.813 2.813-4.395 6.621-4.395 10.606v84.858c0 8.291 6.709 15 15 15h84.858c3.984 0 7.793-1.582 10.605-4.395l21.211-21.226c3.237-3.237 4.819-7.778 4.292-12.334l-2.637-22.793 31.582-2.974c7.178-0.674 12.847-6.343 13.521-13.521l2.974-31.582 22.793 2.651c4.233 0.571 8.496-0.85 11.704-3.691 3.193-2.856 5.024-6.929 5.024-11.206v-27.929h27.422c3.984 0 7.793-1.582 10.605-4.395l38.467-37.958c58.74 19.043 122.38 4.929 166.33-39.046 64.336-64.335 64.336-169.01 0-233.35zm-42.435 106.07c-17.549 17.549-46.084 17.549-63.633 0s-17.549-46.084 0-63.633 46.084-17.549 63.633 0 17.548 46.084 0 63.633z"></path>
                         </svg>
                         <input type="text" value="<?php echo $token; ?>"
-                            placeholder="API key" name="token"
+                            placeholder="Paste your API key" name="token"
                             <?php echo ( 'Disconnect' == $action ) ? 'readonly="readonly"' : ''; ?>
                         />
                         <input type="hidden" name="_action" value="<?php echo $action; ?>">
@@ -392,6 +395,7 @@ class SettingsPage {
     private function selling_plugins() {
         $plugins = [
             'fastspring' => 'Appsero With FastSpring',
+            'paddle'     => 'Appsero With Paddle',
         ];
 
         if ( class_exists( 'WooCommerce' ) ) {

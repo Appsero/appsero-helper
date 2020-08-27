@@ -5,6 +5,10 @@
 }
 .appsero-widget p {
     font-size: 16px;
+    color: #718096;
+}
+.appsero-widget p.darker-text {
+    color: #1A202C;
 }
 .appsero-widget-logo img {
     width: 200px;
@@ -42,7 +46,7 @@
 .apikey-input-fields {
     display: flex;
     justify-content: space-between;
-    margin-top: 30px;
+    margin-top: 40px;
     width: 100%;
 }
 .apikey-input-fields button {
@@ -66,9 +70,12 @@
 }
 
 .appsero-settings-form {
-    margin-top: 30px;
+    margin-top: 40px;
     border-top: 1px solid #e8e5e5;
     padding-top: 22px;
+}
+.appsero-settings-form h2 {
+    color: #4A5568;
 }
 .appsero-settings-form h2.title {
     margin: 0;
