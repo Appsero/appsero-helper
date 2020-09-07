@@ -19,3 +19,4 @@ Shortcodes will be used in any pages.
 - [appsero_licenses] show licenses
 - [appsero_orders] show orders
 - [appsero_downloads] show downloads
+- [appsero_my_account] My Account page

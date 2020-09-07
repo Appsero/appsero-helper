@@ -5,7 +5,7 @@
  * Description: Helper plugin to connect WordPress store to Appsero
  * Author: Appsero
  * Author URI: https://appsero.com
- * Version: 1.1.9
+ * Version: 1.1.10
  * Text Domain: appsero-helper
  */
 
@@ -17,14 +17,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @class Appsero_Helper The class that holds the entire Appsero_Helper plugin
  */
-class Appsero_Helper {
+final class Appsero_Helper {
 
     /**
      * Plugin version
      *
      * @var string
      */
-    public $version = '1.1.9';
+    public $version = '1.1.10';
 
     /**
      * The single instance of the class.
@@ -194,9 +194,7 @@ class Appsero_Helper {
      */
     private function immediate_load() {
         // Helpers
-        require_once __DIR__ . '/includes/Traits/Hooker.php';
-        require_once __DIR__ . '/includes/Traits/Rest.php';
-        require_once __DIR__ . '/includes/functions.php';
+        $this->include_helpers();
 
         // Add settings page for set API key
         require_once __DIR__ . '/includes/SettingsPage.php';
@@ -222,6 +220,9 @@ class Appsero_Helper {
         require_once __DIR__ . '/includes/Common/Filter_Hook.php';
 
         new Appsero\Helper\Common\Filter_Hook();
+
+        // Include AffiliateWP classes
+        $this->affiliate_wp_includes();
     }
 
     /**
@@ -261,6 +262,26 @@ class Appsero_Helper {
         }
 
         return false;
+    }
+
+    /**
+     * Load AffiliateWP classes
+     */
+    private function affiliate_wp_includes() {
+        // Include class files
+        require_once __DIR__ . '/includes/AffiliateWP/Handle.php';
+
+        // Instantiate classes
+        new Appsero\Helper\AffiliateWP\Handle();
+    }
+
+    /**
+     * Load helper classes
+     */
+    private function include_helpers() {
+        require_once __DIR__ . '/includes/Traits/Hooker.php';
+        require_once __DIR__ . '/includes/Traits/Rest.php';
+        require_once __DIR__ . '/includes/functions.php';
     }
 
 } // Appsero_Helper

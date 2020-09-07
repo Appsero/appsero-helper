@@ -172,3 +172,43 @@ small.license-status {
     border-radius: .25em;
     margin-left: 5px;
 }
+
+/* My Account Page */
+.appsero-login-form form {
+    max-width: 550px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.appsero-login-form form .login-submit {
+    margin: 0;
+}
+.appsero-my-account {
+    padding: 50px 35px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.appsero-my-account-sidebar {
+    width: 27%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.appsero-my-account-content {
+    width: 73%;
+    padding-left: 30px;
+}
+.appsero-my-account-sidebar li {
+    margin: 0;
+}
+.appsero-my-account-sidebar li a {
+    color: #333538;
+    padding: 12px 20px;
+    display: block;
+    border-radius: 30px;
+    text-decoration: none;
+}
+.appsero-my-account-sidebar li a.ama-active-tab {
+    color: #fff;
+    background-color: #6B4FF4;
+}
