@@ -80,8 +80,22 @@ class Products {
             return [];
         }
 
+        $recurring = is_a( $product, 'WC_Product_Variable_Subscription' );
+
         $prices = [];
         $result = $product->get_available_variations();
+
+        $period         = null;
+        $times          = null;
+        $trial_unit     = null;
+        $trial_quantity = null;
+
+        if ( class_exists( 'WC_Subscriptions_Product' ) ) {
+            $period         = \WC_Subscriptions_Product::get_period( $product );
+            $times          = \WC_Subscriptions_Product::get_interval( $product );
+            $trial_unit     = \WC_Subscriptions_Product::get_trial_period( $product );
+            $trial_quantity = \WC_Subscriptions_Product::get_trial_length( $product );
+        }
 
         foreach( $result as $variation ) {
 
@@ -96,11 +110,11 @@ class Products {
                 'name'             => implode( ', ', $variation['attributes'] ),
                 'amount'           => $variation['display_regular_price'],
                 'activation_limit' => (int) $activation_limit ?: null,
-                'recurring'        => null,
-                'trial_quantity'   => null,
-                'trial_unit'       => null,
-                'period'           => null,
-                'times'            => null,
+                'recurring'        => $recurring,
+                'trial_quantity'   => $trial_quantity,
+                'trial_unit'       => $this->format_variation_period( $trial_unit ),
+                'period'           => $this->format_variation_period( $period ),
+                'times'            => $times,
                 'signup_fee'       => 0,
             ];
         }
@@ -123,6 +137,25 @@ class Products {
         }
 
         return false;
+    }
+
+    /**
+     * Format the variation period for appsero
+     */
+    private function format_variation_period( $period ) {
+        switch ( $period ) {
+            case 'year':
+                return 'years';
+
+            case 'month':
+                return 'months';
+
+            case 'day':
+                return 'days';
+
+            default:
+                return $period;
+        }
     }
 
 }
