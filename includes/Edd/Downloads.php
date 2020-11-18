@@ -86,16 +86,35 @@ class Downloads {
                 'name'             => $price['name'],
                 'amount'           => isset( $price['amount'] ) ? $price['amount'] : null,
                 'activation_limit' => isset( $price['license_limit'] ) ? $price['license_limit'] : null,
-                'recurring'        => isset( $price['recurring'] ) ? $price['recurring'] : null,
+                'recurring'        => ( isset( $price['recurring'] ) && $price['recurring'] == 'yes' ) ? true : false,
                 'trial_quantity'   => isset( $price['trial-quantity'] ) ? $price['trial-quantity'] : null,
-                'trial_unit'       => isset( $price['trial-unit'] ) ? $price['trial-unit'] : null,
-                'period'           => isset( $price['period'] ) ? $price['period'] : null,
+                'trial_unit'       => isset( $price['trial-unit'] ) ? $this->format_variation_period( $price['trial-unit'] ) : null,
+                'period'           => isset( $price['period'] ) ? $this->format_variation_period( $price['period'] ) : null,
                 'times'            => isset( $price['times'] ) ? $price['times'] : null,
                 'signup_fee'       => isset( $price['signup_fee'] ) ? $price['signup_fee'] : 0,
             ];
         }
 
         return $prices;
+    }
+
+    /**
+     * Format the variation period for appsero
+     */
+    private function format_variation_period( $period ) {
+        switch ( $period ) {
+            case 'year':
+                return 'years';
+
+            case 'month':
+                return 'months';
+
+            case 'day':
+                return 'days';
+
+            default:
+                return $period;
+        }
     }
 
 }

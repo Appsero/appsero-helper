@@ -3,8 +3,8 @@ Contributors: tareq1988, wedevs, nizamuddinbabu, sourovroy, almamunsarkar
 Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
-Tested up to: 5.5.1
-Stable tag: 1.1.10
+Tested up to: 5.5.3
+Stable tag: 1.1.11
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -54,6 +54,10 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= v1.1.11 – (18th Nov, 2020) =
+- **Fix:** [License API] WooCommerce Software Add-On get variation id from order variation
+- **Fix:** [Product API] Variation recurring and period value
 
 = v1.1.10 – (7th Sep, 2020) =
 - **New:** Appsero My Account page
