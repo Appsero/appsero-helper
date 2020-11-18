@@ -239,7 +239,7 @@ class Licenses {
             'expire_date'      => $this->get_woo_sa_license_expire_date( $product_id, $item, $order ),
             'activation_limit' => empty( $item['activations_limit'] ) ? '' : intval( $item['activations_limit'] ),
             'activations'      => $activations,
-            'variation_source' => '',
+            'variation_source' => $this->get_woo_sa_order_variation_source( $product_id, $item, $order ),
             'active_sites'     => $this->get_active_sites_count( $activations ),
             'license_source'   => 'Woo SA',
         ];
@@ -416,6 +416,36 @@ class Licenses {
         }
 
         return $subscription->get_date( 'next_payment' );
+    }
+
+    /**
+     * Get variation id for order
+     */
+    private function get_woo_sa_order_variation_source( $product_id, $item, $order ) {
+        if ( ! is_a( $order, 'WC_Abstract_Order' ) ) {
+            $order = wc_get_order( $item['order_id'] );
+        }
+
+        $order_data = $order->get_data();
+        $cart       = $this->get_cart_details( $product_id, $order_data['line_items'] );
+
+        if ( $cart ) {
+            $variation_id = $cart->get_variation_id();
+            return $variation_id ? $variation_id : '';
+        }
+
+        return '';
+    }
+
+    /**
+     * Get cart of this product
+     */
+    private function get_cart_details( $product_id, $carts ) {
+        foreach( $carts as $cart ) {
+            if ( $cart->get_product_id() == $product_id ) {
+                return $cart;
+            }
+        }
     }
 
 }
