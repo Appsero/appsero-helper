@@ -261,10 +261,10 @@ class Activations {
             // Create new
             $insert = [
                 'key_id'              => $license['key_id'],
-                'instance'            => uniqid(),
+                'instance'            => $site_url,
                 'activation_time'     => current_time( 'mysql' ),
                 'activation_active'   => $status,
-                'activation_platform' => $site_url
+                'activation_platform' => '',
             ];
 
             $format = [ '%d', '%s', '%s', '%d', '%s' ];

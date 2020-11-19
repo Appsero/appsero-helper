@@ -147,6 +147,10 @@ class Licenses {
         foreach ( $activations as $site ) {
             $domain = $this->prepare_domain_name( $site['activation_domain'] );
 
+            if ( ! $domain ) {
+                continue;
+            }
+
             $domains[] = [
                 'site_url'  => $domain,
                 'is_active' => !! $site['activation_active'],
@@ -267,7 +271,11 @@ class Licenses {
         }
 
         foreach ( $activations as $site ) {
-            $domain = $this->prepare_domain_name( $site['activation_platform'] );
+            $domain = $this->prepare_domain_name( $site['instance'] );
+
+            if ( ! $domain ) {
+                continue;
+            }
 
             $domains[] = [
                 'site_url'  => $domain,
@@ -351,6 +359,10 @@ class Licenses {
 
         foreach ( $activations as $site ) {
             $domain = $this->prepare_domain_name( $site->object );
+
+            if ( ! $domain ) {
+                continue;
+            }
 
             $domains[] = [
                 'site_url'  => $domain,
