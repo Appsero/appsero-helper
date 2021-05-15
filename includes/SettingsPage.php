@@ -145,8 +145,8 @@ class SettingsPage {
                         </tbody>
                     </table>
 
-                    <h2>Configure My Account page on Appsero Dashbaord</h2>
-                    <p>Copy the link of Appsero/EDD/WooCommerce My Account page and update it on your Appsero Dashbaord. Go to your <strong>Product > Email > Email Branding</strong> and paste the my account page link their.</p>
+                    <h2>Configure My Account page on Appsero Dashboard</h2>
+                    <p>Copy the link of Appsero/EDD/WooCommerce My Account page and update it on your Appsero Dashboard. Go to your <strong>Product > Email > Email Branding</strong> and paste the my account page link their.</p>
                     <p>You can create Appsero my account page using <code>[appsero_my_account]</code> shortcode.</p>
                     <br>
 
