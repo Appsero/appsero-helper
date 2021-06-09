@@ -122,7 +122,7 @@ class SettingsPage {
                         />
                         <input type="hidden" name="_action" value="<?php echo $action; ?>">
                     </div>
-                    <button type="submit" name="apikey_submit" class="<?php echo $button_class; ?>"><?php echo $action; ?></button>
+                    <button type="submit" name="<?php echo ( $this->is_local() && $action == 'Connect' ? 'local_submit' : 'apikey_submit' ); ?>" class="<?php echo $button_class; ?>"><?php echo $action; ?></button>
                 </form>
 
                 <form method="post" autocomplete="off" class="appsero-settings-form">
@@ -247,6 +247,16 @@ class SettingsPage {
 
             </div>
         </div>
+
+        <div class="appsero-modal" id="appsero-local-error">
+            <div class="appsero-modal-content">
+                <span class="appsero-modal-close">&times;</span>
+                <div style="margin: 20px 20px 20px 0px">
+                    You are using <b>Appsero Helper</b> in local server. <b>Appsero Helper</b> will not function properly in local server.
+                </div>
+            </div>
+        </div>
+
         <script type="text/javascript">
             jQuery( function() {
                 jQuery('select[name="selling_plugin"]').change(function( event ) {
@@ -272,7 +282,27 @@ class SettingsPage {
                         jQuery('.affiliate-wp-fields').addClass('display-none');
                     }
                 });
+
+                jQuery('button[name=local_submit]').click(function( event ) {
+                    event.preventDefault();
+                    jQuery('#appsero-local-error').show();
+                    return false;
+                });
+
+                jQuery('.appsero-modal-close').click(function() {
+                    jQuery('#appsero-local-error').hide();
+                });
+
+                jQuery('.appsero-modal').click(function() {
+                   jQuery('#appsero-local-error').hide();
+                });
+
+                jQuery('.appsero-modal-content').click(function( event ) {
+                    event.stopPropagation();
+                });
+
             } );
+
         </script>
         <?php
     }
@@ -407,6 +437,17 @@ class SettingsPage {
         }
 
         return $plugins;
+    }
+
+    /**
+     * Check whether it is local server
+     */
+    private function is_local()
+    {
+        $local_ips = [ '127.0.0.1', '::1' ];
+
+        if ( in_array( $_SERVER['REMOTE_ADDR'], $local_ips ) )
+            return true;
     }
 
 }
