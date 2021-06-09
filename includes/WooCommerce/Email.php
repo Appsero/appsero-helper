@@ -16,11 +16,23 @@ class Email {
     public function show_license_and_download( $order, $sent_to_admin, $plain_text, $email ) {
 
         if ( $sent_to_admin || ! $order || $email->id !== 'customer_completed_order' )
-            return;
+            return '';
 
-        if ( class_exists( 'WC_Software' ) || class_exists( 'WooCommerce_API_Manager' ) ) {
-            return;
+        $licenses = [];
+
+        foreach ( $order->get_items( 'line_item' ) as $item_id => $item ) {
+            $key = '_appsero_order_license_for_product_' . $item->get_product_id();
+
+            $license = get_post_meta( $order->get_id(), $key, true );
+
+            if ( ( ! isset( $license['send_license'] ) || $license['send_license'] ) && isset( $license['status'] ) ) {
+                $license['item_name'] = $item->get_name();
+                $licenses[] = $license;
+            }
         }
+
+        if( ! count( $licenses ) )
+            return '';
 
         $text_align  = is_rtl() ? 'right' : 'left';
         $margin_side = is_rtl() ? 'left' : 'right';
@@ -38,14 +50,8 @@ class Email {
                 </thead>
                 <tbody>
                 <?php
-                foreach ( $order->get_items( 'line_item' ) as $item_id => $item ) :
-                    $key = '_appsero_order_license_for_product_' . $item->get_product_id();
+                foreach ( $licenses as $license ) :
 
-                    $license = get_post_meta( $order->get_id(), $key, true );
-
-                    /*if ( ! isset( $license['status'] ) || 1 != $license['status'] ) {
-                        continue;
-                    }*/
                     ?>
                     <tr>
                         <td class="td" style="text-align:<?php echo esc_attr( $text_align ); ?>; vertical-align: middle; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif; word-wrap:break-word;">
@@ -55,7 +61,7 @@ class Email {
                             <?php echo $license['expire_date'] ? date( 'M d, Y', strtotime( $license['expire_date'] ) ) : 'Lifetime'; ?>
                         </td>
                         <td class="td" style="text-align:<?php echo esc_attr( $text_align ); ?>; vertical-align: middle; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif; word-wrap:break-word;">
-                            <a href="<?php echo $license['download_url']; ?>" class="button" title="<?php echo sanitize_title( $item->get_name() ); ?>.zip">
+                            <a href="<?php echo $license['download_url']; ?>" class="button" title="<?php echo sanitize_title( $license['item_name'] ); ?>.zip">
                                 Download
                             </a>
                         </td>

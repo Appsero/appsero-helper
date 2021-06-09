@@ -25,6 +25,20 @@ class Email {
 
         $payment = new \EDD_Payment( $payment_id );
 
+        $send_license = 0;
+
+        foreach ( $payment->downloads as $line_download ) {
+            $key = '_appsero_order_license_for_product_' . $line_download['id'];
+            $license = get_post_meta( $payment->ID, $key, true );
+
+            if ( ( ! isset( $license['send_license'] ) || $license['send_license'] ) && isset( $license['status'] ) && 1 == $license['status'] ) {
+                $send_license ++;
+            }
+        }
+
+        if( ! $send_license )
+            return '';
+
         $text_align  = is_rtl() ? 'right' : 'left';
         $margin_side = is_rtl() ? 'left' : 'right';
 
@@ -61,13 +75,14 @@ class Email {
     private function license_and_download_item( $payment, $line_download ) {
         $key = '_appsero_order_license_for_product_' . $line_download['id'];
         $license = get_post_meta( $payment->ID, $key, true );
+
+        if ( ( isset( $license['send_license']) && ! $license['send_license'] ) || ! isset( $license['status'] ) || 1 != $license['status'] ) {
+            return '';
+        }
+
         $download = new \EDD_Download( $line_download['id'] );
         $price_name = '';
         $text_align  = is_rtl() ? 'right' : 'left';
-
-        if ( ! isset( $license['status'] ) || 1 != $license['status'] ) {
-            return '';
-        }
 
         if ( ! empty( $line_download['options']['price_id'] ) ) {
             $price_name = edd_get_price_option_name( $line_download['id'], $line_download['options']['price_id'], $payment->ID );
