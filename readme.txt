@@ -1,10 +1,10 @@
 === Appsero Helper ===
-Contributors: tareq1988, wedevs, nizamuddinbabu, sourovroy, almamunsarkar
+Contributors: tareq1988, wedevs, nizamuddinbabu, sourovroy, almamunsarkar, arafatkn
 Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
-Tested up to: 5.5.3
-Stable tag: 1.1.12
+Tested up to: 5.7.2
+Stable tag: 1.1.13
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -27,6 +27,10 @@ Shortcodes will be used in any pages.
 - [appsero_orders] show orders
 - [appsero_downloads] show downloads
 - [appsero_my_account] My Account page
+
+= Hooks =
+
+Please visit https://github.com/Appsero/appsero-helper to check the hook's documentation.
 
 == Installation ==
 
@@ -54,6 +58,10 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= v1.1.13 - (25th Jun, 2021) =
+- **New:** Added hooks to extend Appsero my account pages.
+- **New:** Download link and license key with Woocommerce and EDD successful purchase email.
 
 = v1.1.12 – (19th Nov, 2020) =
 - **Fix:** [License API] WooCommerce Software Add-On activations site column change to `instance`
