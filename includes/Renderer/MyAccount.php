@@ -24,6 +24,9 @@ class MyAccount {
         ?>
         <div class="appsero-my-account">
             <ul class="appsero-my-account-sidebar">
+
+                <?php do_action( 'before_appsero_myaccount_sidebar', $tab); ?>
+
                 <li><a href="?tab=dashboard" class="<?php echo $tab == 'dashboard' ? 'ama-active-tab' : ''; ?>">Dashboard</a></li>
                 <li><a href="?tab=orders" class="<?php echo $tab == 'orders' ? 'ama-active-tab' : ''; ?>">Orders</a></li>
                 <li><a href="?tab=licenses" class="<?php echo $tab == 'licenses' ? 'ama-active-tab' : ''; ?>">My Licenses</a></li>
@@ -32,9 +35,18 @@ class MyAccount {
                 <?php if ( ! empty( $affiliate['affiliate_area_page'] ) ): ?>
                 <li><a href="<?php echo get_permalink( $affiliate['affiliate_area_page'] ); ?>">Affiliate Area</a></li>
                 <?php endif; ?>
+
+                <?php do_action( 'after_appsero_myaccount_sidebar', $tab); ?>
+
             </ul>
             <div class="appsero-my-account-content">
+
+                <?php do_action( 'before_appsero_myaccount_contents', $tab); ?>
+
                 <?php $this->show_tab_content( $tab ); ?>
+
+                <?php do_action( 'after_appsero_myaccount_contents', $tab); ?>
+
             </div>
         </div>
         <?php
@@ -72,20 +84,24 @@ class MyAccount {
                 echo do_shortcode('[appsero_downloads]');
                 break;
 
-            default:
+            case 'dashboard':
                 $this->show_dashboard_content();
+                break;
+
+            default:
+                do_action( 'appsero_myaccount_custom_tab', $tab );
                 break;
         }
     }
 
     /**
-     * Show dashbaord tab content
+     * Show dashboard tab content
      */
     private function show_dashboard_content() {
         $user = wp_get_current_user();
         ?>
         <p>Hello <strong><?php echo $user->display_name; ?></strong>, (not <strong><?php echo $user->display_name; ?></strong>? <a href="<?php echo wp_logout_url( get_permalink( get_the_ID() ) ); ?>">Sign out</a>)</p>
-        <p>From yor account dashbaord you can view your Orders, Licenses and Downloads</p>
+        <p>From yor account dashboard you can view your Orders, Licenses and Downloads</p>
         <?php
     }
 

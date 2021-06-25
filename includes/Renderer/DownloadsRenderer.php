@@ -16,6 +16,8 @@ class DownloadsRenderer {
         }
 
         ob_start();
+
+        do_action( 'before_appsero_myaccount_download_table' );
         ?>
         <div class="appsero-downloads">
             <?php
@@ -44,6 +46,8 @@ class DownloadsRenderer {
             <?php endif; ?>
         </div>
         <?php
+
+        do_action( 'after_appsero_myaccount_download_table' );
 
         return ob_get_clean();
     }

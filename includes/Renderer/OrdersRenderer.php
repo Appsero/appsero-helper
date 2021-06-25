@@ -16,6 +16,8 @@ class OrdersRenderer {
         }
 
         ob_start();
+
+        do_action( 'before_appsero_myaccount_order_table' );
         ?>
         <div class="appsero-orders">
             <?php
@@ -45,6 +47,8 @@ class OrdersRenderer {
             <?php endif; ?>
         </div>
         <?php
+
+        do_action( 'after_appsero_myaccount_order_table' );
 
         return ob_get_clean();
     }

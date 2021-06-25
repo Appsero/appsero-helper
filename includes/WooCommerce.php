@@ -15,6 +15,7 @@ class WooCommerce {
         require_once __DIR__ . '/WooCommerce/MyAccountPage.php';
         require_once __DIR__ . '/WooCommerce/ThankYouPage.php';
         require_once __DIR__ . '/WooCommerce/MetaBox.php';
+        require_once __DIR__ . '/WooCommerce/Email.php';
 
         // Initialize WooCommerce requests hooks
         new WooCommerce\SendRequests();
@@ -27,12 +28,15 @@ class WooCommerce {
 
         // WooCommerce meta boxes
         new WooCommerce\MetaBox();
+
+        // Woocommerce Email
+        new WooCommerce\Email();
     }
 
     /**
      * Products REST API Class
      *
-     * @return WooCommerce\Downloads
+     * @return WooCommerce\Products
      */
     public function products() {
         require_once __DIR__ . '/WooCommerce/Products.php';
@@ -41,9 +45,9 @@ class WooCommerce {
     }
 
     /**
-     * Licenses REST API Class
+     * Orders REST API Class
      *
-     * @return WooCommerce\Licenses
+     * @return WooCommerce\Orders
      */
     public function orders() {
         require_once __DIR__ . '/WooCommerce/Orders.php';
@@ -76,7 +80,7 @@ class WooCommerce {
     /**
      * Subscriptions REST API Class
      *
-     * @return WooCommerce\Activations
+     * @return WooCommerce\Subscriptions
      */
     public function subscriptions() {
         require_once __DIR__ . '/WooCommerce/Subscriptions.php';

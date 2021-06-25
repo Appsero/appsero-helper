@@ -132,6 +132,7 @@ class SendRequests {
                 'status'       => $response['data']['status'],
                 'download_url' => $response['data']['download_url'],
                 'expire_date'  => $response['data']['expire_date'],
+                'send_license' => isset( $response['data']['send_license'] ) ? $response['data']['send_license'] : true,
             ] );
         }
     }

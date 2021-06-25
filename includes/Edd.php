@@ -11,6 +11,7 @@ class Edd {
         require_once __DIR__ . '/Edd/SendRequests.php';
         require_once __DIR__ . '/Edd/MyAccountPage.php';
         require_once __DIR__ . '/Edd/ThankYouPage.php';
+        require_once __DIR__ . '/Edd/Email.php';
 
         // Initialize Edd requests hooks
         new Edd\SendRequests();
@@ -20,6 +21,9 @@ class Edd {
 
         // EDD Thank You page
         new EDD\ThankYouPage();
+
+        // EDD Purchase Email
+        new Edd\Email();
     }
 
     /**
@@ -34,7 +38,7 @@ class Edd {
     }
 
     /**
-     * Licenses REST API Class
+     * Orders REST API Class
      *
      * @return Edd\Orders
      */
