@@ -15,6 +15,8 @@ class ThankYouPage {
      */
     public function show_license_and_download( $payment_post, $receipt_args ) {
         $payment = new \EDD_Payment( $payment_post->ID );
+        wp_enqueue_style( 'ashp-my-account' );
+        wp_enqueue_script( 'ashp-my-account' );
         ?>
             <h3>License and Download</h3>
             <table class="edd-table">
@@ -55,7 +57,12 @@ class ThankYouPage {
         }
         ?>
         <tr>
-            <td><?php echo esc_html( $license['key'] ); ?></td>
+            <td>
+                <span class="tooltip">
+                    <span class="license-key-code"><?php echo esc_html( $license['key'] ); ?></span>
+                    <span class="tooltiptext">Click to Copy</span>
+                </span>
+            </td>
             <td><?php echo $license['expire_date'] ? date( 'M d, Y', strtotime( $license['expire_date'] ) ) : 'Lifetime'; ?></td>
             <td>
                 <a href="<?php echo esc_url( $license['download_url'] ); ?>" class="button">

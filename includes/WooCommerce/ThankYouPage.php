@@ -23,6 +23,9 @@ class ThankYouPage {
         if ( ! $order ) {
             return;
         }
+
+        wp_enqueue_style( 'ashp-my-account' );
+        wp_enqueue_script( 'ashp-my-account' );
         ?>
         <section class="woocommerce-order-details">
             <h2 class="woocommerce-order-details__title">License and Download</h2>
@@ -46,7 +49,12 @@ class ThankYouPage {
                             }
                     ?>
                     <tr>
-                        <td><?php echo $license['key']; ?></td>
+                        <td>
+                            <span class="tooltip">
+                                <span class="license-key-code"><?php echo esc_html( $license['key'] ); ?></span>
+                                <span class="tooltiptext">Click to Copy</span>
+                            </span>
+                        </td>
                         <td><?php echo $license['expire_date'] ? date( 'M d, Y', strtotime( $license['expire_date'] ) ) : 'Lifetime'; ?></td>
                         <td>
                             <a href="<?php echo $license['download_url']; ?>" class="button">

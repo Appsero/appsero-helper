@@ -38,6 +38,7 @@ class LicensesRenderer {
             <?php endif; ?>
 
         </div>
+
         <?php
 
         do_action( 'after_appsero_myaccount_license_table' );
@@ -52,7 +53,13 @@ class LicensesRenderer {
         ?>
         <div class="license-key-activations">
             <div class="appsero-license-key">
-                <p><strong>Key</strong> <span class="license-key-code"><?php echo $license['key']; ?></span></p>
+                <p>
+                    <strong>Key</strong>
+                    <span class="tooltip">
+                        <span class="license-key-code"><?php echo esc_html( $license['key'] ); ?></span>
+                        <span class="tooltiptext">Click to Copy</span>
+                    </span>
+                </p>
             </div>
             <div class="appsero-activations">
                 <?php if ( count( $activations ) > 0 ) : ?>
@@ -70,6 +77,7 @@ class LicensesRenderer {
                 <?php endif; ?>
             </div>
         </div>
+
         <?php
     }
 
@@ -136,11 +144,15 @@ class LicensesRenderer {
     private function get_license_product( $license ) {
 
         if ( 'woo' == $license['store_type'] && class_exists( 'WooCommerce' ) ) {
-            return wc_get_product( $license['product_id'] );
+            $product = wc_get_product( $license['product_id'] );
         }
 
         if ( 'edd' == $license['store_type'] && class_exists( 'Easy_Digital_Downloads' ) ) {
-            return edd_get_download( $license['product_id'] );
+            $product = edd_get_download( $license['product_id'] );
+        }
+
+        if( isset($product) && $product ) {
+            return $product;
         }
 
         $stdClass                 = new \stdClass;
@@ -191,6 +203,7 @@ class LicensesRenderer {
             <?php $this->print_activations( $license, $activations ); ?>
 
         </div>
+
         <?php
     }
 
