@@ -24,6 +24,22 @@ class ThankYouPage {
             return;
         }
 
+        $licenses = array();
+
+        foreach ( $order->get_items( 'line_item' ) as $item_id => $item ) {
+            $key = '_appsero_order_license_for_product_' . $item->get_product_id();
+
+            $license = get_post_meta( $order->get_id(), $key, true );
+
+            if ( isset( $license['status'] ) && $license['status'] == 1 ) {
+                $license['item_name'] = $item->get_name();
+                $licenses[] = $license;
+            }
+        }
+
+        if( ! count( $licenses ) )
+            return '';
+
         wp_enqueue_style( 'ashp-my-account' );
         wp_enqueue_script( 'ashp-my-account' );
         ?>
@@ -39,14 +55,7 @@ class ThankYouPage {
                 </thead>
                 <tbody>
                     <?php
-                        foreach ( $order->get_items( 'line_item' ) as $item_id => $item ) :
-                            $key = '_appsero_order_license_for_product_' . $item->get_product_id();
-
-                            $license = get_post_meta( $order_id, $key, true );
-
-                            if ( ! isset( $license['status'] ) || 1 != $license['status'] ) {
-                                continue;
-                            }
+                        foreach ( $licenses as $license ) :
                     ?>
                     <tr>
                         <td>
@@ -58,7 +67,7 @@ class ThankYouPage {
                         <td><?php echo $license['expire_date'] ? date( 'M d, Y', strtotime( $license['expire_date'] ) ) : 'Lifetime'; ?></td>
                         <td>
                             <a href="<?php echo $license['download_url']; ?>" class="button">
-                                <?php echo sanitize_title( $item->get_name() ); ?>.zip
+                                <?php echo sanitize_title( $license['item_name'] ); ?>.zip
                             </a>
                         </td>
                     </tr>
