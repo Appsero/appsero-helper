@@ -188,11 +188,7 @@ class LicensesRenderer {
                     </div>
                     <div class="license-product-activation">
                         <h4>Activations Remaining</h4>
-                        <?php if ( $license['activation_limit'] && 0 < $license['activation_limit'] ) : ?>
-                            <p class="h3"><?php echo $license['activation_limit'] - count( $activations ); ?></p>
-                        <?php else: ?>
-                            <p class="h3">Unlimited</p>
-                        <?php endif ?>
+                        <p class="h3"><?php echo $this->activationRemaining( $license, $activations ); ?></p>
                     </div>
                 </div>
                 <div class="license-toggle-info">
@@ -304,6 +300,21 @@ class LicensesRenderer {
         if ( 2 == $license['status'] ) {
             echo '<small class="license-status">Disabled</small>';
         }
+    }
+
+    /**
+     * Get Activation remaining
+     */
+    private function activationRemaining( $license, $activations ) {
+        if ( ! $license['activation_limit'] || 0 >= $license['activation_limit'] ) {
+            return "Unlimited";
+        }
+
+        if( isset( $license['active_sites'] ) ) {
+            return $license['activation_limit'] - $license['active_sites'];
+        }
+
+        return $license['activation_limit'] - count( $activations );
     }
 
 }
