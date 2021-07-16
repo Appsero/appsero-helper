@@ -15,10 +15,26 @@ trait OrderHelper {
         if ( ! function_exists( 'wc' ) )
             return [];
 
+        if ( is_user_logged_in() ) {
+            $user = wp_get_current_user();
+        } else {
+            $user_id = appsero_create_customer(
+                $order_data['billing']['email'],
+                $order_data['billing']['first_name'],
+                $order_data['billing']['last_name']
+            );
+            $user = get_userdata( $user_id );
+        }
+
+        error_log("Email: " . $user->user_email . " , ID: " . $user->ID);
+
+        $first_name = empty( $user->user_firstname ) ? $order_data['billing']['first_name'] : $user->user_firstname;
+        $last_name = empty( $user->user_lastname ) ? $order_data['billing']['last_name'] : $user->user_lastname;
+
         return [
-            'id'       => $order_data['customer_id'],
-            'email'    => $order_data['billing']['email'],
-            'name'     => $order_data['billing']['first_name'] .' '. $order_data['billing']['last_name'],
+            'id'       => $user ? $user->ID : $order_data['customer_id'],
+            'email'    => $user ? $user->user_email : $order_data['billing']['email'],
+            'name'     => $first_name . ' ' . $last_name,
             'address'  => $order_data['billing']['address_1'] .' '. $order_data['billing']['address_2'],
             'zip'      => $order_data['billing']['postcode'],
             'state'    => $this->get_state( $order_data['billing']['country'], $order_data['billing']['state'] ),
@@ -85,6 +101,12 @@ trait OrderHelper {
     private function edd_customer_data( $payment ) {
         if ( function_exists( 'edd_software_licensing' ) ) {
             $user_id = $payment->customer_id;
+            $user = get_userdata( $user_id );
+            $email = $user ? $user->user_email : '';
+        } else if ( is_user_logged_in() ) {
+            $user = wp_get_current_user();
+            $user_id = $user->ID;
+            $email = $user ? $user->user_email : '';
         } else {
             $user_id = appsero_create_customer(
                 $payment->user_info['email'],
@@ -93,9 +115,11 @@ trait OrderHelper {
             );
         }
 
+        error_log("Email: " . $email . " , ID: " . $user_id);
+
         return [
             'id'       => (int) $user_id,
-            'email'    => $payment->user_info['email'],
+            'email'    => ! empty( $email ) ? $email : $payment->user_info['email'],
             'name'     => $payment->user_info['first_name'] .' '. $payment->user_info['last_name'],
             'address'  => $payment->address['line1'] .' '. $payment->address['line2'],
             'zip'      => $payment->address['zip'],
