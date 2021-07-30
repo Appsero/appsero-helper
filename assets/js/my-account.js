@@ -49,4 +49,21 @@ jQuery( document ).ready( function () {
         }
     });
 
+    jQuery('.license-key-code').on('click', function( event ) {
+        const el = document.createElement("textarea");
+        el.value = jQuery(this).text();
+        document.body.appendChild(el);
+        el.select();
+        el.setSelectionRange(0, 99999); // Mobile compatibility
+        document.execCommand("copy");
+        document.body.removeChild(el);
+        jQuery(this).next('.tooltiptext').text("Copied!");
+    });
+
+    jQuery('.license-key-code').on('mouseout mouseleave', function() {
+        jQuery(this).next('.tooltiptext').text("Click to Copy");
+    });
+
+    jQuery('.appsero-licenses .license-toggle-info').first().click();
+
 } );
