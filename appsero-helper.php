@@ -24,7 +24,7 @@ final class Appsero_Helper {
      *
      * @var string
      */
-    public $version = '1.1.13';
+    public $version = '1.1.14';
 
     /**
      * The single instance of the class.

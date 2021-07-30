@@ -3,8 +3,8 @@ Contributors: tareq1988, wedevs, nizamuddinbabu, sourovroy, almamunsarkar, arafa
 Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
-Tested up to: 5.7.2
-Stable tag: 1.1.13
+Tested up to: 5.8
+Stable tag: 1.1.14
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -58,6 +58,11 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= v1.1.14 - (30th July, 2021) =
+- **New:** Copy license key by clicking on it.
+- **Fix:** Updated Appsero customer creation process.
+- **Fix:** Hide license & download box in thank you page for pending orders.
 
 = v1.1.13 - (25th Jun, 2021) =
 - **New:** Added hooks to extend Appsero my account pages.
