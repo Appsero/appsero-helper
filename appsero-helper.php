@@ -281,6 +281,7 @@ final class Appsero_Helper {
     private function include_helpers() {
         require_once __DIR__ . '/includes/Traits/Hooker.php';
         require_once __DIR__ . '/includes/Traits/Rest.php';
+        require_once __DIR__ . '/includes/Traits/SettingsHelper.php';
         require_once __DIR__ . '/includes/functions.php';
     }
 
