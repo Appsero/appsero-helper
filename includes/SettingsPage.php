@@ -194,56 +194,6 @@ class SettingsPage {
                         <br>
                     </div>
 
-<!--                    <div class="appsero-test-fields display-none <?php /*echo $selling_plugin === 'fastspring' ? '' : 'display-none'; */?>">
-                        <h2>Configure Affiliates with FastSpring sales</h2>
-                        <?php /*$affiliate = get_option( 'appsero_affiliate_wp_settings', '' ); */?>
-                        <p>
-                            <label>
-                                <input type="checkbox" name="enable_affiliates" <?php /*checked( true, ! empty( $affiliate['enable_affiliates'] ) ) */?> />
-                                Enable Affiliates with FastSpring sales
-                            </label>
-                        </p>
-
-                        <?php /*if ( ! class_exists( 'Affiliate_WP' ) ): */?>
-                        <p>You do not have AffiliateWP plugin installed. <a href="https://affiliatewp.com/" target="_blank">Install AffiliateWP</a> to enable affiliation from your FastSpring sales.</p>
-                        <?php /*endif; */?>
-
-                        <table class="form-table affiliate-wp-fields <?php /*echo empty( $affiliate['enable_affiliates'] ) ? 'display-none' : ''; */?>">
-                            <tbody>
-                                <tr>
-                                    <th scope="row"><label>Affiliate Area Page</label></th>
-                                    <td>
-                                        <select name="affiliate_area_page">
-                                            <option value="">Select Affiliate Area Page</option>
-
-                                            <?php
-/*                                                $affiliate_page = empty( $affiliate['affiliate_area_page'] ) ? '' : $affiliate['affiliate_area_page'];
-                                                foreach( get_pages() as $page ) :
-                                            */?>
-                                            <option value="<?php /*echo $page->ID; */?>" <?php /*selected( $affiliate_page, $page->ID ); */?> ><?php /*echo $page->post_title; */?></option>
-                                            <?php /*endforeach; */?>
-                                        </select>
-                                        <p class="description">Select the same page that is selected as Affiliate Area page of AffiliateWP plugin.</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row"><label>FastSpring API Username</label></th>
-                                    <td>
-                                        <input name="fastspring_username" type="text" value="<?php /*echo empty($affiliate['fastspring_username']) ? '' : $affiliate['fastspring_username']; */?>" class="regular-text" placeholder="Enter FastSpring API username">
-                                        <p class="description">Enter FastSpring API username from your API credentials</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row"><label>FastSpring API Password</label></th>
-                                    <td>
-                                        <input name="fastspring_password" type="password" value="<?php /*echo empty($affiliate['fastspring_password']) ? '' : $affiliate['fastspring_password']; */?>" class="regular-text" placeholder="Enter FastSpring API password">
-                                        <p class="description">Enter FastSpring API password from your API credentials</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
--->
                     <div class="appsero-fastspring-fields appsero-paddle-fields <?php echo $this->isAffiliatable($selling_plugin) ? '' : 'display-none'; ?>">
                         <h2>Configure Affiliates with <?php $this->showSellingPluginName(); ?> sales</h2>
                         <?php $affiliate = get_option( 'appsero_affiliate_wp_settings', '' ); ?>
@@ -302,6 +252,16 @@ class SettingsPage {
                                 <td>
                                     <input name="paddle_vendor_auth_code" type="password" value="<?php echo empty($affiliate['paddle_vendor_auth_code']) ? '' : $affiliate['paddle_vendor_auth_code']; ?>" class="regular-text" placeholder="Paddle Vendor Auth Code">
                                     <p class="description">Enter Paddle Vendor Auth Code from your API credentials</p>
+                                </td>
+                            </tr>
+                            <tr class="appsero-paddle-fields <?php echo $selling_plugin === 'paddle' ? '' : 'display-none'; ?>">
+                                <th scope="row"><label>Paddle Connection Mode</label></th>
+                                <td>
+                                    <select name="paddle_sandbox" class="regular-text">
+                                        <option value="0" <?php echo empty($affiliate['paddle_sandbox']) ? 'selected' : ''; ?> >Live/Production</option>
+                                        <option value="1" <?php echo empty($affiliate['paddle_sandbox']) ? '' : 'selected'; ?> >Test/Sandbox</option>
+                                    </select>
+                                    <p class="description">Select Paddle Connection Mode.</p>
                                 </td>
                             </tr>
                             </tbody>
@@ -397,7 +357,7 @@ class SettingsPage {
             update_option( 'appsero_general_settings', $fastspring );
         }
 
-        if ( isset( $post['fastspring_username'], $post['fastspring_password'] ) ) {
+        if ( $post['selling_plugin'] == 'fastspring' && isset( $post['fastspring_username'], $post['fastspring_password'] ) ) {
             $userinfo = [
                 'fastspring_username' => sanitize_text_field( $post['fastspring_username'] ),
                 'fastspring_password' => sanitize_text_field( $post['fastspring_password'] ),
@@ -407,6 +367,20 @@ class SettingsPage {
 
             update_option( 'appsero_affiliate_wp_settings', $userinfo, false );
         }
+
+        if ( $post['selling_plugin'] == 'paddle' && isset( $post['paddle_vendor_id'], $post['paddle_vendor_auth_code'] ) ) {
+            $userinfo = [
+                'paddle_vendor_id' => sanitize_text_field( $post['paddle_vendor_id'] ),
+                'paddle_vendor_auth_code' => sanitize_text_field( $post['paddle_vendor_auth_code'] ),
+                'paddle_sandbox' => ! empty( $post['paddle_sandbox'] ),
+                'enable_affiliates'   => ! empty( $post['enable_affiliates'] ),
+                'affiliate_area_page' => sanitize_text_field( $post['affiliate_area_page'] ),
+            ];
+
+            update_option( 'appsero_affiliate_wp_settings', $userinfo, false );
+        }
+
+        $this->success = "Saved Successfully.";
     }
 
 }

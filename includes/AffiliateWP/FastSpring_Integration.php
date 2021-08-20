@@ -54,7 +54,7 @@ class FastSpring_Integration extends Affiliate_WP_Base {
         $product_total = $this->order['totalInPayoutCurrency'];
 
         if ( ! $this->affiliate_id ) {
-            $this->log( 'No referel id found, skipping.' );
+            $this->log( 'No referral id found, skipping.' );
             return;
         }
 

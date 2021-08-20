@@ -101,7 +101,7 @@ class MyAccount {
         $user = wp_get_current_user();
         ?>
         <p>Hello <strong><?php echo $user->display_name; ?></strong>, (not <strong><?php echo $user->display_name; ?></strong>? <a href="<?php echo wp_logout_url( get_permalink( get_the_ID() ) ); ?>">Sign out</a>)</p>
-        <p>From yor account dashboard you can view your Orders, Licenses and Downloads</p>
+        <p>From your account dashboard you can view your Orders, Licenses and Downloads</p>
         <?php
     }
 
