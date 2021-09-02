@@ -77,6 +77,8 @@ trait SettingsHelper {
 
         if ( in_array( $_SERVER['REMOTE_ADDR'], $local_ips ) )
             return true;
+
+        return false;
     }
 
     /**
