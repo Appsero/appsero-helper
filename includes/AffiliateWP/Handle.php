@@ -27,14 +27,24 @@ class Handle  {
      * Add new integration to AffiliateWP
      */
     public function add_integration( $integrations ) {
-        $path = __DIR__ . '/FastSpring_Integration.php';
+        $fastspring_path = __DIR__ . '/FastSpring_Integration.php';
+        $paddle_path = __DIR__ . '/Paddle_Integration.php';
 
-        require_once $path;
+        require_once $fastspring_path;
+        require_once $paddle_path;
 
         $integrations['fastspring'] = [
             'name'     => 'FastSpring',
             'class'    => FastSpring_Integration::class,
-            'file'     => $path,
+            'file'     => $fastspring_path,
+            // 'enabled'  => true,
+            // 'supports' => [ 'sales_reporting' ],
+        ];
+
+        $integrations['paddle'] = [
+            'name'     => 'Paddle',
+            'class'    => Paddle_Integration::class,
+            'file'     => $paddle_path,
             // 'enabled'  => true,
             // 'supports' => [ 'sales_reporting' ],
         ];
@@ -68,6 +78,20 @@ class Handle  {
      * Load scripts to frontend
      */
     public function enqueue_scripts() {
+        $af_wp_settings = get_option( 'appsero_affiliate_wp_settings', [] );
+
+        if( !$af_wp_settings['enable_affiliates']) {
+            return;
+        }
+
+        wp_enqueue_script('paddle-checkout', 'https://cdn.paddle.com/paddle/paddle.js', [], false, false);
+        wp_enqueue_script( 'paddle-affiliate-wp', ASHP_ROOT_URL . 'assets/js/paddle-affiliate-wp.js', [ 'jquery' ], time(), true );
+
+        wp_localize_script( 'paddle-affiliate-wp', 'appseroPaddleAffWP', [
+            'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
+            'vendor_id'    => isset( $af_wp_settings['paddle_vendor_id'] ) ? $af_wp_settings['paddle_vendor_id'] : '',
+        ] );
+
         $settings = get_option( 'appsero_general_settings', [] );
 
         if ( empty( $settings['storefront_path'] ) || empty( $settings['redirect_purchases'] ) ) {

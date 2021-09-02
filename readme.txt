@@ -4,7 +4,7 @@ Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
 Tested up to: 5.8
-Stable tag: 1.1.15
+Stable tag: 1.1.16
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -58,6 +58,9 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= v1.1.16 - (2nd September, 2021) =
+- **New:** Added Paddle Affiliate feature using AffiliateWP.
 
 = v1.1.15 - (30th July, 2021) =
 - **Fix:** Update plugin version and tested up to.
