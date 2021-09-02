@@ -29,7 +29,6 @@ function appseroSetupAffiliatePaddle() {
 }
 
 function appseroPaddleEvent(data) {
-    console.log( data );
 
     if( data.event === 'Checkout.Complete' ) {
         appseroPaddleCheckoutComplete(data.eventData);
@@ -45,11 +44,6 @@ function appseroPaddleCheckoutComplete(data) {
         return;
     }
 
-    Paddle.Order.details(checkoutId, function(data) {
-        // Order data, downloads, receipts etc... available within 'data' variable.
-        console.log(data);
-    });
-
     jQuery.ajax({
         url: appseroPaddleAffWP.ajaxUrl,
         type: "POST",
@@ -57,7 +51,5 @@ function appseroPaddleCheckoutComplete(data) {
             checkout_id: checkoutId,
             action: 'appsero_affwp_paddle_completed'
         },
-    })/*.always(function() {
-        window.location.href = appseroFastSpringAffwp.thankYouPage;
-    })*/;
+    });
 }
