@@ -251,3 +251,15 @@ small.license-status {
     visibility: visible;
     opacity: 1;
 }
+
+a.download-btn {
+    margin-left: 10px;
+    padding: 4px 10px;
+    background-color: #4A5568;
+    color: #fff;
+    border-radius: 5px;
+    text-decoration: none;
+}
+a.download-btn:active, a.download-btn:link {
+    text-decoration: none;
+}

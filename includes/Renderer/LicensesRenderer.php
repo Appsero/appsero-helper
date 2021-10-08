@@ -59,6 +59,9 @@ class LicensesRenderer {
                         <span class="license-key-code"><?php echo esc_html( $license['key'] ); ?></span>
                         <span class="tooltiptext">Click to Copy</span>
                     </span>
+                    <?php if ( !empty($license['download_url']) ) : ?>
+                    <a class="download-btn" href="<?php echo $license['download_url']; ?>">Download</a>
+                    <?php endif; ?>
                 </p>
             </div>
             <div class="appsero-activations">
