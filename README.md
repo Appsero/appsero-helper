@@ -2,7 +2,7 @@
 
 Appsero Helper provide a connection between your Plugin or Theme users and their sites to your WordPress store.
 
-AppSero offers Analytics, Licensing and Release system for Premium Plugins and Themes.
+Appsero offers Analytics, Licensing and Release system for Premium Plugins and Themes.
 
 ## Installation
 
