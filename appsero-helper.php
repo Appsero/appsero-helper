@@ -158,9 +158,9 @@ final class Appsero_Helper {
      * Enqueue CSS and JS
      */
     public function enqueue_scripts() {
-        wp_register_style( 'ashp-my-account', ASHP_ROOT_URL . 'assets/css/my-account.css' );
+        wp_register_style( 'ashp-my-account', ASHP_ROOT_URL . 'assets/css/my-account.css', [], $this->version );
 
-        wp_register_script( 'ashp-my-account', ASHP_ROOT_URL . 'assets/js/my-account.js', [ 'jquery' ] );
+        wp_register_script( 'ashp-my-account', ASHP_ROOT_URL . 'assets/js/my-account.js', [ 'jquery' ], $this->version );
 
         wp_localize_script( 'ashp-my-account', 'appseroHelper', [
             'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
