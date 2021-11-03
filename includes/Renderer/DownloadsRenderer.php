@@ -77,7 +77,10 @@ class DownloadsRenderer {
     private function single_download_output( $download ) {
         ?>
         <tr>
-            <td><?php echo $download['name']; ?></td>
+            <td>
+                <?php echo $download['name']; ?>
+                <?php if( $download['has_variations'] ) { echo '<br/><small>' . $download['variation_name'] . '</small>'; } ?>
+            </td>
             <td><?php echo $download['version']; ?></td>
             <td><?php echo $download['release_date']; ?></td>
             <td><a href="<?php echo $download['download_url']; ?>">Download</a></td>

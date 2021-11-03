@@ -59,6 +59,9 @@ class LicensesRenderer {
                         <span class="license-key-code"><?php echo esc_html( $license['key'] ); ?></span>
                         <span class="tooltiptext">Click to Copy</span>
                     </span>
+                    <?php if ( !empty($license['download_url']) ) : ?>
+                    <a class="download-btn" href="<?php echo $license['download_url']; ?>">Download</a>
+                    <?php endif; ?>
                 </p>
             </div>
             <div class="appsero-activations">
@@ -67,7 +70,16 @@ class LicensesRenderer {
 
                 <?php foreach ( $activations as $activation ) : ?>
                 <div class="appsero-activation-item">
-                    <span><?php echo $activation['site_url']; ?></span>
+                    <span>
+                        <?php echo $activation['site_url']; ?>
+                        <?php if ( $activation['is_local'] ) : ?>
+                            <small class="badge text-normal" style="margin-left: 5px">Local</small>
+                            <span class="tooltip">
+                                <i class="as-icon-info"></i>
+                                <small class="tooltiptext text-normal" style="min-width: 260px; margin-left: -130px">Local sites are whitelisted and they do not increase the number of your total activated sites</small>
+                            </span>
+                        <?php endif; ?>
+                    </span>
                     <a href="#" data-activationid="<?php echo $activation['id']; ?>" class="remove-activation-button">Remove</a>
                 </div>
                 <?php endforeach; ?>

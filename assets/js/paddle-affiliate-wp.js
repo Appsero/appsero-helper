@@ -16,7 +16,7 @@ function appseroSetupAffiliatePaddle() {
         return;
     }
 
-    if( PaddleCompletedSetup === undefined || !PaddleCompletedSetup ) {
+    if( window.PaddleCompletedSetup === undefined || !window.PaddleCompletedSetup ) {
         appseroSetupPaddle();
         return;
     }
