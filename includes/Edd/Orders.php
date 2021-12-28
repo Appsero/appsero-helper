@@ -29,12 +29,13 @@ class Orders {
      */
     public function get_items( $request ) {
         $this->download_id = $request->get_param( 'product_id' );
+        $after             = $request->get_param( 'after' ); // After the date
         $per_page          = $request->get_param( 'per_page' );
         $current_page      = $request->get_param( 'page' );
         $offset            = ( $current_page - 1 ) * $per_page;
 
         global $wpdb;
-        $order_ids    = $wpdb->get_col( $this->get_order_ids_query( $per_page, $offset ) );
+        $order_ids    = $wpdb->get_col( $this->get_order_ids_query( $per_page, $offset, $after ) );
         $total_orders = $wpdb->get_var( 'SELECT FOUND_ROWS()' );
 
         $items = [];
@@ -88,6 +89,7 @@ class Orders {
             'fee'            => $fee,
             'status'         => $this->get_order_status( $payment->status ),
             'ordered_at'     => $payment->date,
+            'updated_at'     => get_post($payment->ID)->post_modified_gmt,
             'payment_method' => $this->format_payment_method( $payment->gateway ),
             'notes'          => $this->get_notes( $payment->ID ),
             'customer'       => $this->edd_customer_data( $payment ),
@@ -251,7 +253,7 @@ class Orders {
     /**
      * SQL query of get order ids
      */
-    private function get_order_ids_query( $per_page, $offset ) {
+    private function get_order_ids_query( $per_page, $offset, $after ) {
         global $wpdb;
 
         $query = "SELECT SQL_CALC_FOUND_ROWS `ID` FROM {$wpdb->posts}
@@ -263,6 +265,7 @@ class Orders {
                   AND `post_status` IN (
                       'abandoned', 'edd_subscription', 'failed', 'pending', 'processing', 'publish', 'refunded', 'revoked'
                   )
+                  AND `post_modified_gmt` >= '{$after}'
                   ORDER BY `ID` ASC LIMIT %d OFFSET %d;";
 
         return $wpdb->prepare( $query, $this->download_id, $per_page, $offset );
