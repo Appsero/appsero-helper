@@ -78,9 +78,11 @@ class ThankYouPage {
             </td>
             <td><?php echo $license['expire_date'] ? date( 'M d, Y', strtotime( $license['expire_date'] ) ) : 'Lifetime'; ?></td>
             <td>
-                <a href="<?php echo esc_url( $license['download_url'] ); ?>" class="button">
-                    <?php echo esc_html( sanitize_title( $license['item_name'] ) ); ?>.zip
-                </a>
+                <?php if (! empty($license['download_url'])): ?>
+                    <a href="<?php echo esc_url( $license['download_url'] ); ?>" class="button">
+                        <?php echo esc_html( sanitize_title( $license['item_name'] ) ); ?>.zip
+                    </a>
+                <?php endif; ?>
             </td>
         </tr>
         <?php
