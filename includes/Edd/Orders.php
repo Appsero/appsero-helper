@@ -50,6 +50,7 @@ class Orders {
 
         $response->header( 'X-WP-Total', (int) $total_orders );
         $response->header( 'X-WP-TotalPages', (int) $max_pages );
+        $response->header( 'X-WP-Orders-After', $after );
 
         return $response;
     }
