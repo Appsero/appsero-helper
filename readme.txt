@@ -3,8 +3,8 @@ Contributors: tareq1988, wedevs, nizamuddinbabu, sourovroy, almamunsarkar, arafa
 Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
-Tested up to: 5.8.1
-Stable tag: 1.1.17
+Tested up to: 5.8.3
+Stable tag: 1.2.0
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -58,6 +58,12 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= v1.2.0 - (21st January, 2022) =
+- **New:** Sync orders with Woo & EDD automatically.
+- **Fix:** Login form rendering issue in some sites.
+- **Fix:** PHP Notice in affiliate.
+- **Improvement:** Hide download button in thank you page if file is not available.
 
 = v1.1.17 - (3rd October, 2021) =
 - **New:** Added purchased variation name in download list.
