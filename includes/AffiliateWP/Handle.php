@@ -80,7 +80,7 @@ class Handle  {
     public function enqueue_scripts() {
         $af_wp_settings = get_option( 'appsero_affiliate_wp_settings', [] );
 
-        if( !$af_wp_settings['enable_affiliates']) {
+        if( empty($af_wp_settings['enable_affiliates']) ) {
             return;
         }
 

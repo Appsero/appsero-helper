@@ -14,7 +14,7 @@ class MyAccount {
         if ( ! is_user_logged_in() ) {
             $this->show_login_form();
 
-            return;
+            return ob_get_clean();
         }
 
         $affiliate = get_option( 'appsero_affiliate_wp_settings', '' );

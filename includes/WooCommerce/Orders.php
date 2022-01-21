@@ -27,11 +27,12 @@ class Orders {
      */
     public function get_items( $request ) {
         $per_page         = $request->get_param( 'per_page' );
+        $after            = $request->get_param( 'after' );
         $current_page     = $request->get_param( 'page' );
         $this->product_id = $request->get_param( 'product_id' );
         $offset           = ( $current_page - 1 ) * $per_page;
 
-        list( $order_ids, $total_orders ) = $this->get_orders_ids( $per_page, $offset );
+        list( $order_ids, $total_orders ) = $this->get_orders_ids( $per_page, $offset, $after );
 
         $items = [];
 
@@ -48,6 +49,7 @@ class Orders {
 
         $response->header( 'X-WP-Total', (int) $total_orders );
         $response->header( 'X-WP-TotalPages', (int) $max_pages );
+        $response->header( 'X-WP-Orders-After', $after );
 
         return $response;
     }
@@ -55,7 +57,7 @@ class Orders {
     /**
      * Get order IDs
      */
-    private function get_orders_ids( $limit, $offset ) {
+    private function get_orders_ids( $limit, $offset, $after = 0 ) {
         global $wpdb;
         $orders_statuses = array_keys( wc_get_order_statuses() );
         $orders_statuses = implode( "', '", $orders_statuses );
@@ -67,8 +69,13 @@ class Orders {
             WHERE woi.order_item_id = woim.order_item_id
             AND woi.order_id = p.ID
             AND p.post_status IN ( '{$orders_statuses}' )
-            AND p.post_type = 'shop_order'
-            AND woim.meta_key = '_product_id'
+            AND p.post_type = 'shop_order' ";
+
+        if ( !empty($after) ) {
+            $query .= " AND p.post_modified_gmt >= '{$after}' ";
+        }
+
+        $query .= " AND woim.meta_key = '_product_id'
             AND woim.meta_value = '{$this->product_id}'
             ORDER BY woi.order_item_id ASC LIMIT {$limit} OFFSET {$offset}";
 
@@ -126,6 +133,7 @@ class Orders {
             'fee'            => $fee,
             'status'         => $order_data['status'],
             'ordered_at'     => $order_data['date_created']->date( 'Y-m-d H:i:s' ),
+            'updated_at'     => date('Y-m-d H:i:s', $order_data['date_modified']->getTimestamp()),
             'payment_method' => $order_data['payment_method_title'],
             'notes'          => $this->get_woocommerce_notes( $order_data['id'] ),
             'customer'       => $this->woocommerce_customer( $order_data ),
