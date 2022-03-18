@@ -1,5 +1,5 @@
 === Appsero Helper ===
-Contributors: tareq1988, wedevs, nizamuddinbabu, sourovroy, almamunsarkar, arafatkn
+Contributors: tareq1988, wedevs, nizamuddinbabu
 Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
