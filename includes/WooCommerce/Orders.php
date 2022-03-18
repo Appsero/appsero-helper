@@ -133,7 +133,7 @@ class Orders {
             'fee'            => $fee,
             'status'         => $order_data['status'],
             'ordered_at'     => $order_data['date_created']->date( 'Y-m-d H:i:s' ),
-            'updated_at'     => date('Y-m-d H:i:s', $order_data['date_modified']->getTimestamp()),
+            'updated_at'     => date('Y-m-d H:i:s', $order_data['date_modified'] instanceof \WC_DateTime ? $order_data['date_modified']->getTimestamp() : time() ),
             'payment_method' => $order_data['payment_method_title'],
             'notes'          => $this->get_woocommerce_notes( $order_data['id'] ),
             'customer'       => $this->woocommerce_customer( $order_data ),
