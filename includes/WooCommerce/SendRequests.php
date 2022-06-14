@@ -88,15 +88,18 @@ class SendRequests {
     private function save_license_response( $response, $order_id, $product_id ) {
         if ( isset( $response['data'] ) && isset( $response['data']['source_id'] ) ) {
             $key = '_appsero_order_license_for_product_' . $product_id;
-
-            update_post_meta( $order_id, $key, [
+            $data = [
                 'source_id'    => $response['data']['source_id'],
                 'key'          => $response['data']['key'],
                 'status'       => $response['data']['status'],
                 'download_url' => $response['data']['download_url'],
                 'expire_date'  => $response['data']['expire_date'],
                 'send_license' => isset( $response['data']['send_license'] ) ? $response['data']['send_license'] : true,
-            ] );
+            ];
+            if ( isset( $response['data']['bundleProducts'] ) ) {
+                $data['bundle_products'] = $response['data']['bundleProducts'];
+            }
+            update_post_meta( $order_id, $key, $data );
         }
     }
 
