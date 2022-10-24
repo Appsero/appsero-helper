@@ -4,6 +4,13 @@ namespace Appsero\Helper\Renderer;
 class OrdersRenderer {
 
     /**
+     * View invoice option show or not
+     *
+     * @var boolean
+     */
+    protected $view_invoice;
+
+    /**
      * Show orders of user
      */
     public function show() {
@@ -22,6 +29,7 @@ class OrdersRenderer {
         <div class="appsero-orders">
             <?php
                 $orders = $this->get_orders();
+                $this->view_invoice = $this->is_invoice_url($orders);
                 if ( count( $orders ) > 0 ) :
             ?>
             <table class="appsero-order-table">
@@ -31,7 +39,9 @@ class OrdersRenderer {
                         <th>Date</th>
                         <th>Status</th>
                         <th>Total</th>
-                        <th>Actions</th>
+                        <?php if ( $this->view_invoice ) : ?>
+                            <th>Actions</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,7 +76,15 @@ class OrdersRenderer {
                 echo isset( $order['currency'] ) ? $order['currency'] : '';
                 echo $order['total'];
             ?></td>
-            <td><a href="<?php echo $order['invoice_url']; ?>">View Invoice</a></td>
+            <?php if ($this->view_invoice) : ?>
+                <td>
+                    <?php if ($order['invoice_url']): ?>
+                        <a href="<?php echo $order['invoice_url']; ?>">View Invoice</a>
+                    <?php else: ?>
+                        <span>N/A</span>
+                    <?php endif; ?>
+                </td>
+            <?php endif; ?>
         </tr>
         <?php
     }
@@ -88,5 +106,19 @@ class OrdersRenderer {
         $body = json_decode( wp_remote_retrieve_body( $response ), true );
 
         return isset( $body['data'] ) ? $body['data'] : [];
+    }
+
+    /**
+     * Count invoice urls to show the action tab
+     *
+     * @param array $orders
+     * @return boolean
+     */
+    private function is_invoice_url($orders)
+    {
+        $invoice_urls = array_filter($orders, function($order) {
+            return $order['invoice_url'];
+        });
+        return count($invoice_urls);
     }
 }
