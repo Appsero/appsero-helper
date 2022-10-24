@@ -3,8 +3,8 @@ Contributors: tareq1988, wedevs, nizamuddinbabu
 Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
-Tested up to: 5.9
-Stable tag: 1.2.1
+Tested up to: 6.0
+Stable tag: 1.2.2
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -89,9 +89,12 @@ It has both free and premium services which you can avail by [registering](https
 
 == Changelog ==
 
-= 1.2.1 - (18th March, 2022) =
+= 1.2.2 - (24th October, 2022) =
+- **New:** Full compatibility with Easy Digital Downloads V3
+- **Improvement:** Bug fixes & code improvements
 
- - **Fix:** WooCommerce order `updated_at` column error.
+= 1.2.1 - (18th March, 2022) =
+- **Fix:** WooCommerce order `updated_at` column error.
 
 = v1.2.0 - (21st January, 2022) =
 - **New:** Sync orders with Woo & EDD automatically.
