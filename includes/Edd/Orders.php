@@ -147,6 +147,8 @@ class Orders {
             case 'abandoned':
             case 'revoked':
                 return 'cancelled';
+            case 'complete':
+                return 'completed';
 
             default:
                 return $status;

@@ -227,7 +227,7 @@ class LicensesRenderer {
         // For EDD
         if ( is_a( $product, 'EDD_Download' ) ) {
             $payment = edd_get_payment( $license['order_id'] );
-            $variation_id = $this->get_edd_cart_variation_id( $payment->cart_details, $product->ID );
+            $variation_id = $this->get_edd_cart_variation_id( $payment ? $payment->cart_details : [], $product->ID );
 
             if ( $variation_id ) {
                 $prices = $product->get_prices();

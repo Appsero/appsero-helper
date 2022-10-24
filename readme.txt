@@ -3,34 +3,64 @@ Contributors: tareq1988, wedevs, nizamuddinbabu
 Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
-Tested up to: 5.9
-Stable tag: 1.2.1
+Tested up to: 6.0
+Stable tag: 1.2.2
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Helper plugin to connect WordPress site to Appsero
+Connect your website with Appsero Helper plugin to start managing your licenses, create new account from each, manage affiliates and do more with Appsero
 
 == Description ==
 
-> **Note:** This plugin is only really of use to you if you have a Appsero account. You can set one up for free. [**Join Appsero**](https://appsero.com/?ref=wporg) if you are interested.
+> **Note:** This plugin is only really of use to you if you have an Appsero account. You can set one up for free. [**Join Appsero**](https://appsero.com/?ref=wporg) if you are interested in managing your plugin/theme without any hassle.
 
-Appsero Helper provides a connection between Appsero service and your site.
+Appsero is a top-class WordPress Analytics, Licensing & Deployment Tool for free/premium plugins and themes.
 
-Appsero offers analytics, licensing and release system for free/premium plugins and themes.
+Appsero Helper provides a connection between Appsero service and your site. Which opens effective ways of plugin management from Appsero.
 
-= Shortcodes =
+## WHY YOU SHOULD USE APPSERO TO MANAGE YOUR WORDPRESS PRODUCTS' LICENSE
 
-Shortcodes will be used in any pages.
+1. Appsero provides you with enhanced analytics like you’ve never seen! 
+Get ***plugin and theme deactivation data***, [***comprehensive WordPress analytics***](https://appsero.com/features/analytics/), ***automatic release deployment***, ***product licensing*** & more exciting features.
+2. Appsero is ***affordable*** for all WordPress developers. You can choose the platform where you want to sell your plugins ([***Easy Digital Downloads***](https://appsero.com/integrations/easy-digital-downloads/), [***WooCommerce***](https://appsero.com/integrations/woocommerce/), [***FastSpring***](https://appsero.com/integrations/fastspring/), [***Paddle***](https://appsero.com/integrations/paddle/), or [***Gumroad***](https://appsero.com/integrations/gumroad/) while saving time & money.
+3. Appsero comes with a hassle-free [***software license management system***](https://appsero.com/features/licensing/). Generate and check licenses, like - WooCommerce license, EDD License, and more with Appsero. Or you can keep using your existing license management system. 
+4. Want to ***push a new release?*** You can ***push your code to Git*** (GitHub, Bitbucket, or Gitlab) - and ***appsero will [automatically deploy](https://appsero.com/features/deployment/)*** it to WordPress and other channels.
+5. Get accurate data about the ***increase/decrease of installations & deactivations*** from Appsero’s Dashboard.
 
-- [appsero_licenses] show licenses
-- [appsero_orders] show orders
-- [appsero_downloads] show downloads
-- [appsero_my_account] My Account page
 
-= Hooks =
+## INTEGRATIONS
 
-Please visit https://github.com/Appsero/appsero-helper to check the hook's documentation.
+Here are the tools and services you can seamlessly [***integrate with Appsero***](https://appsero.com/integrations/) - 
+
+1. WooCommerce
+2. Easy Digital Downloads
+3. Themeforest
+4. CodeCanyon
+5. Fastspring
+6. Paddle
+7. Gumroad
+8. Mailchimp
+9. Mailchimp eCommerce
+
+## SHORTCODES
+
+To help you easily access important information related to your plugins/themes, you can create shortcodes on any page.
+
+Here are the shortcodes -
+
+- [appsero_my_account] - This shortcode outputs a full featured My Account page where users can find their licenses, downloads and more
+- [appsero_licenses] - this shortcode shows the licenses of products a user
+- [appsero_orders] this shortcode shows the orders placed by a user 
+- [appsero_downloads] this shortcode shows the product download links of a user 
+
+
+##### For Example: Configuring My Account page on Appsero Dashboard
+Copy the link to the Appsero/EDD/WooCommerce My Account page and update it on your Appsero Dashboard. Go to your Product > Email > Email Branding and paste my account page link there.
+
+= HOOKS =
+
+Please visit https://github.com/Appsero/appsero-helper to check the hook’s documentation.
 
 == Installation ==
 
@@ -59,9 +89,12 @@ It has both free and premium services which you can avail by [registering](https
 
 == Changelog ==
 
-= 1.2.1 - (18th March, 2022) =
+= 1.2.2 - (24th October, 2022) =
+- **New:** Full compatibility with Easy Digital Downloads V3
+- **Improvement:** Bug fixes & code improvements
 
- - **Fix:** WooCommerce order `updated_at` column error.
+= 1.2.1 - (18th March, 2022) =
+- **Fix:** WooCommerce order `updated_at` column error.
 
 = v1.2.0 - (21st January, 2022) =
 - **New:** Sync orders with Woo & EDD automatically.
