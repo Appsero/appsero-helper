@@ -9,14 +9,13 @@ use Appsero\Helper\Traits\Hooker;
  */
 class SendRequests {
 
-    use Hooker;
     use UseCases\SendRequestsHelper;
 
-    public function __construct() {
-        // Add or Update order with license
-        $this->action( 'woocommerce_order_status_changed', 'order_status_changed', 20, 4 );
-
-        $this->action( 'before_delete_post', 'delete_order', 8, 1 );
+    public function receive_order_status_changed( $order_id, $status_from, $status_to, $order ) {
+        if (did_action('woocommerce_email_after_order_table')) {
+            return;
+        }
+        $this->order_status_changed( $order_id, $status_from, $status_to, $order );
     }
 
     /**

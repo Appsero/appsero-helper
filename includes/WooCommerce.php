@@ -11,14 +11,15 @@ class WooCommerce {
      */
     public function __construct() {
         require_once __DIR__ . '/WooCommerce/UseCases/SendRequestsHelper.php';
-        require_once __DIR__ . '/WooCommerce/SendRequests.php';
+        require_once __DIR__ . '/WooCommerce/OrderHooks.php';
         require_once __DIR__ . '/WooCommerce/MyAccountPage.php';
         require_once __DIR__ . '/WooCommerce/ThankYouPage.php';
         require_once __DIR__ . '/WooCommerce/MetaBox.php';
         require_once __DIR__ . '/WooCommerce/Email.php';
 
         // Initialize WooCommerce requests hooks
-        new WooCommerce\SendRequests();
+//        new WooCommerce\SendRequests();
+        new WooCommerce\OrderHooks();
 
         // WooCommerce My Account page
         new WooCommerce\MyAccountPage();
