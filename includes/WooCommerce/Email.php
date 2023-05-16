@@ -19,6 +19,10 @@ class Email {
             return '';
 
         $licenses = [];
+        if (! did_action('woocommerce_order_status_changed')) {
+            $request = new SendRequests();
+            $request->order_status_changed( $order->get_id(), '', '', $order);
+        }
 
         foreach ( $order->get_items( 'line_item' ) as $item_id => $item ) {
             $key = '_appsero_order_license_for_product_' . $item->get_product_id();
