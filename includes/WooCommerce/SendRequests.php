@@ -12,9 +12,6 @@ class SendRequests {
     use UseCases\SendRequestsHelper;
 
     public function receive_order_status_changed( $order_id, $status_from, $status_to, $order ) {
-        if (did_action('woocommerce_email_after_order_table')) {
-            return;
-        }
         $this->order_status_changed( $order_id, $status_from, $status_to, $order );
     }
 

@@ -82,6 +82,13 @@ class SendRequests {
 
         $order['licenses'] = $this->get_order_licenses( $payment->ID, $download_id );
 
+        // To solve the subscription status always pending issue
+        if ( ! empty( $order['subscription'] ) ) {
+             if ( $order['status'] === "completed" &&  $order['subscription']['status'] === "pending" ) {
+                 $order['subscription']['status'] = "active";
+             }
+        }
+
         $route = 'public/' . $download_id . '/update-order';
 
         $api_response = appsero_helper_remote_post( $route, $order );
