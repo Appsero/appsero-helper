@@ -4,7 +4,7 @@ Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
 Tested up to: 6.3
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -122,6 +122,11 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= 1.2.4 - (16th August, 2023) =
+- **New:** Full compatibility with WordPress 6.3
+- **Improvement:** Fixed license link for WooCommerce email
+- **Improvement:** Fixed release version
 
 = 1.2.3 - (16th August, 2023) =
 - **New:** Full compatibility with WordPress 6.3
