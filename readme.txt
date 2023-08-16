@@ -3,8 +3,8 @@ Contributors: tareq1988, wedevs, nizamuddinbabu
 Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
-Tested up to: 6.0
-Stable tag: 1.2.2
+Tested up to: 6.3
+Stable tag: 1.2.3
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -13,7 +13,7 @@ Connect your website with Appsero Helper plugin to start managing your licenses,
 
 == Description ==
 
-Appsero is a world-class **WordPress Analytics, Licensing & Deployment Tool** for free/premium plugins and themes. It’s one of the best **plugin management software** for WordPress plugin owners and developers. 
+Appsero is a world-class **WordPress Analytics, Licensing & Deployment Tool** for free/premium plugins and themes. It’s one of the best **plugin management software** for WordPress plugin owners and developers.
 
 Appsero is **affordable** for all WordPress developers. You can choose the platform where you want to sell your plugins (Easy Digital Downloads, WooCommerce, FastSpring, Paddle, or Gumroad) while saving time & money.
 
@@ -29,10 +29,10 @@ By cloning the [**Appsero SDK**](https://github.com/appsero/client/) into your p
 
 #### FEATURES
 
-1. Appseros' most notable feature is its **hassle-free [License Management](https://appsero.com/features/licensing/).** Appsero generates licenses as soon as your customer completes their purchase, making the whole licensing process easier than ever! You can manage and verify licenses, such as - *WooCommerce license, EDD license,* and more with Appsero. 
-2. Appsero comes with **advanced [WordPress Analytics](https://appsero.com/features/analytics/)**; providing you with product insights like you’ve never seen! With this WordPress analytics, you can get product data like - *customer behavior data, sales & revenue data, product usage reporting, WordPress version used by users, server software analytics,* and many more! 
-3. Managing releases for premium products is hard. To ease your hardship, Appsero can do an automatic update that works hand in hand with the licensing engine. You can now **push your code to Git** *(GitHub, Bitbucket, or Gitlab)* - and **Appsero will [automatically deploy](https://appsero.com/features/deployment/)** it to WordPress.org and other channels. 
-4. With Appsero, now you can get an **in-depth [Deactivation Data Analysis](https://appsero.com/features/deactivations/)** to know what your customer wants! From Appsero’s dashboard, you can find out *deactivation stats, deactivation reasons,* and many more. 
+1. Appseros' most notable feature is its **hassle-free [License Management](https://appsero.com/features/licensing/).** Appsero generates licenses as soon as your customer completes their purchase, making the whole licensing process easier than ever! You can manage and verify licenses, such as - *WooCommerce license, EDD license,* and more with Appsero.
+2. Appsero comes with **advanced [WordPress Analytics](https://appsero.com/features/analytics/)**; providing you with product insights like you’ve never seen! With this WordPress analytics, you can get product data like - *customer behavior data, sales & revenue data, product usage reporting, WordPress version used by users, server software analytics,* and many more!
+3. Managing releases for premium products is hard. To ease your hardship, Appsero can do an automatic update that works hand in hand with the licensing engine. You can now **push your code to Git** *(GitHub, Bitbucket, or Gitlab)* - and **Appsero will [automatically deploy](https://appsero.com/features/deployment/)** it to WordPress.org and other channels.
+4. With Appsero, now you can get an **in-depth [Deactivation Data Analysis](https://appsero.com/features/deactivations/)** to know what your customer wants! From Appsero’s dashboard, you can find out *deactivation stats, deactivation reasons,* and many more.
 5. Have multiple WordPress products and want to sell them together? Lucky for you, Appsero has now the feature of **Bundle Product Selling.** If you have *more than one product in Appsero,* then you can combine both plugins and themes for a bundle using this Appsero feature; bringing in higher revenue in the process.
 6. Appsero can even help you with team collaboration! Supercharge your team with **superior permission management: [Teams](https://appsero.com/features/teams/).** With this, make sure *your team is in sync,* just with the right amount of your WordPress product information.
 
@@ -40,9 +40,9 @@ By cloning the [**Appsero SDK**](https://github.com/appsero/client/) into your p
 
 Appsero works seamlessly with your favorite web services to skyrocket your business growth. Find the tools you already use or discover new ways to step things up.
 
-Here are all the tools & services Appsero has [**seamless integration**](https://appsero.com/integrations/) with - 
+Here are all the tools & services Appsero has [**seamless integration**](https://appsero.com/integrations/) with -
 
-- **Selling Platform** 
+- **Selling Platform**
 	- WooCommerce
 	- Easy Digital Downloads (EDD)
 	- Envato
@@ -62,7 +62,7 @@ Here are all the tools & services Appsero has [**seamless integration**](https:/
 - **Others**
 	- WordPress.org integration for pushing updates to products directly from GitHub
 	- Mailchimp eCommerce for advanced marketing
-	- Help Scout to provide email-based customer support 
+	- Help Scout to provide email-based customer support
 
 
 
@@ -70,12 +70,12 @@ Here are all the tools & services Appsero has [**seamless integration**](https:/
 
 You can create shortcodes on any page to easily access essential information related to your plugins/themes.
 
-Here are the shortcodes - 
+Here are the shortcodes -
 
 - [appsero_my_account] - This shortcode outputs a full featured My Account page where users can find their licenses, downloads and more
 - [appsero_licenses] - this shortcode shows the licenses of products a user
-- [appsero_orders] this shortcode shows the orders placed by a user 
-- [appsero_downloads] this shortcode shows the product download links of a user 
+- [appsero_orders] this shortcode shows the orders placed by a user
+- [appsero_downloads] this shortcode shows the product download links of a user
 
 
 ##### For Example: Configuring My Account page on Appsero Dashboard
@@ -122,6 +122,10 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= 1.2.3 - (16th August, 2023) =
+- **New:** Full compatibility with WordPress 6.3
+- **Improvement:** Fixed license link for WooCommerce email
 
 = 1.2.2 - (24th October, 2022) =
 - **New:** Full compatibility with Easy Digital Downloads V3
