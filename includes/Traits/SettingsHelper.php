@@ -74,11 +74,12 @@ trait SettingsHelper {
     private function is_local()
     {
         $local_ips = [ '127.0.0.1', '::1' ];
+        $isLocal   = false;
 
         if ( in_array( $_SERVER['REMOTE_ADDR'], $local_ips ) )
-            return true;
+            $isLocal = true;
 
-        return false;
+        return apply_filters( 'appsero_is_local', $isLocal );
     }
 
     /**
