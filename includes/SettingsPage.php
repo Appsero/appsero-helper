@@ -363,6 +363,7 @@ class SettingsPage {
                 'fastspring_password' => sanitize_text_field( $post['fastspring_password'] ),
                 'enable_affiliates'   => ! empty( $post['enable_affiliates'] ),
                 'affiliate_area_page' => sanitize_text_field( $post['affiliate_area_page'] ),
+                'paddle_vendor_id' => sanitize_text_field( $post['paddle_vendor_id'] )
             ];
 
             update_option( 'appsero_affiliate_wp_settings', $userinfo, false );
@@ -374,7 +375,7 @@ class SettingsPage {
                 'paddle_vendor_auth_code' => sanitize_text_field( $post['paddle_vendor_auth_code'] ),
                 'paddle_sandbox' => ! empty( $post['paddle_sandbox'] ),
                 'enable_affiliates'   => ! empty( $post['enable_affiliates'] ),
-                'affiliate_area_page' => sanitize_text_field( $post['affiliate_area_page'] ),
+                'affiliate_area_page' => sanitize_text_field( $post['affiliate_area_page'] )
             ];
 
             update_option( 'appsero_affiliate_wp_settings', $userinfo, false );
