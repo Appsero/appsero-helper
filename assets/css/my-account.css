@@ -1,283 +1,336 @@
 .entry .entry-content .appsero-licenses,
 .appsero-licenses {
-    max-width: initial;
+  max-width: initial;
 }
 .appsero-license {
-    border: 1px solid #E1DDE0;
-    margin-bottom: 30px;
+  border: 1px solid #e1dde0;
+  margin-bottom: 30px;
 }
-.license-product-info{
-    padding: 15px 20px;
-    width: calc(100% - 80px);
-    display: flex;
-    border-right: 1px solid #E1DDE0;
+.license-product-info {
+  padding: 15px 20px;
+  width: calc(100% - 80px);
+  display: flex;
+  border-right: 1px solid #e1dde0;
 }
 .license-product-info h2:after,
 .license-product-info h2:before {
-    display: none;
+  display: none;
 }
 .license-product-info h2 {
-    color: #A04E8C;
-    font-size: 22px;
-    margin: 0 0 7px 0;
-    font-weight: 600;
+  color: #a04e8c;
+  font-size: 22px;
+  margin: 0 0 7px 0;
+  font-weight: 600;
 }
 .license-product-info p {
-    margin: 0;
-    color: #555555;
+  margin: 0;
+  color: #555555;
 }
 .license-product-info p.h3 {
-    font-size: 17px;
+  font-size: 17px;
 }
 .license-product-info h4 {
-    font-size: 15px;
-    text-transform: capitalize;
-    color: #5B5B5B;
-    font-weight: 600;
-    margin: 0 0 8px 0;
+  font-size: 15px;
+  text-transform: capitalize;
+  color: #5b5b5b;
+  font-weight: 600;
+  margin: 0 0 8px 0;
 }
 .license-header {
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 .license-toggle-info {
-    width: 80px;
-    display: -ms-flexbox;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 25px;
-    cursor: pointer;
+  width: 80px;
+  display: -ms-flexbox;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  cursor: pointer;
 }
 .license-toggle-info svg {
-    width: 25px;
-    height: 25px;
-    fill: #333333;
+  width: 25px;
+  height: 25px;
+  fill: #333333;
 }
 .license-toggle-info.license-button-toggled svg {
-    -webkit-transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
-    transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 .license-product-title {
-    width: 50%;
+  width: 50%;
 }
 .license-product-expire,
 .license-product-activation {
-    width: 25%;
+  width: 25%;
 }
 .license-key-activations {
-    border-top: 1px solid #E1DDE0;
-    padding: 20px 20px 15px 20px;
-    display: none;
+  border-top: 1px solid #e1dde0;
+  padding: 20px 20px 15px 20px;
+  display: none;
 }
 .appsero-license-key {
-    padding-bottom: 20px;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #E1DDE0;
+  padding-bottom: 20px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #e1dde0;
 }
 .appsero-license-key p {
-    margin: 0;
+  margin: 0;
 }
 .appsero-license-key strong {
-    font-weight: 600;
-    font-size: 17px;
-    color: #5B5B5B;
+  font-weight: 600;
+  font-size: 17px;
+  color: #5b5b5b;
 }
 .license-key-code {
-    background-color: #E3E1E3;
-    color: #4D4D4D;
-    padding: 0px 8px;
-    display: inline-block;
-    margin-left: 10px;
-    letter-spacing: 1px;
-    cursor: pointer;
+  background-color: #e3e1e3;
+  color: #4d4d4d;
+  padding: 0px 8px;
+  display: inline-block;
+  margin-left: 10px;
+  letter-spacing: 1px;
+  cursor: pointer;
 }
 .appsero-activations h4 {
-    font-size: 19px;
-    color: #5B5B5B;
-    font-weight: 600;
-    margin: 0 0 7px 0;
+  font-size: 19px;
+  color: #5b5b5b;
+  font-weight: 600;
+  margin: 0 0 7px 0;
 }
 .appsero-activation-item {
-    display: -ms-flexbox;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: #A04E8C;
+  display: -ms-flexbox;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #a04e8c;
 }
 .appsero-activation-item + .appsero-activation-item {
-    border-top: 1px solid #E1DDE0;
-    margin-top: 6px;
-    padding-top: 6px;
+  border-top: 1px solid #e1dde0;
+  margin-top: 6px;
+  padding-top: 6px;
 }
 .appsero-activation-item span {
-    font-weight: 600;
-    font-size: 16px;
+  font-weight: 600;
+  font-size: 16px;
 }
 .hentry .entry-content .appsero-activation-item a,
 .appsero-activation-item a {
-    text-decoration: none;
-    font-size: 16px;
+  text-decoration: none;
+  font-size: 16px;
 }
 .appsero-notice {
-    padding: 15px;
-    margin-bottom: 30px;
-    border-left: 8px solid rgba(0, 0, 0, .15);
-    color: #fff;
+  padding: 15px;
+  margin-bottom: 30px;
+  border-left: 8px solid rgba(0, 0, 0, 0.15);
+  color: #fff;
 }
 .appsero-notice.notice-info {
-    background-color: #3d9cd2;
+  background-color: #3d9cd2;
 }
 .appsero-notice.notice-error {
-    background-color: #e2401c;
+  background-color: #e2401c;
 }
 
 /* Orders */
-table.appsero-order-table  {
-    font-size: 17px;
-    border-spacing: 0;
-    width: 100%;
-    border-collapse: separate;
+table.appsero-order-table {
+  font-size: 17px;
+  border-spacing: 0;
+  width: 100%;
+  border-collapse: separate;
 }
 table.appsero-order-table thead th {
-    padding: 1.4em;
+  padding: 1.4em;
 }
 table.appsero-order-table tbody td {
-    background-color: #fdfdfd;
+  background-color: #fdfdfd;
 }
 table.appsero-order-table tbody tr:nth-child(2n) td {
-    background-color: #fbfbfb;
+  background-color: #fbfbfb;
 }
 table.appsero-order-table a {
-    color: #96588a;
+  color: #96588a;
 }
-table.appsero-order-table td, table.appsero-order-table th {
-    padding: 1em 1.4em;
-    text-align: left;
-    vertical-align: middle;
+table.appsero-order-table td,
+table.appsero-order-table th {
+  padding: 1em 1.4em;
+  text-align: left;
+  vertical-align: middle;
 }
 
 small.license-status {
-    color: #212529;
-    background-color: #ffc107;
-    display: inline-block;
-    padding: .3em .5em;
-    font-size: 66%;
-    font-weight: 600;
-    line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-    border-radius: .25em;
-    margin-left: 5px;
+  color: #212529;
+  background-color: #ffc107;
+  display: inline-block;
+  padding: 0.3em 0.5em;
+  font-size: 66%;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: 0.25em;
+  margin-left: 5px;
 }
 
 /* My Account Page */
 .appsero-login-form form {
-    max-width: 550px;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
+  max-width: 550px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 .appsero-login-form form .login-submit {
-    margin: 0;
+  margin: 0;
 }
 .appsero-my-account {
-    padding: 50px 35px;
-    display: flex;
-    flex-wrap: wrap;
+  padding: 50px 35px;
+  display: flex;
+  flex-wrap: wrap;
 }
 .appsero-my-account-sidebar {
-    width: 27%;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  width: 27%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 .appsero-my-account-content {
-    width: 73%;
-    padding-left: 30px;
+  width: 73%;
+  padding-left: 30px;
 }
 .appsero-my-account-sidebar li {
-    margin: 0;
+  margin: 0;
 }
 .appsero-my-account-sidebar li a {
-    color: #333538;
-    padding: 12px 20px;
-    display: block;
-    border-radius: 30px;
-    text-decoration: none;
+  color: #333538;
+  padding: 12px 20px;
+  display: block;
+  border-radius: 30px;
+  text-decoration: none;
 }
 .appsero-my-account-sidebar li a.ama-active-tab {
-    color: #fff;
-    background-color: #6B4FF4;
+  color: #fff;
+  background-color: #6b4ff4;
 }
 
 .tooltip {
-    position: relative;
-    display: inline-block;
+  position: relative;
+  display: inline-block;
 }
 
 .tooltip .tooltiptext {
-    visibility: hidden;
-    width: 140px;
-    background-color: #555;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 150%;
-    left: 50%;
-    margin-left: -75px;
-    opacity: 0;
-    transition: opacity 0.3s;
+  visibility: hidden;
+  width: 140px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -75px;
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 .tooltip .tooltiptext::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #555 transparent transparent transparent;
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
 }
 
 .tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
+  visibility: visible;
+  opacity: 1;
 }
 
 a.download-btn {
-    margin-left: 10px;
-    padding: 4px 10px;
-    background-color: #4A5568;
-    color: #fff;
-    border-radius: 5px;
-    text-decoration: none;
+  margin-left: 10px;
+  padding: 4px 10px;
+  background-color: #4a5568;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
 }
-a.download-btn:active, a.download-btn:link {
-    text-decoration: none;
+a.download-btn:active,
+a.download-btn:link {
+  text-decoration: none;
 }
 .badge {
-    background: #EFF6FF;
-    color: #3B82F6;
-    border-radius: 3px;
-    padding: 2px 8px;
-    vertical-align: middle;
+  background: #eff6ff;
+  color: #3b82f6;
+  border-radius: 3px;
+  padding: 2px 8px;
+  vertical-align: middle;
 }
 .as-icon-info {
-    padding: 0 3px;
-    vertical-align: middle;
-    content: url("data:image/svg+xml,%3Csvg width='12' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 490 490' style='enable-background:new 0 0 490 490;' xml:space='preserve'%3E%3Cg id='bold_copy_37_'%3E%3Cpath fill='currentColor' d='M245,0C109.684,0,0,109.684,0,245s109.684,245,245,245s245-109.684,245-245S380.316,0,245,0z M245,459.375 c-118.213,0-214.375-96.163-214.375-214.375S126.787,30.625,245,30.625S459.375,126.787,459.375,245S363.212,459.375,245,459.375z'/%3E%3Cpolygon points='266.836,286.987 275.196,114.874 214.788,114.874 223.532,286.987 '/%3E%3Cpath fill='currentColor' d='M245.184,305.974c-20.136,0-34.178,14.424-34.178,34.576c0,19.738,13.674,34.576,34.178,34.576 c20.503,0,33.825-14.823,33.825-34.576C278.611,320.399,265.304,305.974,245.184,305.974z'/%3E%3C/g%3E%3C/svg%3E");
+  padding: 0 3px;
+  vertical-align: middle;
+  content: url("data:image/svg+xml,%3Csvg width='12' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 490 490' style='enable-background:new 0 0 490 490;' xml:space='preserve'%3E%3Cg id='bold_copy_37_'%3E%3Cpath fill='currentColor' d='M245,0C109.684,0,0,109.684,0,245s109.684,245,245,245s245-109.684,245-245S380.316,0,245,0z M245,459.375 c-118.213,0-214.375-96.163-214.375-214.375S126.787,30.625,245,30.625S459.375,126.787,459.375,245S363.212,459.375,245,459.375z'/%3E%3Cpolygon points='266.836,286.987 275.196,114.874 214.788,114.874 223.532,286.987 '/%3E%3Cpath fill='currentColor' d='M245.184,305.974c-20.136,0-34.178,14.424-34.178,34.576c0,19.738,13.674,34.576,34.178,34.576 c20.503,0,33.825-14.823,33.825-34.576C278.611,320.399,265.304,305.974,245.184,305.974z'/%3E%3C/g%3E%3C/svg%3E");
 }
- svg {
-    fill: #3B82F6;
+svg {
+  fill: #3b82f6;
 }
 .text-normal {
-    font-weight: normal;
+  font-weight: normal;
+}
+
+.appsero-license-status {
+  padding-bottom: 20px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #e1dde0;
+  display: flex;
+  margin: 0;
+}
+.appsero-license-status p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 17px;
+  color: #5b5b5b;
+}
+
+.appsero-status-btn {
+  text-transform: uppercase;
+  margin-left: 10px;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #000;
+  background-color: #e9ebee;
+}
+
+.appsero-status-btn.active {
+  background-color: #f0fdf4;
+  color: #065f46;
+}
+
+.appsero-status-btn.inactive {
+  background-color: #f9fafb;
+  color: #111827;
+}
+
+.appsero-status-btn.disabled {
+  background-color: #fef2f2;
+  color: #7f1d1d;
+}
+
+.appsero-status-btn.expired {
+  background-color: #fffbeb;
+  color: #78350f;
+}
+
+.appsero-status-btn.unknown {
+  background-color: #eff6ff;
+  color: #1e3a8a;
 }

@@ -64,6 +64,10 @@ class LicensesRenderer {
                     <?php endif; ?>
                 </p>
             </div>
+            <div class="appsero-license-status">
+                <p>Status</p>
+                <?php echo $this->license_status($license); ?>
+            </div>
             <div class="appsero-activations">
                 <?php if ( count( $activations ) > 0 ) : ?>
                 <h4>Activations</h4>
@@ -191,7 +195,7 @@ class LicensesRenderer {
             <div class="license-header">
                 <div class="license-product-info">
                     <div class="license-product-title">
-                        <h2><?php echo $product_name; ?> <?php $this->license_status( $license ); ?></h2>
+                        <h2><?php echo $product_name; ?> </h2>
                         <p class="h3"><?php echo $this->get_variation_name( $product, $license ); ?></p>
                     </div>
                     <div class="license-product-expire">
@@ -304,14 +308,37 @@ class LicensesRenderer {
     /**
      * Show license status
      */
-    private function license_status( $license ) {
-        if ( 0 == $license['status'] ) {
-            echo '<small class="license-status">Inactive</small>';
-        }
+    private function license_status($license)
+    {
+        $status = '';
+        $class = '';
+    
+        // Constants to match your original model
+        $INACTIVE = 0;
+        $ACTIVE = 1;
+        $DISABLE = 2;
 
-        if ( 2 == $license['status'] ) {
-            echo '<small class="license-status">Disabled</small>';
+        if ($license['status'] == $INACTIVE) {
+            $status = 'Inactive';
+            $class = 'inactive';
+        } elseif ($license['status'] == $DISABLE) {
+            $status = 'Disabled';
+            $class = 'disabled';
+        } elseif ($license['status'] == $ACTIVE) {
+            $today = date('Y-m-d');
+            if (empty($license['expire_date']) || $license['expire_date'] >= $today) {
+                $status = 'Active';
+                $class = 'active';
+            } else {
+                $status = 'Expired';
+                $class = 'expired';
+            }
+        } else {
+            $status = 'Unknown';
+            $class = 'unknown';
         }
+    
+        return "<small class='appsero-status-btn $class'>$status</small>";
     }
 
     /**
