@@ -308,38 +308,39 @@ class LicensesRenderer {
     /**
      * Show license status
      */
-    private function license_status($license)
-    {
-        $status = '';
-        $class = '';
-    
-        // Constants to match your original model
+    private function license_status( $license ){
         $inactive = 0;
         $active = 1;
         $disable = 2;
-
-        if ($license['status'] == $inactive) {
-            $status = 'Inactive';
-            $class = 'inactive';
-        } elseif ($license['status'] == $disable) {
-            $status = 'Disabled';
-            $class = 'disabled';
-        } elseif ($license['status'] == $active) {
-            $today = date('Y-m-d');
-            if (empty($license['expire_date']) || $license['expire_date'] >= $today) {
-                $status = 'Active';
-                $class = 'active';
-            } else {
-                $status = 'Expired';
-                $class = 'expired';
-            }
-        } else {
-            $status = 'Unknown';
-            $class = 'unknown';
+    
+        $status = 'Unknown';
+        $class = 'unknown';
+    
+        switch ($license['status']) {
+            case $inactive:
+                $status = 'Inactive';
+                $class = 'inactive';
+                break;
+    
+            case $disable:
+                $status = 'Disabled';
+                $class = 'disabled';
+                break;
+    
+            case $active:
+                $today = date('Y-m-d');
+                if (empty($license['expire_date']) || $license['expire_date'] >= $today) {
+                    $status = 'Active';
+                    $class = 'active';
+                } else {
+                    $status = 'Expired';
+                    $class = 'expired';
+                }
+                break;
         }
     
         return "<small class='appsero-status-btn $class'>$status</small>";
-    }
+    }    
 
     /**
      * Get Activation remaining
