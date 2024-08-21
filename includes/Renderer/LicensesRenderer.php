@@ -314,32 +314,32 @@ class LicensesRenderer {
         $disable = 2;
     
         $status = 'Unknown';
-        $class = 'unknown';
+        $status_class = 'unknown';
     
         switch ($license['status']) {
             case $inactive:
                 $status = 'Inactive';
-                $class = 'inactive';
+                $status_class = 'inactive';
                 break;
     
             case $disable:
                 $status = 'Disabled';
-                $class = 'disabled';
+                $status_class = 'disabled';
                 break;
     
             case $active:
                 $today = date('Y-m-d');
                 if (empty($license['expire_date']) || $license['expire_date'] >= $today) {
                     $status = 'Active';
-                    $class = 'active';
+                    $status_class = 'active';
                 } else {
                     $status = 'Expired';
-                    $class = 'expired';
+                    $status_class = 'expired';
                 }
                 break;
         }
     
-        return "<small class='appsero-status-btn $class'>$status</small>";
+        return "<small class='appsero-status-btn $status_class'>$status</small>";
     }    
 
     /**
