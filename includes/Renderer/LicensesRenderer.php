@@ -314,17 +314,17 @@ class LicensesRenderer {
         $class = '';
     
         // Constants to match your original model
-        $INACTIVE = 0;
-        $ACTIVE = 1;
-        $DISABLE = 2;
+        $inactive = 0;
+        $active = 1;
+        $disable = 2;
 
-        if ($license['status'] == $INACTIVE) {
+        if ($license['status'] == $inactive) {
             $status = 'Inactive';
             $class = 'inactive';
-        } elseif ($license['status'] == $DISABLE) {
+        } elseif ($license['status'] == $disable) {
             $status = 'Disabled';
             $class = 'disabled';
-        } elseif ($license['status'] == $ACTIVE) {
+        } elseif ($license['status'] == $active) {
             $today = date('Y-m-d');
             if (empty($license['expire_date']) || $license['expire_date'] >= $today) {
                 $status = 'Active';
