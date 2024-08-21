@@ -64,6 +64,10 @@ class LicensesRenderer {
                     <?php endif; ?>
                 </p>
             </div>
+            <div class="appsero-license-status">
+                <p>Status</p>
+                <?php echo $this->license_status($license); ?>
+            </div>
             <div class="appsero-activations">
                 <?php if ( count( $activations ) > 0 ) : ?>
                 <h4>Activations</h4>
@@ -191,7 +195,7 @@ class LicensesRenderer {
             <div class="license-header">
                 <div class="license-product-info">
                     <div class="license-product-title">
-                        <h2><?php echo $product_name; ?> <?php $this->license_status( $license ); ?></h2>
+                        <h2><?php echo $product_name; ?> </h2>
                         <p class="h3"><?php echo $this->get_variation_name( $product, $license ); ?></p>
                     </div>
                     <div class="license-product-expire">
@@ -304,15 +308,39 @@ class LicensesRenderer {
     /**
      * Show license status
      */
-    private function license_status( $license ) {
-        if ( 0 == $license['status'] ) {
-            echo '<small class="license-status">Inactive</small>';
+    private function license_status( $license ){
+        $inactive = 0;
+        $active = 1;
+        $disable = 2;
+    
+        $status = 'Unknown';
+        $status_class = 'unknown';
+    
+        switch ($license['status']) {
+            case $inactive:
+                $status = 'Inactive';
+                $status_class = 'inactive';
+                break;
+    
+            case $disable:
+                $status = 'Disabled';
+                $status_class = 'disabled';
+                break;
+    
+            case $active:
+                $today = date('Y-m-d');
+                if (empty($license['expire_date']) || $license['expire_date'] >= $today) {
+                    $status = 'Active';
+                    $status_class = 'active';
+                } else {
+                    $status = 'Expired';
+                    $status_class = 'expired';
+                }
+                break;
         }
-
-        if ( 2 == $license['status'] ) {
-            echo '<small class="license-status">Disabled</small>';
-        }
-    }
+    
+        return "<small class='appsero-status-btn $status_class'>$status</small>";
+    }    
 
     /**
      * Get Activation remaining
