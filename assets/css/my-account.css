@@ -275,9 +275,60 @@ a.download-btn:active, a.download-btn:link {
     vertical-align: middle;
     content: url("data:image/svg+xml,%3Csvg width='12' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 490 490' style='enable-background:new 0 0 490 490;' xml:space='preserve'%3E%3Cg id='bold_copy_37_'%3E%3Cpath fill='currentColor' d='M245,0C109.684,0,0,109.684,0,245s109.684,245,245,245s245-109.684,245-245S380.316,0,245,0z M245,459.375 c-118.213,0-214.375-96.163-214.375-214.375S126.787,30.625,245,30.625S459.375,126.787,459.375,245S363.212,459.375,245,459.375z'/%3E%3Cpolygon points='266.836,286.987 275.196,114.874 214.788,114.874 223.532,286.987 '/%3E%3Cpath fill='currentColor' d='M245.184,305.974c-20.136,0-34.178,14.424-34.178,34.576c0,19.738,13.674,34.576,34.178,34.576 c20.503,0,33.825-14.823,33.825-34.576C278.611,320.399,265.304,305.974,245.184,305.974z'/%3E%3C/g%3E%3C/svg%3E");
 }
- svg {
+svg {
     fill: #3B82F6;
 }
 .text-normal {
     font-weight: normal;
+}
+  
+.appsero-license-status {
+    padding-bottom: 20px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #E1DDE0;
+    display: flex;
+    margin: 0;
+}
+.appsero-license-status p {
+    margin: 0;
+    font-weight: 600;
+    font-size: 17px;
+    color: #5B5B5B;
+}
+  
+.appsero-status-btn {
+    text-transform: uppercase;
+    margin-left: 10px;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    color: #000;
+    background-color: #E9EBEE;
+}
+  
+.appsero-status-btn.active {
+    background-color: #F0FDF4;
+    color: #065F46;
+}
+  
+.appsero-status-btn.inactive {
+    background-color: #F9FAFB;
+    color: #111827;
+}
+  
+.appsero-status-btn.disabled {
+    background-color: #FEF2F2;
+    color: #7F1D1D;
+}
+  
+.appsero-status-btn.expired {
+    background-color: #FFFBEB;
+    color: #78350F;
+}
+  
+.appsero-status-btn.unknown {
+    background-color: #EFF6FF;
+    color: #1E3A8A;
 }
