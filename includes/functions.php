@@ -360,3 +360,67 @@ function get_appsero_api_url() {
 
     return trailingslashit( $endpoint );
 }
+
+/**
+ * Update customer data to appsero.
+ * 
+ * @param int $user_id
+ * @return void
+ */
+function appsero_update_customer($user_id, $old) {
+    $user = get_userdata($user_id);
+    if (!$user) {
+        return;
+    }
+
+    // Get billing country code
+    $country_code = get_user_meta($user_id, 'billing_country', true);
+    $state_code = get_user_meta($user_id, 'billing_state', true);
+    
+    // Prepare user data array
+    $user_data = [
+        'email'             => $user->user_email,
+        'name'              => $user->display_name,
+        'phone'             => get_user_meta($user_id, 'billing_phone', true),
+        'image'             => get_user_meta($user_id, 'billing_image', true),
+        'company'           => get_user_meta($user_id, 'billing_company', true),
+        'address'           => get_user_meta($user_id, 'billing_address_1', true),
+        'zip_code'          => get_user_meta($user_id, 'billing_postcode', true),
+        'state'             => get_state_name($country_code, $state_code),
+        'country'           => get_country_name($country_code),
+    ];
+
+    $url = 'public/users/' . $user_id . '/edit-customer';
+
+    appsero_helper_remote_post($url, $user_data);
+}
+
+/**
+ * Get full country name from country code.
+ *
+ * @param string $country_code
+ * @return string|null
+ */
+function get_country_name($country_code) {
+    if (class_exists('WooCommerce')) {
+        $countries = WC()->countries->get_countries();
+        return isset($countries[$country_code]) ? $countries[$country_code] : null;
+    }
+
+    return null; 
+}
+
+/**
+ * Get full state name from state code.
+ *
+ * @param string $country_code
+ * @param string $state_code
+ * @return string|null
+ */
+function get_state_name($country_code, $state_code) {
+    if (class_exists('WooCommerce')) {
+        $states = WC()->countries->get_states($country_code);
+        return isset($states[$state_code]) ? $states[$state_code] : null;
+    }
+    return null;
+}
