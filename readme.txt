@@ -4,7 +4,7 @@ Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
 Tested up to: 6.3
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -123,10 +123,13 @@ It has both free and premium services which you can avail by [registering](https
 
 == Changelog ==
 
-= 1.3.0 - (22th August, 2024) =
-- New: Restricted release access for expired licenses.
-- New: Notify Appsero on customer updates.
-- Improvement: Updated style and display for license status in a separate row.
+= 1.3.1 - (25th September, 2024) =
+- **Fix:** Updated changelog for version 1.3.1 to correct version name and details.
+
+= 1.3.0 - (25th September, 2024) =
+- **New:** Restricted release access for expired licenses.
+- **New:** Notify Appsero on customer updates.
+- **Improvement: Updated style and display for license status in a separate row.
 
 = 1.2.4 - (16th August, 2023) =
 - **New:** Full compatibility with WordPress 6.3
