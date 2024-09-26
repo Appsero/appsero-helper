@@ -4,7 +4,7 @@ Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
 Tested up to: 6.3
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -122,6 +122,10 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= 1.3.2 - (26th September, 2024) =
+- **Fix:** Moved user profile update hook to main file for frontend access.
+- **Note:** Previously, the update hook only triggered when editing in the admin panel, not when customers updated profiles from the My Account page.
 
 = 1.3.1 - (25th September, 2024) =
 - **Fix:** Updated changelog for version 1.3.1 to correct version name and details.
