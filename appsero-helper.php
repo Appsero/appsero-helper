@@ -5,7 +5,7 @@
  * Description: Helper plugin to connect WordPress store to Appsero
  * Author: Appsero
  * Author URI: https://appsero.com
- * Version: 1.3.1
+ * Version: 1.3.2
  * Text Domain: appsero-helper
  */
 
@@ -24,7 +24,7 @@ final class Appsero_Helper {
      *
      * @var string
      */
-    public $version = '1.3.1';
+    public $version = '1.3.2';
 
     /**
      * The single instance of the class.
@@ -52,6 +52,9 @@ final class Appsero_Helper {
         add_action( 'plugins_loaded', [ $this, 'init_plugin' ] );
 
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+
+        $this->invokeRequiredHooks();
+
     }
 
     /**
@@ -96,6 +99,14 @@ final class Appsero_Helper {
 
         // Require API classes and Initialize
         $this->woo_and_edd_includes();
+    }
+
+    /**
+     * Run necessary hooks
+     */
+    public function invokeRequiredHooks() {      
+        // Update customer data to sync with Appsero
+        add_action( 'profile_update', 'appsero_update_customer', 10, 2 );
     }
 
     /**
