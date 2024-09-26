@@ -22,8 +22,6 @@ class Admin_Notice {
 
         add_action( 'admin_notices', [ $this, 'no_product_warning' ] );
 
-        add_action( 'profile_update', 'appsero_update_customer', 10, 2 );
-
     }
 
     /**
