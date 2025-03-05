@@ -128,6 +128,7 @@ class SettingsPage {
                         />
                         <input type="hidden" name="_action" value="<?php echo $action; ?>">
                     </div>
+                    <?php wp_nonce_field('appsero_apikey_submit', 'appsero_apikey_submit') ?>
                     <button type="submit" name="<?php echo ( $this->is_local() && $action == 'Connect' ? 'local_submit' : 'apikey_submit' ); ?>" class="<?php echo $button_class; ?>"><?php echo $action; ?></button>
                 </form>
 
@@ -271,6 +272,7 @@ class SettingsPage {
                     <h2>Documentation & Support</h2>
                     <p>Check <a href="https://appsero.com/docs/" target="_blank">Appsero Docs</a> to explore all the features of Appsero with in-depth tutorials. If you need any help, email to support@appsero.com</p>
 
+                    <?php wp_nonce_field('appsero_settings_submit', 'appsero_settings_submit') ?>
                     <?php submit_button( 'Save Settings', 'primary', 'settings_submit' ); ?>
                 </form>
 
@@ -287,6 +289,10 @@ class SettingsPage {
      * Connect with appsero server
      */
     public function connect_with_appsero( $form ) {
+        if ( ! isset( $form['appsero_apikey_submit'] ) || ! wp_verify_nonce( $form['appsero_apikey_submit'], 'appsero_apikey_submit' ) ) {
+            $this->error = "Unauthorized connection request.";
+        }
+
         if ( empty( $form['token'] ) ) {
             $this->error = 'Token Is Required.';
             return $form;
@@ -343,6 +349,12 @@ class SettingsPage {
      * Save settings field
      */
     private function save_settings_fields( $post ) {
+        // check nonce
+        if ( ! isset( $post['appsero_settings_submit'] ) || ! wp_verify_nonce( $post['appsero_settings_submit'], 'appsero_settings_submit' ) ) {
+            $this->error = "Unauthorized request.";
+            return;
+        }
+
         if ( isset( $post['selling_plugin'] ) ) {
             update_option( 'appsero_selling_plugin', sanitize_text_field( $post['selling_plugin'] ) );
         }
