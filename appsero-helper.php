@@ -24,7 +24,7 @@ final class Appsero_Helper {
      *
      * @var string
      */
-    public $version = '1.3.2';
+    public $version = '1.3.3';
 
     /**
      * The single instance of the class.
@@ -104,7 +104,7 @@ final class Appsero_Helper {
     /**
      * Run necessary hooks
      */
-    public function invokeRequiredHooks() {      
+    public function invokeRequiredHooks() {
         // Update customer data to sync with Appsero
         add_action( 'profile_update', 'appsero_update_customer', 10, 2 );
     }
