@@ -3,8 +3,8 @@ Contributors: tareq1988, wedevs, nizamuddinbabu
 Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
-Tested up to: 6.3
-Stable tag: 1.3.2
+Tested up to: 6.7
+Stable tag: 1.3.3
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -122,6 +122,9 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= 1.3.3 - (5th March, 2025) =
+- **Fix:** Cross-Site Request Forgery Vulnerability
 
 = 1.3.2 - (26th September, 2024) =
 - **Fix:** Moved user profile update hook to main file for frontend access.
