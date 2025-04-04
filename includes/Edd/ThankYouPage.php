@@ -55,6 +55,10 @@ class ThankYouPage {
                     <?php
                         foreach ( $licenses as $license ) {
                             $this->license_and_download_item( $license );
+                            if (! isset( $license['bundle_products'] )) {
+                                continue;
+                            }
+                            $this->show_bundle_products( $license );
                         }
                     ?>
                 </tbody>
@@ -86,6 +90,33 @@ class ThankYouPage {
             </td>
         </tr>
         <?php
+    }
+
+    /**
+     * Show bundle products
+     */
+    private function show_bundle_products( $products ) {
+        ?>
+            <tr>
+                <th colspan="3" style="text-align: center">
+                   Products in <?php echo $products['item_name']?>
+                </th>
+            </tr>
+        <?php
+        foreach ($products['bundle_products'] as $product) {
+            ?>
+            <tr>
+                <td colspan="2"><?php echo $product['name'] ; ?></td>
+                <td>
+                    <?php if (! empty($product['download_url'])): ?>
+                        <a href="<?php echo esc_url( $product['download_url'] ); ?>" class="button">
+                            <?php echo esc_html( sanitize_title( $product['slug'] ) ); ?>.zip
+                        </a>
+                    <?php endif; ?>
+                </td>
+            </tr>
+            <?php
+        }
     }
 
 }
