@@ -3,8 +3,8 @@ Contributors: tareq1988, wedevs, nizamuddinbabu
 Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
-Tested up to: 6.7
-Stable tag: 1.3.4
+Tested up to: 6.9
+Stable tag: 1.3.5
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -122,6 +122,9 @@ It has both free and premium services which you can avail by [registering](https
 
 
 == Changelog ==
+
+= 1.3.5 - (5th March, 2026) =
+- **Fix:** Improve SQL query preparation for better security and performance.
 
 = 1.3.4 - (10th March, 2025) =
 - **Fix:** Updated changelog for version 1.3.4 to correct version name and details.

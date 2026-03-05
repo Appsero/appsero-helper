@@ -118,9 +118,11 @@ class Activations {
 
         $meta_key = $wpdb->get_blog_prefix() . WC_AM_HELPERS()->user_meta_key_orders;
 
-        $query  = "SELECT meta_value FROM {$wpdb->usermeta} WHERE meta_key = '{$meta_key}' ";
-        $query .= " AND meta_value LIKE '%{$license_key}%' ";
-
+        $query = $wpdb->prepare(
+            "SELECT meta_value FROM {$wpdb->usermeta} WHERE meta_key = %s AND meta_value LIKE %s",
+            $meta_key,
+            '%' . $wpdb->esc_like( $license_key ) . '%'
+        );
         $license_data = $wpdb->get_var( $query );
         $license_data = maybe_unserialize( $license_data );
 
@@ -235,10 +237,13 @@ class Activations {
 
         // retrieve active sites count
         global $wpdb;
-        $query  = "SELECT COUNT(activation_id) FROM {$wpdb->wc_software_activations} WHERE key_id = %s ";
-        $query .= " AND activation_active = 1 AND activation_platform <> '%s' ";
-
-        $active_sites = $wpdb->get_var( $wpdb->prepare( $query, $license['key_id'], $site_url ) );
+        $query = $wpdb->prepare(
+            "SELECT COUNT(activation_id) FROM {$wpdb->wc_software_activations}
+             WHERE key_id = %s AND activation_active = 1 AND activation_platform <> %s",
+            $license['key_id'],
+            $site_url
+        );
+        $active_sites = $wpdb->get_var( $query );
 
         if ( $limit > 0 && $active_sites >= $limit ) {
             return true;
@@ -366,9 +371,12 @@ class Activations {
     private function get_exist_activation( $key_id, $site_url ) {
         global $wpdb;
 
-        $query  = "SELECT * FROM {$wpdb->wc_software_activations}  ";
-        $query .= " WHERE key_id = %s AND activation_platform = '%s' ";
-        return $wpdb->get_row( $wpdb->prepare( $query, $key_id, $site_url ), ARRAY_A );
+        $query = $wpdb->prepare(
+            "SELECT * FROM {$wpdb->wc_software_activations} WHERE key_id = %s AND activation_platform = %s",
+            $key_id,
+            $site_url
+        );
+        return $wpdb->get_row( $query, ARRAY_A );
     }
 
     /**
