@@ -259,18 +259,24 @@ class Orders {
     private function get_order_ids_query( $per_page, $offset, $after ) {
         global $wpdb;
 
-        $query = "SELECT SQL_CALC_FOUND_ROWS `ID` FROM {$wpdb->posts}
-                  WHERE `post_type` = 'edd_payment' AND
-                  `ID` IN (
-                      SELECT `post_id` FROM {$wpdb->postmeta}
-                      WHERE `meta_value` LIKE '%{s:2:\"id\";i:%d;s:8:\"quantity\";i%'
-                  )
-                  AND `post_status` IN (
-                      'abandoned', 'edd_subscription', 'failed', 'pending', 'processing', 'publish', 'refunded', 'revoked'
-                  )
-                  AND `post_modified_gmt` >= '{$after}'
-                  ORDER BY `ID` ASC LIMIT %d OFFSET %d;";
+        $query = $wpdb->prepare(
+            "SELECT SQL_CALC_FOUND_ROWS `ID` FROM {$wpdb->posts}
+             WHERE `post_type` = 'edd_payment' AND
+             `ID` IN (
+                 SELECT `post_id` FROM {$wpdb->postmeta}
+                 WHERE `meta_value` LIKE %s
+             )
+             AND `post_status` IN (
+                 'abandoned', 'edd_subscription', 'failed', 'pending', 'processing', 'publish', 'refunded', 'revoked'
+             )
+             AND `post_modified_gmt` >= %s
+             ORDER BY `ID` ASC LIMIT %d OFFSET %d",
+            '%{s:2:\"id\";i:' . intval( $this->download_id ) . ';s:8:\"quantity\";i%',
+            $after,
+            intval( $per_page ),
+            intval( $offset )
+        );
 
-        return $wpdb->prepare( $query, $this->download_id, $per_page, $offset );
+        return $query;
     }
 }

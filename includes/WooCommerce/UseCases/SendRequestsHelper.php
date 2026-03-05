@@ -53,7 +53,11 @@ trait SendRequestsHelper {
 
         $software_id = get_post_meta( $product_id, '_software_product_id', true);
 
-        $query = "SELECT * FROM {$wpdb->wc_software_licenses} WHERE `order_id` = {$order_id} AND `software_product_id` = '{$software_id}' ";
+        $query = $wpdb->prepare(
+            "SELECT * FROM {$wpdb->wc_software_licenses} WHERE `order_id` = %d AND `software_product_id` = %s",
+            intval( $order_id ),
+            $software_id
+        );
         $licenses = $wpdb->get_results( $query, ARRAY_A );
 
         foreach ( $licenses as $license ) {

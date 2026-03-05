@@ -52,8 +52,11 @@ class Activations {
 
         // retrieve active sites count
         global $wpdb;
-        $query  = "SELECT COUNT(site_id) as `count` FROM {$wpdb->prefix}edd_license_activations WHERE license_id = {$license->id} ";
-        $query .= " AND activated = 1 AND is_local = 0 AND site_name <> '{$site_url}' ";
+        $query = $wpdb->prepare(
+            "SELECT COUNT(site_id) as `count` FROM {$wpdb->prefix}edd_license_activations WHERE license_id = %d AND activated = 1 AND is_local = 0 AND site_name <> %s",
+            intval( $license->id ),
+            $site_url
+        );
         $active_sites = $wpdb->get_row( $query, ARRAY_A );
 
         if ( $limit > 0 && $active_sites['count'] >= $limit ) {

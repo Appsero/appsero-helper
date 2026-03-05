@@ -62,16 +62,25 @@ class Licenses {
         $table_order_itemmeta = $wpdb->prefix . 'woocommerce_order_itemmeta';
         $table_order_items    = $wpdb->prefix . 'woocommerce_order_items';
 
-        $itemmetaQuery  = " SELECT `{$table_order_itemmeta}`.`order_item_id` FROM `{$table_order_itemmeta}` ";
-        $itemmetaQuery .= " WHERE `meta_key` = '_product_id' AND `meta_value` = {$product_id} ";
+        $itemmetaQuery = $wpdb->prepare(
+            "SELECT `{$table_order_itemmeta}`.`order_item_id` FROM `{$table_order_itemmeta}`
+             WHERE `meta_key` = '_product_id' AND `meta_value` = %d",
+            intval( $product_id )
+        );
 
-        $itemsQuery   = " SELECT SQL_CALC_FOUND_ROWS postmeta.meta_value AS license_key from {$table_order_items} AS order_items ";
-        $itemsQuery  .= " LEFT JOIN {$wpdb->posts} AS posts ON order_items.order_id = posts.ID ";
-        $itemsQuery  .= " LEFT JOIN {$wpdb->postmeta} AS postmeta ON posts.ID = postmeta.post_id ";
-        $itemsQuery  .= " WHERE `order_item_id` IN ( {$itemmetaQuery} ) ";
-        $itemsQuery  .= " AND posts.post_status = 'wc-completed' ";
-        $itemsQuery  .= " AND postmeta.meta_key LIKE '%_api_license_key_%' ";
-        $itemsQuery  .= " ORDER BY order_items.order_id ASC LIMIT {$per_page} OFFSET {$offset} ";
+        $itemsQuery = $wpdb->prepare(
+            "SELECT SQL_CALC_FOUND_ROWS postmeta.meta_value AS license_key
+             FROM {$table_order_items} AS order_items
+             LEFT JOIN {$wpdb->posts} AS posts ON order_items.order_id = posts.ID
+             LEFT JOIN {$wpdb->postmeta} AS postmeta ON posts.ID = postmeta.post_id
+             WHERE `order_item_id` IN ( {$itemmetaQuery} )
+             AND posts.post_status = 'wc-completed'
+             AND postmeta.meta_key LIKE %s
+             ORDER BY order_items.order_id ASC LIMIT %d OFFSET %d",
+            '%_api_license_key_%',
+            intval( $per_page ),
+            intval( $offset )
+        );
 
         $results     = $wpdb->get_col( $itemsQuery, 0 );
         $total_items = $wpdb->get_var( 'SELECT FOUND_ROWS()' );
@@ -101,9 +110,11 @@ class Licenses {
         if ( empty( $license_data ) ) {
             $meta_key = $wpdb->get_blog_prefix() . WC_AM_HELPERS()->user_meta_key_orders;
 
-            $query = "SELECT meta_value FROM {$wpdb->usermeta} WHERE meta_key = '{$meta_key}' ";
-            $query .= " AND meta_value LIKE '%{$license_key}%' ";
-
+            $query = $wpdb->prepare(
+                "SELECT meta_value FROM {$wpdb->usermeta} WHERE meta_key = %s AND meta_value LIKE %s",
+                $meta_key,
+                '%' . $wpdb->esc_like( $license_key ) . '%'
+            );
             $license_data = $wpdb->get_var( $query );
             $license_data = maybe_unserialize( $license_data );
         }
