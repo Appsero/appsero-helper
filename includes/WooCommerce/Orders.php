@@ -62,12 +62,14 @@ class Orders {
         $orders_statuses = array_keys( wc_get_order_statuses() );
         $status_placeholders = implode( ', ', array_fill( 0, count( $orders_statuses ), '%s' ) );
 
-        $params = [
-            intval( $limit ),
-            intval( $offset ),
-            intval( $this->product_id ),
-        ];
-        $params = array_merge( $params, $orders_statuses );
+        $params = array_merge(
+            $orders_statuses,
+            [
+                intval( $this->product_id ),
+                intval( $limit ),
+                intval( $offset ),
+            ]
+        );
 
         if ( ! empty( $after ) ) {
             $query = $wpdb->prepare(
@@ -83,7 +85,15 @@ class Orders {
                  AND woim.meta_key = '_product_id'
                  AND woim.meta_value = %d
                  ORDER BY woi.order_item_id ASC LIMIT %d OFFSET %d",
-                array_merge( [ $after ], $params )
+                array_merge(
+                $orders_statuses,
+                [
+                    $after,
+                    intval( $this->product_id ),
+                    intval( $limit ),
+                    intval( $offset ),
+                ]
+            )
             );
         } else {
             $query = $wpdb->prepare(
