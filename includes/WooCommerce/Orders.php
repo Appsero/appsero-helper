@@ -60,24 +60,47 @@ class Orders {
     private function get_orders_ids( $limit, $offset, $after = 0 ) {
         global $wpdb;
         $orders_statuses = array_keys( wc_get_order_statuses() );
-        $orders_statuses = implode( "', '", $orders_statuses );
+        $status_placeholders = implode( ', ', array_fill( 0, count( $orders_statuses ), '%s' ) );
 
-        $query = "SELECT SQL_CALC_FOUND_ROWS DISTINCT woi.order_id
-            FROM {$wpdb->prefix}woocommerce_order_itemmeta as woim,
-                 {$wpdb->prefix}woocommerce_order_items as woi,
-                 {$wpdb->prefix}posts as p
-            WHERE woi.order_item_id = woim.order_item_id
-            AND woi.order_id = p.ID
-            AND p.post_status IN ( '{$orders_statuses}' )
-            AND p.post_type = 'shop_order' ";
+        $params = [
+            intval( $limit ),
+            intval( $offset ),
+            intval( $this->product_id ),
+        ];
+        $params = array_merge( $params, $orders_statuses );
 
-        if ( !empty($after) ) {
-            $query .= " AND p.post_modified_gmt >= '{$after}' ";
+        if ( ! empty( $after ) ) {
+            $query = $wpdb->prepare(
+                "SELECT SQL_CALC_FOUND_ROWS DISTINCT woi.order_id
+                 FROM {$wpdb->prefix}woocommerce_order_itemmeta as woim,
+                      {$wpdb->prefix}woocommerce_order_items as woi,
+                      {$wpdb->prefix}posts as p
+                 WHERE woi.order_item_id = woim.order_item_id
+                 AND woi.order_id = p.ID
+                 AND p.post_status IN ( {$status_placeholders} )
+                 AND p.post_type = 'shop_order'
+                 AND p.post_modified_gmt >= %s
+                 AND woim.meta_key = '_product_id'
+                 AND woim.meta_value = %d
+                 ORDER BY woi.order_item_id ASC LIMIT %d OFFSET %d",
+                array_merge( [ $after ], $params )
+            );
+        } else {
+            $query = $wpdb->prepare(
+                "SELECT SQL_CALC_FOUND_ROWS DISTINCT woi.order_id
+                 FROM {$wpdb->prefix}woocommerce_order_itemmeta as woim,
+                      {$wpdb->prefix}woocommerce_order_items as woi,
+                      {$wpdb->prefix}posts as p
+                 WHERE woi.order_item_id = woim.order_item_id
+                 AND woi.order_id = p.ID
+                 AND p.post_status IN ( {$status_placeholders} )
+                 AND p.post_type = 'shop_order'
+                 AND woim.meta_key = '_product_id'
+                 AND woim.meta_value = %d
+                 ORDER BY woi.order_item_id ASC LIMIT %d OFFSET %d",
+                $params
+            );
         }
-
-        $query .= " AND woim.meta_key = '_product_id'
-            AND woim.meta_value = '{$this->product_id}'
-            ORDER BY woi.order_item_id ASC LIMIT {$limit} OFFSET {$offset}";
 
         $orders_ids = $wpdb->get_col( $query );
         $count = $wpdb->get_var('SELECT FOUND_ROWS()');
@@ -185,14 +208,19 @@ class Orders {
      */
     private function get_order_type( $order_id, $subscription_id ) {
         global $wpdb;
-        $query = "SELECT * FROM $wpdb->postmeta WHERE post_id = {$order_id}
-                  AND (
-                    meta_key = '_subscription_renewal'
-                    OR meta_key = '_subscription_resubscribe'
-                    OR meta_key = '_subscription_switch'
-                  )
-                  AND meta_value = {$subscription_id}
-                  LIMIT 1";
+        $query = $wpdb->prepare(
+            "SELECT * FROM {$wpdb->postmeta}
+             WHERE post_id = %d
+             AND (
+                 meta_key = '_subscription_renewal'
+                 OR meta_key = '_subscription_resubscribe'
+                 OR meta_key = '_subscription_switch'
+             )
+             AND meta_value = %d
+             LIMIT 1",
+            intval( $order_id ),
+            intval( $subscription_id )
+        );
         $result = $wpdb->get_row( $query, ARRAY_A );
 
         if ( empty( $result ) ) {

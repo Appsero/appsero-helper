@@ -23,9 +23,12 @@ class Subscriptions {
 
         global $wpdb;
         $table_name  = $wpdb->prefix . 'edd_subscriptions';
-        $query = $wpdb->prepare( "SELECT SQL_CALC_FOUND_ROWS `id` FROM {$table_name} WHERE
-                                `product_id` = {$product_id} ORDER BY `id` ASC LIMIT %d OFFSET %d;",
-                                absint( $per_page ), absint( $offset ) );
+        $query = $wpdb->prepare(
+            "SELECT SQL_CALC_FOUND_ROWS `id` FROM {$table_name} WHERE `product_id` = %d ORDER BY `id` ASC LIMIT %d OFFSET %d",
+            absint( $product_id ),
+            absint( $per_page ),
+            absint( $offset )
+        );
 
         $items = $wpdb->get_col( $query );
         $total_items = $wpdb->get_var( 'SELECT FOUND_ROWS()' );
@@ -75,10 +78,14 @@ class Subscriptions {
     private function get_last_ordered_date( $subscription ) {
         global $wpdb;
 
-        $query = "SELECT post_date_gmt FROM {$wpdb->posts} WHERE `post_parent` = {$subscription->parent_payment_id}
-                  AND `ID` IN ( SELECT `post_id` FROM {$wpdb->postmeta} WHERE `meta_key` = 'subscription_id'
-                  AND meta_value = {$subscription->id} ) AND `post_type` = 'edd_payment'
-                  ORDER BY `ID` DESC LIMIT 1;";
+        $query = $wpdb->prepare(
+            "SELECT post_date_gmt FROM {$wpdb->posts} WHERE `post_parent` = %d
+             AND `ID` IN ( SELECT `post_id` FROM {$wpdb->postmeta} WHERE `meta_key` = 'subscription_id'
+             AND meta_value = %d ) AND `post_type` = 'edd_payment'
+             ORDER BY `ID` DESC LIMIT 1",
+            intval( $subscription->parent_payment_id ),
+            intval( $subscription->id )
+        );
         $last_renewal_date = $wpdb->get_var( $query );
 
         if ( empty( $last_renewal_date ) ) {

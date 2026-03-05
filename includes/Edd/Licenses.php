@@ -30,9 +30,13 @@ class Licenses {
 
         // `edd_software_licensing()->licenses_db->get_licenses()` not fulfill my need
         global $wpdb;
-        $query       = "SELECT SQL_CALC_FOUND_ROWS id FROM {$wpdb->prefix}edd_licenses WHERE download_id = {$download_id} ";
-        $query      .= " ORDER BY id ASC LIMIT {$per_page} OFFSET {$offset}";
-        $results     = $wpdb->get_col( $query, 0 );
+        $query   = $wpdb->prepare(
+            "SELECT SQL_CALC_FOUND_ROWS id FROM {$wpdb->prefix}edd_licenses WHERE download_id = %d ORDER BY id ASC LIMIT %d OFFSET %d",
+            absint( $download_id ),
+            absint( $per_page ),
+            absint( $offset )
+        );
+        $results = $wpdb->get_col( $query, 0 );
         $total_items = $wpdb->get_var( 'SELECT FOUND_ROWS()' );
 
         $licenses = [];
