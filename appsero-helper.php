@@ -232,6 +232,9 @@ final class Appsero_Helper {
 
         new Appsero\Helper\Common\Filter_Hook();
 
+        // Include Webhook classes
+        $this->webhook_includes();
+
         // Include AffiliateWP classes
         $this->affiliate_wp_includes();
     }
@@ -273,6 +276,18 @@ final class Appsero_Helper {
         }
 
         return false;
+    }
+
+    /**
+     * Load Webhook classes
+     */
+    private function webhook_includes() {
+        require_once __DIR__ . '/includes/Webhooks/Repository.php';
+        require_once __DIR__ . '/includes/Webhooks/Dispatcher.php';
+        require_once __DIR__ . '/includes/Webhooks/EventListener.php';
+        require_once __DIR__ . '/includes/Webhooks/WebhooksPage.php';
+
+        new Appsero\Helper\Webhooks\EventListener();
     }
 
     /**

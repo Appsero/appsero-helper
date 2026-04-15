@@ -80,6 +80,9 @@ class SettingsPage {
             $this->save_settings_fields( $_POST );
         }
 
+        $webhooks_page = new \Appsero\Helper\Webhooks\WebhooksPage();
+        $webhooks_page->handle_post();
+
         $token = isset( $this->connection['token'] ) ? $this->connection['token'] : '';
         $button_class = '';
 
@@ -277,6 +280,8 @@ class SettingsPage {
                 </form>
 
             </div>
+
+            <?php $webhooks_page->render(); ?>
         </div>
 
         <?php

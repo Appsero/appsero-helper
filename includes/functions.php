@@ -347,6 +347,10 @@ function appsero_create_customer( $email, $first_name, $last_name ) {
 
     $user_id = wp_insert_user( $userdata );
 
+    if ( ! is_wp_error( $user_id ) ) {
+        do_action( 'appsero_user_created', $user_id, $userdata );
+    }
+
     wp_send_new_user_notifications( $user_id, 'user' );
 
     return $user_id;
