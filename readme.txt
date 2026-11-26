@@ -3,8 +3,8 @@ Contributors: tareq1988, wedevs, nizamuddinbabu
 Donate link: https://tareq.co/donate/
 Tags: licensing, release, analytics, deactivation
 Requires at least: 4.0
-Tested up to: 6.9
-Stable tag: 1.3.5
+Tested up to: 7.1
+Stable tag: 1.3.6
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -117,11 +117,18 @@ for WordPress Plugins and Themes.
 
 It has both free and premium services which you can avail by [registering](https://appsero.com) an account.
 
+= Where do I report security bugs found in this plugin? =
+
+Please report security bugs found in the source code of the Appsero Helper plugin through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/9e5fbd33-87d9-44a0-b714-29f37652b7da). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
 
 == Screenshots ==
 
 
 == Changelog ==
+
+= 1.3.6 - (26th November, 2026) =
+- **Fix:** Restricted the "Create / View on Appsero" order action to administrators and added nonce verification.
+- **Fix:** The store connection token is no longer printed in the order page HTML.
 
 = 1.3.5 - (5th March, 2026) =
 - **Fix:** Improve SQL query preparation for better security and performance.
