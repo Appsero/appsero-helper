@@ -122,11 +122,11 @@ class Ajax_Requsts {
     /**
      * Sync the order to Appsero if needed and redirect the admin to it.
      *
-     * The redirect carries the store connection token, so only store managers
+     * The redirect carries the store connection token, so only site admins
      * may reach it, and only from the order screen (nonce bound to the order).
      */
     public function create_in_appsero_for_view() {
-        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+        if ( ! current_user_can( 'manage_options' ) ) {
             wp_die( esc_html__( 'You are not allowed to view this order on Appsero.', 'appsero-helper' ), 403 );
         }
 

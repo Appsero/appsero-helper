@@ -29,7 +29,7 @@ class MetaBox {
             return null;
         }
 
-        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+        if ( ! current_user_can( 'manage_options' ) ) {
             return null;
         }
 
