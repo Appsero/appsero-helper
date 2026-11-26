@@ -120,28 +120,46 @@ class Ajax_Requsts {
     }
 
     /**
-     * Create order in Appsero
+     * Sync the order to Appsero if needed and redirect the admin to it.
+     *
+     * The redirect carries the store connection token, so only store managers
+     * may reach it, and only from the order screen (nonce bound to the order).
      */
     public function create_in_appsero_for_view() {
-
-        if ( ! isset( $_GET['order_id'], $_GET['product_id'] ) ) {
-            wp_die( 'No order found.' );
+        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+            wp_die( esc_html__( 'You are not allowed to view this order on Appsero.', 'appsero-helper' ), 403 );
         }
 
-        $order = wc_get_order( $_GET['order_id'] );
+        $order_id   = isset( $_GET['order_id'] ) ? absint( $_GET['order_id'] ) : 0;
+        $product_id = isset( $_GET['product_id'] ) ? absint( $_GET['product_id'] ) : 0;
+
+        if ( ! $order_id || ! $product_id ) {
+            wp_die( esc_html__( 'No order found.', 'appsero-helper' ), 400 );
+        }
+
+        check_admin_referer( 'appsero-view-order-' . $order_id );
+
+        $order = wc_get_order( $order_id );
 
         if ( ! is_a( $order, 'WC_Abstract_Order' ) ) {
-            wp_die( 'Could not find any order associated with your given order ID.' );
+            wp_die( esc_html__( 'Could not find any order associated with your given order ID.', 'appsero-helper' ), 404 );
         }
 
-        $request = new \Appsero\Helper\WooCommerce\SendRequests();
+        $license = get_post_meta( $order->get_id(), '_appsero_order_license_for_product_' . $product_id, true );
 
-        // Update order on Appsero
-        $request->order_status_changed( $order->get_id(), null, null, $order );
+        // Order not on Appsero yet, send it first
+        if ( ! isset( $license['source_id'] ) ) {
+            $request = new \Appsero\Helper\WooCommerce\SendRequests();
+            $request->order_status_changed( $order->get_id(), null, null, $order );
+        }
 
-        $url     = get_appsero_api_url();
-        $api_key = appsero_helper_connection_token();
-        $url     = sprintf( '%spublic/view-orders/%d/products/%d?store_token=%s', $url, $order->get_id(), $_GET['product_id'], $api_key );
+        $url = sprintf(
+            '%spublic/view-orders/%d/products/%d?store_token=%s',
+            get_appsero_api_url(),
+            $order->get_id(),
+            $product_id,
+            rawurlencode( appsero_helper_connection_token() )
+        );
 
         wp_redirect( $url );
         exit;
