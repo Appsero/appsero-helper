@@ -29,9 +29,11 @@ class MetaBox {
             return null;
         }
 
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return null;
+        }
+
         $connected = get_option( 'appsero_connected_products', [] );
-        $url       = get_appsero_api_url();
-        $api_key   = appsero_helper_connection_token();
 
         $this->load_styles();
 
@@ -40,7 +42,7 @@ class MetaBox {
 
             // Check the product is connected with appsero
             if ( in_array( $product_id, $connected ) ) {
-                $this->show_button( $order, $product_id, $url, $api_key );
+                $this->show_button( $order, $product_id );
             }
         }
     }
@@ -87,16 +89,15 @@ class MetaBox {
     /**
      * Show the button
      */
-    private function show_button( $order, $product_id, $api_url, $api_key ) {
+    private function show_button( $order, $product_id ) {
         $license = get_post_meta( $order->get_id(), '_appsero_order_license_for_product_' . $product_id, true );
+        $label   = isset( $license['source_id'] ) ? 'View on Appsero' : 'Create in Appsero';
 
-        if ( isset( $license['source_id'] ) ) {
-            $label = 'View on Appsero';
-            $url   = sprintf( '%spublic/view-orders/%d/products/%d?store_token=%s', $api_url, $order->get_id(), $product_id, $api_key );
-        } else {
-            $label = 'Create in Appsero';
-            $url   = admin_url( sprintf( 'admin-ajax.php?action=create_in_appsero_for_view&order_id=%s&product_id=%s', $order->get_id(), $product_id ) );
-        }
+        // Go through admin-ajax so the store token never lands in the page HTML
+        $url = wp_nonce_url(
+            admin_url( sprintf( 'admin-ajax.php?action=create_in_appsero_for_view&order_id=%d&product_id=%d', $order->get_id(), $product_id ) ),
+            'appsero-view-order-' . $order->get_id()
+        );
 
         $html = '<div class="view-on-appsero-button-left">';
         $html .= '<img src="' . ASHP_ROOT_URL . 'assets/images/appsero-icon.png">';
